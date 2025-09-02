@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Topbar from "../../components/Topbar/Topbar";
 import {
-  useCandiateActions,
+  useCandidateActions,
   useCandidateStore,
 } from "../../store/useCandidateStore";
 import Table from "../../components/Table";
@@ -22,14 +22,16 @@ const columns = [
 
 export default function Candidates() {
   const { candidates, pagination, isLoading } = useCandidateStore();
-  const { getAllCandidates } = useCandiateActions();
+  const { getAllCandidates } = useCandidateActions();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
 
   useEffect(() => {
     // Load saved search params from localStorage, or set default perPage to 10
-    const savedParams = JSON.parse(localStorage.getItem("searchParams"));
+    const savedParams: Record<string, string> = JSON.parse(
+      localStorage.getItem("searchParams") || "{}"
+    );
 
     console.log(savedParams);
 
@@ -60,7 +62,7 @@ export default function Candidates() {
     return () => localStorage.setItem("searchParams", JSON.stringify(params));
   }, [searchParams, getAllCandidates]);
 
-  const handleApplyFilters = (filters) => {
+  const handleApplyFilters = (filters: Record<string, string>) => {
     setSearchParams((prevParams) => {
       const newParams = new URLSearchParams(prevParams);
       Object.keys(filters).forEach((key) => {
@@ -84,11 +86,11 @@ export default function Candidates() {
 
             <div className=" flex gap-2 relative">
               <SearchInput />
-              <Button
+              {/* <Button
                 text="Filter"
                 className="bg-primary p-2 rounded-lg text-white"
                 onClick={() => setIsFilterModalOpen(true)}
-              />
+              /> */}
               <FilterModal
                 isOpen={isFilterModalOpen}
                 onClose={() => setIsFilterModalOpen(false)}

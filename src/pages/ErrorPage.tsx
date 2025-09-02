@@ -2,7 +2,11 @@ import React from "react";
 import { useRouteError, Link } from "react-router-dom";
 
 export default function ErrorPage() {
-  const error = useRouteError();
+  const error = useRouteError() as {
+    status?: number;
+    statusText?: string;
+    message?: string;
+  };
 
   return (
     <div className="h-screen flex flex-col items-center justify-center text-center">

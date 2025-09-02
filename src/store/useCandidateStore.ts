@@ -3,8 +3,44 @@ import { handleError } from "../utils/handleError";
 import axiosInstance from "../utils/axios.config";
 import { toast } from "sonner";
 
-const actions = (set) => ({
-  getAllCandidates: async (query) => {
+// Types
+interface Candidate {
+  staffId?: string;
+  name?: string;
+  [key: string]: any;
+}
+
+interface Pagination {
+  currentPage: number;
+  totalPages: number;
+  totalCount: number;
+  filteredCount: number;
+  perPage: number;
+}
+
+interface CandidateState {
+  candidates: Candidate[];
+  candidate: Candidate | {};
+  credentails: any[];
+  documents: any[];
+  pagination: Pagination;
+  status: any;
+  verificationInfo: any;
+  isLoading: boolean;
+  isSubmitting: boolean;
+  searchParams: Record<string, any>;
+  actions: CandidateActions;
+}
+
+interface CandidateActions {
+  getAllCandidates: (query?: Record<string, any>) => Promise<void>;
+  getCandidate: (staffId: string, update?: boolean) => Promise<void>;
+  verifyCandidateGuarantor: (staffId: string, data: any) => Promise<void>;
+  setSearchParams: (params: Record<string, any>) => void;
+}
+
+const actions = (set: any): CandidateActions => ({
+  getAllCandidates: async (query?: Record<string, any>) => {
     set({ isLoading: true });
     try {
       const response = await axiosInstance.get("/candidates", {
@@ -14,18 +50,18 @@ const actions = (set) => ({
 
       console.log(data);
 
-      set((state) => ({
+      set((state: CandidateState) => ({
         candidates: data?.candidates,
         pagination: data?.pagination,
         isLoading: false,
       }));
-    } catch (error) {
+    } catch (error: any) {
       handleError(error);
     } finally {
       set({ isLoading: false });
     }
   },
-  getCandidate: async (staffId, update = false) => {
+  getCandidate: async (staffId: string, update: boolean = false) => {
     set({ isLoading: true });
     try {
       const response = await axiosInstance.get(
@@ -33,9 +69,7 @@ const actions = (set) => ({
       );
       const data = response?.data?.data;
 
-      // console.log(data);
-
-      set((state) => ({
+      set((state: CandidateState) => ({
         candidate: data?.candidate,
         status: data?.status,
         verificationInfo: data?.verification_info,
@@ -43,13 +77,13 @@ const actions = (set) => ({
         documents: data?.documents,
         isLoading: false,
       }));
-    } catch (error) {
+    } catch (error: any) {
       handleError(error);
     } finally {
       set({ isLoading: false });
     }
   },
-  verifyCandidateGuarantor: async (staffId, data) => {
+  verifyCandidateGuarantor: async (staffId: string, data: any) => {
     set({ isSubmitting: true });
     try {
       const response = await axiosInstance.post(
@@ -59,16 +93,17 @@ const actions = (set) => ({
       console.log(response?.data);
       toast.success(response?.data?.message);
       await actions(set).getCandidate(staffId);
-    } catch (error) {
+    } catch (error: any) {
       handleError(error);
     } finally {
       set({ isSubmitting: false });
     }
   },
-  setSearchParams: (params) => set({ searchParams: params }),
+  setSearchParams: (params: Record<string, any>) =>
+    set({ searchParams: params }),
 });
 
-export const useCandidateStore = create((set) => {
+export const useCandidateStore = create<CandidateState>((set) => {
   return {
     candidates: [],
     candidate: {},
@@ -85,10 +120,10 @@ export const useCandidateStore = create((set) => {
     verificationInfo: {},
     isLoading: false,
     isSubmitting: false,
-    searchParams: {}, // Add searchParams to store the current search parameters
+    searchParams: {},
     actions: actions(set),
   };
 });
 
-export const useCandiateActions = () =>
+export const useCandidateActions = (): CandidateActions =>
   useCandidateStore((state) => state.actions);

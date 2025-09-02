@@ -2,25 +2,6 @@ import { configureStore } from "@reduxjs/toolkit";
 import storage from "redux-persist/lib/storage";
 import { combineReducers } from "redux";
 import { persistReducer, persistStore } from "redux-persist";
-// import { counterSlice } from "./slice/counterSlice";
-// import { Auth } from "./AuthSlice";
-
-// import Auth from "./Auth";
-// import AuthenticationSlice from "./AuthenticationSlice";
-// import groupSlice from "./groupSlice";
-// import ProfileSlice from "./ProfileSlice";
-// import { walletApi } from "./WalletApi";
-// import { orderApi, groupOrderApi } from "./orderApi";
-// import { passwordResetApi } from "./PasswordResetApi";
-// import { categoryApi } from "./categoryApi";
-// import { groupApi } from "./groupApi";
-// import { userApi } from "./userApi";
-// import ProductSlice from "./ProductSlice";
-// import OrderSlice from "./OrderSlice";
-// import AdminRecipteSLice from "./AdminRecipteSLice";
-
-// AuthSlice
-
 import AuthSlice from "./AuthSlice";
 import estateSlice from "./estateSlice";
 
@@ -42,10 +23,12 @@ const persistConfig = {
   blacklist: [],
 };
 
-const rootReducer = (state, action) => {
+type StateType = ReturnType<typeof reducers>;
+
+const rootReducer = (state: StateType | undefined, action: any): StateType => {
   if (action.type === "RESET") {
     storage.removeItem("persist:root");
-    state = {};
+    state = undefined;
   }
   return reducers(state, action);
 };
@@ -79,3 +62,6 @@ export const store = configureStore({
 });
 
 export const persistor = persistStore(store);
+
+// RootState type for use in selectors
+export type RootState = ReturnType<typeof store.getState>;

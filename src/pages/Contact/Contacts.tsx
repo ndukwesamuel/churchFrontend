@@ -1,7 +1,12 @@
 import React, { useState } from "react";
 import { FiMail, FiPhone, FiEdit2, FiTrash } from "react-icons/fi";
 import { AiOutlineUser } from "react-icons/ai";
-// import AddContactModal from "./AddContactModal";
+import { IoClose } from "react-icons/io5";
+import { useFetchData } from "../../hook/Request";
+
+interface AddContactModalProps {
+  onClose: () => void;
+}
 
 export default function Contacts() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -10,9 +15,9 @@ export default function Contacts() {
     "profilesetting" // Changed query key for clarity
   );
 
-  console.log({
-    cccc: settingApiData?.data?.user?.groups,
-  });
+  // console.log({
+  //   cccc: settingApiData?.data?.user?.groups,
+  // });
 
   const contacts = [
     {
@@ -127,19 +132,15 @@ export default function Contacts() {
   );
 }
 
-// import React from "react";
-import { IoClose } from "react-icons/io5";
-import { useFetchData } from "../../hook/Request";
+function AddContactModal({ onClose }: AddContactModalProps) {
+  const {
+    data: settingApiData = { user: { groups: [] } },
+    refetch: refetchIncomeData = () => {},
+  } = useFetchData(`/api/v1/setting`, "profilesetting") as {
+    data?: { user?: { groups?: any[] } };
+    refetch?: () => void;
+  };
 
-function AddContactModal({ onClose }) {
-  const { data: settingApiData, refetch: refetchIncomeData } = useFetchData(
-    `/api/v1/setting`,
-    "profilesetting" // Changed query key for clarity
-  );
-
-  console.log({
-    cccc: settingApiData?.data?.user?.groups,
-  });
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-end z-50">
       <div className="bg-white w-full sm:w-[400px] h-full p-6 overflow-y-auto shadow-lg">
@@ -202,9 +203,11 @@ function AddContactModal({ onClose }) {
           <div>
             <label className="block text-sm text-gray-700">Group</label>
             <select className="w-full border rounded-md px-3 py-2">
-              {settingApiData?.data?.user?.groups?.map((group, index) => (
-                <option key={group?._id}>{group?.name}</option>
-              ))}
+              {settingApiData?.user?.groups?.map(
+                (group: any, index: number) => (
+                  <option key={group?._id}>{group?.name}</option>
+                )
+              )}
             </select>
           </div>
 

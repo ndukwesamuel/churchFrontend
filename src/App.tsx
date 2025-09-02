@@ -1,16 +1,13 @@
-import "./App.css";
+import "./index.css";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Login from "./pages/Login/Login";
 import RootLayout from "./layouts/RootLayout";
 import { Toaster } from "sonner";
-import Candidates from "./pages/Candidates/Candidates";
 import FieldOfficers from "./pages/FieldOfficers/FieldOfficers";
-import CandidateDetail from "./pages/CandidateDetail/CandidateDetail";
 import RouteGuard from "./utils/RouteGuard";
 import Dashboard from "./pages/UserDashboard/Dashboard";
 import ErrorPage from "./pages/ErrorPage";
 import Contacts from "./pages/Contact/Contacts";
-// import ErrorPage from "./pages/ErrorPage"; // 👈 create this page
 
 const router = createBrowserRouter([
   {

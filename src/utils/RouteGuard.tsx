@@ -3,12 +3,13 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { useAuthActions, useAuthStore } from "../store/useAuthStore";
 import Loader from "../components/Loader";
 import { useSelector } from "react-redux";
+import type { RootState } from "../redux/store";
 
 export default function RouteGuard() {
   const { user, isValidating } = useAuthStore();
   const { getUser } = useAuthActions();
 
-  const selectedEstate = useSelector((state) => state?.reducer);
+  const selectedEstate = useSelector((state: RootState) => state?.reducer);
 
   // console.log({});
 
@@ -16,7 +17,8 @@ export default function RouteGuard() {
 
   useEffect(() => {
     getUser(navigate);
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [getUser, navigate]);
 
   if (isValidating) {
     return (
