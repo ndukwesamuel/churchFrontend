@@ -6,6 +6,9 @@ export default {
       colors: {
         primary: "#1710E1",
         secondary: "#02052F",
+        textColor: "#3D4C5E",
+        lightGray: "#F5F7F9",
+        vividBlue: "#5B38DB",
       },
       keyframes: {
         shake: {

@@ -11,7 +11,7 @@ import Dashboard from "./pages/UserDashboard/Dashboard";
 import ErrorPage from "./pages/ErrorPage";
 import Contacts from "./pages/Contact/Contacts";
 // import ErrorPage from "./pages/ErrorPage"; // 👈 create this page
-
+import TemplateManager from "./pages/Template/template";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -48,10 +48,10 @@ const router = createBrowserRouter([
           //   path: "/campaigns",
           //   element: <Campaigns />, // Create this component
           // },
-          // {
-          //   path: "/templates",
-          //   element: <Templates />, // Create this component
-          // },
+          {
+            path: "/templates",
+            element: <TemplateManager />,
+          },
           // {
           //   path: "/files",
           //   element: <Files />, // Create this component
