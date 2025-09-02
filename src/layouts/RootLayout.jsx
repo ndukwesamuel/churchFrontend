@@ -11,11 +11,5 @@ export default function RootLayout() {
         <Outlet />
       </div>
     </div>
-
-    // <div className="flex min-h-dvh  p-4 bg-sky-50 gap-4">
-    //   <div className="w-2/5 max-w-fit bg-white border border-gray-200 rounded-lg p-3 max-h-dvh">
-    //   </div>
-
-    // </div>
   );
 }

@@ -3,9 +3,9 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Login from "./pages/Login/Login";
 import RootLayout from "./layouts/RootLayout";
 import { Toaster } from "sonner";
-import Candidates from "./pages/Candidates/Candidates";
+// import Candidates from "./pages/Candidates/Candidates";
 import FieldOfficers from "./pages/FieldOfficers/FieldOfficers";
-import CandidateDetail from "./pages/CandidateDetail/CandidateDetail";
+// import CandidateDetail from "./pages/CandidateDetail/CandidateDetail";
 import RouteGuard from "./utils/RouteGuard";
 import Dashboard from "./pages/UserDashboard/Dashboard";
 import ErrorPage from "./pages/ErrorPage";
@@ -23,6 +23,7 @@ const router = createBrowserRouter([
     element: <Login />,
     errorElement: <ErrorPage />,
   },
+
   {
     element: <RouteGuard />,
     errorElement: <ErrorPage />,
@@ -38,11 +39,39 @@ const router = createBrowserRouter([
             path: "/contacts",
             element: <Contacts />,
           },
+          // Add these new routes
+          // {
+          //   path: "/compose",
+          //   element: <Compose />, // Create this component
+          // },
+          // {
+          //   path: "/campaigns",
+          //   element: <Campaigns />, // Create this component
+          // },
+          // {
+          //   path: "/templates",
+          //   element: <Templates />, // Create this component
+          // },
+          // {
+          //   path: "/files",
+          //   element: <Files />, // Create this component
+          // },
+          // {
+          //   path: "/settings",
+          //   element: <Settings />, // Create this component
+          // },
+          // {
+          //   path: "/customers/all",
+          //   element: <AllCustomers />, // Create this component
+          // },
+          // {
+          //   path: "/customers/active",
+          //   element: <ActiveMembers />, // Create this component
+          // },
           {
             path: "/field-officers",
             element: <FieldOfficers />,
           },
-          // 👇 catch-all for 404s inside protected area
           {
             path: "*",
             element: <ErrorPage />,
