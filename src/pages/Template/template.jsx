@@ -1,25 +1,14 @@
-import React, { useState } from "react";
-import {
-  Search,
-  Plus,
-  Eye,
-  Edit,
-  Copy,
-  Trash2,
-  ChevronDown,
-  Megaphone,
-  Mail,
-  Calendar,
-  Heart,
-  Users,
-} from "lucide-react";
+import { useState } from "react";
+import { Plus, Megaphone, Mail, Calendar, Heart, Users } from "lucide-react";
+import { SearchAndFilters } from "./_components/searchAndFilters";
+import { CategoryStats } from "./_components/categoryStats";
+import { TemplateCard } from "./_components/templateCard";
 
 const TemplateManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [channelFilter, setChannelFilter] = useState("all channel");
   const [categoryFilter, setCategoryFilter] = useState("All categories");
 
-  // Sample template data
   const templates = [
     {
       id: 1,
@@ -103,180 +92,63 @@ const TemplateManager = () => {
   });
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="p-3 sm:p-6 max-w-7xl mx-auto">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
           Template Manager
         </h1>
-        <p className="text-gray-600">
+        <p className="text-sm sm:text-base text-gray-600">
           Create and manage message templates for SMS, Email, and WhatsApp
         </p>
       </div>
 
-      {/* Category Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {categoryStats.map((category, index) => {
-          const IconComponent = category.icon;
-          return (
-            <div
-              key={index}
-              className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow"
-            >
-              <div className="flex items-center gap-3">
-                <div className="flex-shrink-0 bg-lightGray p-2 rounded-md border border-gray-300">
-                  <IconComponent className="w-4 h-4 text-textColor" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">
-                    {category.name}
-                  </h3>
-                  <p className="text-sm text-gray-500">
-                    {category.count} templates
-                  </p>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      {/* Category Stats */}
+      <CategoryStats categoryStats={categoryStats} />
 
       {/* Message Templates Section */}
       <div className="mb-6">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
               Message Templates
             </h2>
-            <p className="text-gray-600">Manage your communication templates</p>
+            <p className="text-sm sm:text-base text-gray-600">
+              Manage your communication templates
+            </p>
           </div>
-          <button className="bg-purple-700  text-white px-4 py-2 rounded-full flex items-center gap-2 hover:bg-purple-600 transition-colors">
+          <button className="bg-purple-700 text-white px-4 py-2 rounded-full flex items-center justify-center gap-2 hover:bg-purple-600 transition-colors w-full sm:w-auto">
             <Plus className="w-4 h-4" />
-            Create Template
+            <span>Create Template</span>
           </button>
         </div>
 
         {/* Search and Filters */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <input
-              type="text"
-              placeholder="Search templates..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-
-          <div className="flex gap-2">
-            <div className="relative">
-              <select
-                value={channelFilter}
-                onChange={(e) => setChannelFilter(e.target.value)}
-                className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option>All Channel</option>
-                <option>WhatsApp</option>
-                <option>SMS</option>
-                <option>Email</option>
-              </select>
-              <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
-            </div>
-
-            <div className="relative">
-              <select
-                value={categoryFilter}
-                onChange={(e) => setCategoryFilter(e.target.value)}
-                className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option>All categories</option>
-                <option>Service Announcement</option>
-                <option>Newsletter</option>
-                <option>Event</option>
-                <option>Pastoral Care</option>
-                <option>Members Care</option>
-              </select>
-              <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
-            </div>
-          </div>
-        </div>
+        <SearchAndFilters
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          channelFilter={channelFilter}
+          setChannelFilter={setChannelFilter}
+          categoryFilter={categoryFilter}
+          setCategoryFilter={setCategoryFilter}
+        />
       </div>
 
       {/* Template Cards */}
       <div className="space-y-4">
         {filteredTemplates.map((template) => (
-          <div
+          <TemplateCard
             key={template.id}
-            className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow"
-          >
-            {/* First Line: Title, Channel Badge, Category, Actions */}
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-3 flex-1">
-                <h3 className="font-semibold text-gray-900 text-lg">
-                  {template.title}
-                </h3>
-                <span
-                  className={`px-2 py-1 text-xs font-medium rounded-full ${getChannelBadgeColor(
-                    template.channel
-                  )}`}
-                >
-                  {template.channel}
-                </span>
-                <span className="text-sm text-gray-500">
-                  {template.category}
-                </span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-                  <Eye className="w-4 h-4" />
-                </button>
-                <button className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors">
-                  <Edit className="w-4 h-4" />
-                </button>
-                <button className="p-2 text-gray-400 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors">
-                  <Copy className="w-4 h-4" />
-                </button>
-                <button className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-            {/* Second Line: Usage Stats */}
-            <div className="flex items-center gap-4 mb-3 text-sm text-gray-500">
-              <span>Used {template.usageCount} times</span>
-              <span>•</span>
-              <span>Last used {template.lastUsed}</span>
-            </div>
-
-            {/* Content Snippet */}
-            <div className="mb-3">
-              <p className="text-gray-700 text-sm leading-relaxed">
-                {template.content}
-              </p>
-            </div>
-
-            {/* Variables */}
-            <div className="flex flex-wrap gap-2">
-              {template.variables.map((variable, index) => (
-                <span
-                  key={index}
-                  className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs font-mono"
-                >
-                  {variable}
-                </span>
-              ))}
-            </div>
-          </div>
+            template={template}
+            getChannelBadgeColor={getChannelBadgeColor}
+          />
         ))}
       </div>
 
       {/* Empty State */}
       {filteredTemplates.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-gray-500 text-lg">
+        <div className="text-center py-8 sm:py-12">
+          <p className="text-gray-500 text-base sm:text-lg">
             No templates found matching your criteria.
           </p>
           <p className="text-gray-400 text-sm mt-2">
