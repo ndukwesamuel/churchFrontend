@@ -1,8 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { Church } from "lucide-react";
 
 const initialState = {
   isAuthenticated: false,
   user: null,
+  ChurchProfile: null,
   //   token: null,
 };
 
@@ -19,6 +21,9 @@ const AuthSlice = createSlice({
       state.isAuthenticated = false;
       state.user = null;
       state.token = null;
+    },
+    ChurchProfile: (state, action) => {
+      state.ChurchProfile = action.payload.members;
     },
   },
 });

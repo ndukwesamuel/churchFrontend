@@ -7,10 +7,6 @@ import { useSelector } from "react-redux";
 const apiUrl = "https://churchbackend-r0x2.onrender.com";
 const fetchData = async (url, token) => {
   try {
-    console.log({
-      token,
-    });
-
     const response = await axios.get(`${apiUrl}${url}`, {
       headers: {
         Authorization: `Bearer ${token}`,

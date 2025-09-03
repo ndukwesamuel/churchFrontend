@@ -10,6 +10,7 @@ import RouteGuard from "./utils/RouteGuard";
 import Dashboard from "./pages/UserDashboard/Dashboard";
 import ErrorPage from "./pages/ErrorPage";
 import Contacts from "./pages/Contact/Contacts";
+import SettingsDashboard from "./pages/Setting/SettingsDashboard";
 // import ErrorPage from "./pages/ErrorPage"; // 👈 create this page
 
 const router = createBrowserRouter([
@@ -56,10 +57,10 @@ const router = createBrowserRouter([
           //   path: "/files",
           //   element: <Files />, // Create this component
           // },
-          // {
-          //   path: "/settings",
-          //   element: <Settings />, // Create this component
-          // },
+          {
+            path: "/settings",
+            element: <SettingsDashboard />, // Create this component
+          },
           // {
           //   path: "/customers/all",
           //   element: <AllCustomers />, // Create this component
