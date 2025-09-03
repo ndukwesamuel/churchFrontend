@@ -11,6 +11,7 @@ import Dashboard from "./pages/UserDashboard/Dashboard";
 import ErrorPage from "./pages/ErrorPage";
 import Contacts from "./pages/Contact/Contacts";
 import SettingsDashboard from "./pages/Setting/SettingsDashboard";
+import FileManager from "./pages/FileManager/FileManager";
 // import ErrorPage from "./pages/ErrorPage"; // 👈 create this page
 
 const router = createBrowserRouter([
@@ -53,10 +54,10 @@ const router = createBrowserRouter([
           //   path: "/templates",
           //   element: <Templates />, // Create this component
           // },
-          // {
-          //   path: "/files",
-          //   element: <Files />, // Create this component
-          // },
+          {
+            path: "/files",
+            element: <FileManager />, // Create this component
+          },
           {
             path: "/settings",
             element: <SettingsDashboard />, // Create this component
