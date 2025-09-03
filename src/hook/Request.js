@@ -61,6 +61,68 @@ export const useFetchData = (url, queryKey, options = {}) => {
 };
 
 // Reusable hook for mutations (POST, PUT, DELETE)
+// export const useMutateData = (queryKey, method = "POST") => {
+//   const { user } = useSelector((state) => state?.reducer?.AuthSlice);
+//   const token = user?.data?.token;
+//   const queryClient = useQueryClient();
+
+//   const mutation = useMutation({
+//     mutationFn: ({ url, data }) => mutateData({ url, token, data, method }),
+//     onSuccess: () => {
+//       queryClient.invalidateQueries([queryKey]);
+//     },
+//     onError: (error) => {
+//       throw error?.response;
+//     },
+//   });
+//   return {
+//     ...mutation,
+//     isLoading: mutation.isPending,
+//   };
+// };
+
+// export const useMutateData = (queryKey, method = "POST") => {
+//   const { user } = useSelector((state) => state?.reducer?.AuthSlice);
+//   const token = user?.data?.token;
+//   const queryClient = useQueryClient();
+
+//   const mutation = useMutation({
+//     mutationFn: ({ url, data }) => mutateData({ url, token, data, method }), // 👈 method comes from hook, not from call
+//     onSuccess: () => {
+//       queryClient.invalidateQueries([queryKey]);
+//     },
+//     onError: (error) => {
+//       throw error?.response;
+//     },
+//   });
+//   return {
+//     ...mutation,
+//     isLoading: mutation.isPending,
+//   };
+// };
+
+// export const useMutateData = (queryKey, method = "POST") => {
+//   const { user } = useSelector((state) => state?.reducer?.AuthSlice);
+//   const token = user?.data?.token;
+//   const queryClient = useQueryClient();
+
+//   const mutation = useMutation({
+//     mutationFn: ({ url, data }) => mutateData({ url, token, data, method }), // 👈 method is fixed here
+//     onSuccess: () => {
+//       queryClient.invalidateQueries([queryKey]);
+//     },
+//     onError: (error) => {
+//       throw error?.response;
+//     },
+//   });
+
+//   return {
+//     ...mutation,
+//     isLoading: mutation.isPending,
+//   };
+// };
+
+// leave your existing hook as is
 export const useMutateData = (queryKey, method = "POST") => {
   const { user } = useSelector((state) => state?.reducer?.AuthSlice);
   const token = user?.data?.token;
@@ -75,8 +137,25 @@ export const useMutateData = (queryKey, method = "POST") => {
       throw error?.response;
     },
   });
+
   return {
     ...mutation,
     isLoading: mutation.isPending,
   };
+};
+
+// ✅ new PATCH-only wrapper
+export const usePatchData = (queryKey) => {
+  return useMutateData(queryKey, "PATCH");
+};
+
+export const useDeleteData = (queryKey) => {
+  const { user } = useSelector((state) => state?.reducer?.AuthSlice);
+  const token = user?.data?.token;
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ url }) => mutateData({ url, token, method: "DELETE" }),
+    onSuccess: () => queryClient.invalidateQueries([queryKey]),
+  });
 };
