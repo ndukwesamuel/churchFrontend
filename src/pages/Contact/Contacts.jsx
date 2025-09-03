@@ -4,133 +4,14 @@ import { AiOutlineUser } from "react-icons/ai";
 // import React from "react";
 import { IoClose } from "react-icons/io5";
 import { useFetchData } from "../../hook/Request";
-// import AddContactModal from "./AddContactModal";
-
-// export default function Contacts() {
-//   const [isModalOpen, setIsModalOpen] = useState(false);
-//   const { data: settingApiData, refetch: refetchIncomeData } = useFetchData(
-//     `/api/v1/contacts`,
-//     "contacts" // Changed query key for clarity
-//   );
-
-//   console.log({
-//     fff: settingApiData,
-//   });
-
-//   const contacts = [
-//     {
-//       id: 1,
-//       name: "John Smith",
-//       email: "admin@gracechurch.com",
-//       phone: "+1 (555) 345-7890",
-//       status: "Active",
-//       groups: ["Members", "Youth Ministry"],
-//     },
-//     {
-//       id: 2,
-//       name: "John Smith",
-//       email: "admin@gracechurch.com",
-//       phone: "+1 (555) 345-7890",
-//       status: "Active",
-//       groups: ["Members", "Youth Ministry"],
-//     },
-//   ];
-
-//   return (
-//     <div className="p-6 flex-1">
-//       {/* Header */}
-//       <div className="flex justify-between items-center mb-6">
-//         <div>
-//           <h1 className="text-2xl font-semibold">Contact Management</h1>
-//           <p className="text-gray-500">
-//             Manage your congregation contacts and groups
-//           </p>
-//         </div>
-//         <button
-//           onClick={() => setIsModalOpen(true)}
-//           className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700"
-//         >
-//           + Add Contact
-//         </button>
-//       </div>
-
-//       {/* Stats */}
-//       <div className="grid grid-cols-3 gap-4 mb-6">
-//         <div className="bg-white shadow rounded-lg p-4">
-//           <p className="text-gray-500">Total Contact</p>
-//           <h2 className="text-2xl font-bold">4</h2>
-//         </div>
-//         <div className="bg-white shadow rounded-lg p-4">
-//           <p className="text-gray-500">Active Members</p>
-//           <h2 className="text-2xl font-bold">3</h2>
-//         </div>
-//         <div className="bg-white shadow rounded-lg p-4">
-//           <p className="text-gray-500">Groups</p>
-//           <h2 className="text-2xl font-bold">4</h2>
-//         </div>
-//       </div>
-
-//       {/* Search + Filter */}
-//       <div className="flex justify-between items-center mb-6">
-//         <input
-//           type="text"
-//           placeholder="Search customers"
-//           className="border border-gray-300 rounded-md px-3 py-2 w-1/3 focus:ring-2 focus:ring-purple-500"
-//         />
-//         <select className="border border-gray-300 rounded-md px-3 py-2">
-//           <option>All Groups</option>
-//         </select>
-//       </div>
-
-//       {/* Contact Cards */}
-//       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-//         {contacts.map((contact) => (
-//           <div
-//             key={contact.id}
-//             className="bg-white shadow rounded-lg p-4 flex flex-col gap-3"
-//           >
-//             <div className="flex justify-between items-center">
-//               <AiOutlineUser className="text-3xl text-purple-500" />
-//               <div className="flex gap-2">
-//                 <button className="text-gray-500 hover:text-gray-700">
-//                   <FiEdit2 />
-//                 </button>
-//                 <button className="text-gray-500 hover:text-red-600">
-//                   <FiTrash />
-//                 </button>
-//               </div>
-//             </div>
-//             <h3 className="text-lg font-semibold">{contact.name}</h3>
-//             <span className="bg-green-100 text-green-700 px-2 py-1 text-sm rounded-md w-fit">
-//               {contact.status}
-//             </span>
-//             <div className="flex items-center gap-2 text-gray-600 text-sm">
-//               <FiMail /> {contact.email}
-//             </div>
-//             <div className="flex items-center gap-2 text-gray-600 text-sm">
-//               <FiPhone /> {contact.phone}
-//             </div>
-//             <div className="flex gap-2 flex-wrap mt-2">
-//               {contact.groups.map((group, i) => (
-//                 <span
-//                   key={i}
-//                   className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-md"
-//                 >
-//                   {group}
-//                 </span>
-//               ))}
-//             </div>
-//           </div>
-//         ))}
-//       </div>
-
-//       {/* Add Contact Modal */}
-//       {isModalOpen && <AddContactModal onClose={() => setIsModalOpen(false)} />}
-//     </div>
-//   );
-// }
+import { useSelector } from "react-redux";
 
 export default function Contacts() {
+  const { ChurchProfile } = useSelector((state) => state?.reducer?.AuthSlice);
+
+  console.log({
+    ff: ChurchProfile,
+  });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { data: settingApiData, refetch } = useFetchData(
     `/api/v1/contacts`,

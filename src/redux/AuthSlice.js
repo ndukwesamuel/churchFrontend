@@ -23,10 +23,10 @@ const AuthSlice = createSlice({
       state.token = null;
     },
     ChurchProfile: (state, action) => {
-      state.ChurchProfile = action.payload.members;
+      state.ChurchProfile = action.payload;
     },
   },
 });
 
-export const { logindispatch, mainlogout } = AuthSlice.actions;
+export const { logindispatch, mainlogout, ChurchProfile } = AuthSlice.actions;
 export default AuthSlice.reducer;

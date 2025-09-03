@@ -1,22 +1,34 @@
 import React, { useEffect } from "react";
 import { MessageSquare, Users, Send, Mail, Eye, Settings } from "lucide-react";
 import { useFetchData } from "../../hook/Request";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { ChurchProfile } from "../../redux/AuthSlice";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
+
+  const selectedEstate = useSelector((state) => state?.reducer);
+
+  console.log({
+    ff: selectedEstate,
+  });
+
   const {
-    data: contactsData,
+    data: settingData,
     refetch,
     isLoading,
-  } = useFetchData(`/api/v1/contacts`, "contacts");
+  } = useFetchData(`/api/v1/setting`, "setting");
 
   // Dispatch contacts to Redux when they load
   useEffect(() => {
-    if (contactsData?.data) {
-      dispatch(setContacts(contactsData.data));
+    if (settingData?.data) {
+      console.log({
+        jaja: settingData?.data,
+      });
+
+      dispatch(ChurchProfile(settingData?.data));
     }
-  }, [contactsData, dispatch]);
+  }, [settingData, dispatch]);
   const stats = [
     {
       title: "Total messages sent",
