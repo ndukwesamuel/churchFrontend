@@ -7,19 +7,22 @@ export const TemplateCard = ({ template, getChannelBadgeColor }) => {
       <div className="flex flex-col gap-3 mb-3">
         {/* Title and Actions Row */}
         <div className="flex items-start justify-between gap-3">
-          <div className="flex-1 min-w-0">
+          <div className="flex gap-2 min-w-0">
             <h3 className="font-semibold text-gray-900 text-base sm:text-lg break-words mb-2">
-              {template.title}
+              {template.name}
             </h3>
             <div className="flex items-center gap-2 flex-wrap">
-              <span
-                className={`px-2 py-1 text-xs font-medium rounded-full ${getChannelBadgeColor(
-                  template.channel
-                )}`}
-              >
-                {template.channel}
-              </span>
-              <span className="text-xs sm:text-sm text-gray-500">
+              {template.channels.map((channel) => (
+                <span
+                  key={channel}
+                  className={`text-center px-2 py-1 text-md font-medium rounded-md ${getChannelBadgeColor(
+                    channel
+                  )}`}
+                >
+                  {channel}
+                </span>
+              ))}
+              <span className="text-md font-bold p-2 rounded-md sm:text-sm text-[#546881] bg-lightGray">
                 {template.category}
               </span>
             </div>
@@ -52,11 +55,15 @@ export const TemplateCard = ({ template, getChannelBadgeColor }) => {
 
       {/* Content Snippet */}
       <div className="mb-3">
-        <p className="text-gray-700 text-sm leading-relaxed">
-          {template.content.length > 120
-            ? template.content.substring(0, 120) + "..."
-            : template.content}
-        </p>
+        <p
+          className="text-gray-700 bg-lightGray p-4 text-sm leading-relaxed line-clamp-3"
+          dangerouslySetInnerHTML={{
+            __html:
+              template.content.length > 120
+                ? template.content.substring(0, 120) + "..."
+                : template.content,
+          }}
+        />
       </div>
 
       {/* Variables */}
@@ -66,7 +73,7 @@ export const TemplateCard = ({ template, getChannelBadgeColor }) => {
             key={index}
             className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs font-mono break-all"
           >
-            {variable}
+            Variables {variable}
           </span>
         ))}
       </div>

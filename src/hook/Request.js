@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useSelector } from "react-redux";
 
-const apiUrl = "http://localhost:8080";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 // const apiUrl = "https://remicommerc.onrender.com";
 const fetchData = async (url, token) => {
@@ -75,9 +75,9 @@ export const useMutateData = (queryKey, method = "POST") => {
     onSuccess: () => {
       queryClient.invalidateQueries([queryKey]);
     },
-    onError: (error) => {
-      throw error?.response;
-    },
+    // onError: (error) => {
+    //   throw error?.response;
+    // },
   });
   return {
     ...mutation,

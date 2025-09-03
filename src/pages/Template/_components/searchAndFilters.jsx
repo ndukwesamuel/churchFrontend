@@ -23,7 +23,7 @@ export const SearchAndFilters = ({
             placeholder="Search templates..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+            className="w-full pl-10 pr-4 py-2 sm:py-3 border border-gray-300 rounded-lg outline-none text-sm sm:text-base"
           />
         </div>
 
@@ -33,7 +33,7 @@ export const SearchAndFilters = ({
             <select
               value={channelFilter}
               onChange={(e) => setChannelFilter(e.target.value)}
-              className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-3 pr-10 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm min-w-[140px]"
+              className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-3 pr-10 outline-none text-sm min-w-[140px]"
             >
               <option>All Channel</option>
               <option>WhatsApp</option>
@@ -47,7 +47,7 @@ export const SearchAndFilters = ({
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-3 pr-10 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm min-w-[160px]"
+              className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-3 pr-10 outline-none text-sm min-w-[160px]"
             >
               <option>All categories</option>
               <option>Service Announcement</option>
@@ -85,7 +85,7 @@ export const SearchAndFilters = ({
           <select
             value={channelFilter}
             onChange={(e) => setChannelFilter(e.target.value)}
-            className="w-full appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+            className="w-full appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 outline-none text-sm"
           >
             <option>All Channel</option>
             <option>WhatsApp</option>
@@ -99,7 +99,7 @@ export const SearchAndFilters = ({
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="w-full appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+            className="w-full appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 outline-none text-sm"
           >
             <option>All categories</option>
             <option>Service Announcement</option>

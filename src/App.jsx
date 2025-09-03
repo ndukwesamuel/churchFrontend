@@ -12,6 +12,7 @@ import ErrorPage from "./pages/ErrorPage";
 import Contacts from "./pages/Contact/Contacts";
 // import ErrorPage from "./pages/ErrorPage"; // 👈 create this page
 import TemplateManager from "./pages/Template/template";
+import CreateTemplate from "./pages/Template/_components/createTemplate";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -49,8 +50,14 @@ const router = createBrowserRouter([
           //   element: <Campaigns />, // Create this component
           // },
           {
-            path: "/templates",
-            element: <TemplateManager />,
+            path: "templates",
+            children: [
+              { index: true, element: <TemplateManager /> },
+              {
+                path: "create",
+                element: <CreateTemplate />,
+              },
+            ],
           },
           // {
           //   path: "/files",

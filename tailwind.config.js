@@ -9,6 +9,10 @@ export default {
         textColor: "#3D4C5E",
         lightGray: "#F5F7F9",
         vividBlue: "#5B38DB",
+        lightBlueGray: "#F2F4F7",
+        green: "#096A30",
+        whatsappGreen: "#0A7937",
+        fadedGreen: "#E7F7ED",
       },
       keyframes: {
         shake: {
