@@ -1,8 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { Church } from "lucide-react";
 
 const initialState = {
   isAuthenticated: false,
   user: null,
+  ChurchProfile: null,
   //   token: null,
 };
 
@@ -20,8 +22,11 @@ const AuthSlice = createSlice({
       state.user = null;
       state.token = null;
     },
+    ChurchProfile: (state, action) => {
+      state.ChurchProfile = action.payload;
+    },
   },
 });
 
-export const { logindispatch, mainlogout } = AuthSlice.actions;
+export const { logindispatch, mainlogout, ChurchProfile } = AuthSlice.actions;
 export default AuthSlice.reducer;
