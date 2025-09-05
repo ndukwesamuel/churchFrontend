@@ -1,6 +1,7 @@
 import { ChannelSelector } from "./channelSelector";
 import { ChevronDown } from "lucide-react";
 import { VariableList } from "./variableList";
+import { useFetchData } from "../../../hook/Request";
 export const TemplateForm = ({
   selectedChannels,
   setSelectedChannels,
@@ -11,14 +12,11 @@ export const TemplateForm = ({
   note,
   setNote,
 }) => {
-  const categories = [
-    "Newsletter",
-    "Pastoral Care",
-    "Service Announcement",
-    "Members Care",
-    "Event",
-    "General",
-  ];
+  const { data: categoryData } = useFetchData(
+    "/api/v1/categories",
+    "categories"
+  );
+  const categories = categoryData?.data;
 
   return (
     <div className="space-y-6">
@@ -40,11 +38,12 @@ export const TemplateForm = ({
             className="w-full appearance-none bg-lightGray border border-gray-300 rounded-lg px-4 py-2 pr-10 outline-none text-sm"
           >
             <option value="">Select a category</option>
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
+            {categories &&
+              categories.map((cat) => (
+                <option key={cat} value={cat._id}>
+                  {cat.name}
+                </option>
+              ))}
           </select>
           <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
         </div>

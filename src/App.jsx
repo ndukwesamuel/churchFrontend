@@ -1,4 +1,3 @@
-import "./App.css";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Login from "./pages/Login/Login";
 import RootLayout from "./layouts/RootLayout";
@@ -13,6 +12,7 @@ import Contacts from "./pages/Contact/Contacts";
 // import ErrorPage from "./pages/ErrorPage"; // 👈 create this page
 import TemplateManager from "./pages/Template/template";
 import CreateTemplate from "./pages/Template/_components/createTemplate";
+import EditTemplate from "./pages/Template/_components/editTemplate";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -56,6 +56,10 @@ const router = createBrowserRouter([
               {
                 path: "create",
                 element: <CreateTemplate />,
+              },
+              {
+                path: ":templateId",
+                element: <EditTemplate />,
               },
             ],
           },

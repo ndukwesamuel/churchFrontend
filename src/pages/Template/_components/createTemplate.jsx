@@ -9,11 +9,10 @@ import { toast } from "sonner";
 const CreateTemplate = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const navigate = useNavigate();
-  // Single form for the entire template creation process
   const {
     control,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { errors, isValid, isSubmitting },
     setValue,
     watch,
     getValues,
@@ -76,7 +75,6 @@ const CreateTemplate = () => {
         content: formData.content,
         variables: extractUsedVariables(formData.content),
       };
-      console.log(finalTemplateData);
 
       try {
         const response = await mutateAsync({
@@ -84,14 +82,13 @@ const CreateTemplate = () => {
           data: finalTemplateData,
         });
         toast.success(response.message);
-        console.log("success:", response);
+        navigate("/templates");
       } catch (err) {
         toast.error(
           err.errors?.map((err) => err.message) ||
             err?.message ||
             "Failed to save template"
         );
-        console.log("failed:", err);
       }
     },
     [extractUsedVariables]
@@ -284,7 +281,7 @@ const CreateTemplate = () => {
               errors={errors}
               canSave={canSave}
               isLoading={isLoading}
-              isSubmitting={false} // You can add loading state here
+              isSubmitting={isSubmitting}
             />
           </div>
         </div>

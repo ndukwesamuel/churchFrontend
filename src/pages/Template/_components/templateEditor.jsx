@@ -12,6 +12,7 @@ export const TemplateEditor = ({
   errors,
   canSave,
   isSubmitting,
+  isEditor,
 }) => {
   return (
     <div className="space-y-6">
