@@ -2,9 +2,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useSelector } from "react-redux";
 
-// const apiUrl = "http://localhost:8080";
+const apiUrl = "http://localhost:8080";
 
-const apiUrl = "https://churchbackend-r0x2.onrender.com";
+// const apiUrl = "https://churchbackend-r0x2.onrender.com";
 
 const fetchData = async (url, token) => {
   try {
@@ -51,7 +51,16 @@ const mutateData = async ({ url, token, data, method = "POST" }) => {
 
 export const useFetchData = (url, queryKey, options = {}) => {
   const { user } = useSelector((state) => state?.reducer?.AuthSlice);
+
+  console.log({
+    dddd: user,
+  });
   const token = user?.data?.token;
+
+  console.log({
+    fff: token,
+  });
+
   return useQuery({
     queryKey: [queryKey, token],
     queryFn: () => fetchData(url, token),
@@ -61,71 +70,14 @@ export const useFetchData = (url, queryKey, options = {}) => {
   });
 };
 
-// Reusable hook for mutations (POST, PUT, DELETE)
-// export const useMutateData = (queryKey, method = "POST") => {
-//   const { user } = useSelector((state) => state?.reducer?.AuthSlice);
-//   const token = user?.data?.token;
-//   const queryClient = useQueryClient();
-
-//   const mutation = useMutation({
-//     mutationFn: ({ url, data }) => mutateData({ url, token, data, method }),
-//     onSuccess: () => {
-//       queryClient.invalidateQueries([queryKey]);
-//     },
-//     onError: (error) => {
-//       throw error?.response;
-//     },
-//   });
-//   return {
-//     ...mutation,
-//     isLoading: mutation.isPending,
-//   };
-// };
-
-// export const useMutateData = (queryKey, method = "POST") => {
-//   const { user } = useSelector((state) => state?.reducer?.AuthSlice);
-//   const token = user?.data?.token;
-//   const queryClient = useQueryClient();
-
-//   const mutation = useMutation({
-//     mutationFn: ({ url, data }) => mutateData({ url, token, data, method }), // 👈 method comes from hook, not from call
-//     onSuccess: () => {
-//       queryClient.invalidateQueries([queryKey]);
-//     },
-//     onError: (error) => {
-//       throw error?.response;
-//     },
-//   });
-//   return {
-//     ...mutation,
-//     isLoading: mutation.isPending,
-//   };
-// };
-
-// export const useMutateData = (queryKey, method = "POST") => {
-//   const { user } = useSelector((state) => state?.reducer?.AuthSlice);
-//   const token = user?.data?.token;
-//   const queryClient = useQueryClient();
-
-//   const mutation = useMutation({
-//     mutationFn: ({ url, data }) => mutateData({ url, token, data, method }), // 👈 method is fixed here
-//     onSuccess: () => {
-//       queryClient.invalidateQueries([queryKey]);
-//     },
-//     onError: (error) => {
-//       throw error?.response;
-//     },
-//   });
-
-//   return {
-//     ...mutation,
-//     isLoading: mutation.isPending,
-//   };
-// };
-
 // leave your existing hook as is
 export const useMutateData = (queryKey, method = "POST") => {
   const { user } = useSelector((state) => state?.reducer?.AuthSlice);
+
+  console.log({
+    dddd: user,
+  });
+
   const token = user?.data?.token;
   const queryClient = useQueryClient();
 
