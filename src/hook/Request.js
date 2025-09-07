@@ -2,9 +2,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useSelector } from "react-redux";
 
-const apiUrl = "http://localhost:8080";
+// const apiUrl = "http://localhost:8080";
 
-// const apiUrl = "https://churchbackend-r0x2.onrender.com";
+const apiUrl = "https://churchbackend-r0x2.onrender.com";
 
 const fetchData = async (url, token) => {
   try {
@@ -52,14 +52,7 @@ const mutateData = async ({ url, token, data, method = "POST" }) => {
 export const useFetchData = (url, queryKey, options = {}) => {
   const { user } = useSelector((state) => state?.reducer?.AuthSlice);
 
-  console.log({
-    dddd: user,
-  });
   const token = user?.data?.token;
-
-  console.log({
-    fff: token,
-  });
 
   return useQuery({
     queryKey: [queryKey, token],
@@ -73,10 +66,6 @@ export const useFetchData = (url, queryKey, options = {}) => {
 // leave your existing hook as is
 export const useMutateData = (queryKey, method = "POST") => {
   const { user } = useSelector((state) => state?.reducer?.AuthSlice);
-
-  console.log({
-    dddd: user,
-  });
 
   const token = user?.data?.token;
   const queryClient = useQueryClient();
@@ -110,5 +99,44 @@ export const useDeleteData = (queryKey) => {
   return useMutation({
     mutationFn: ({ url }) => mutateData({ url, token, method: "DELETE" }),
     onSuccess: () => queryClient.invalidateQueries([queryKey]),
+  });
+};
+
+const formdataapiRequest = async ({ url, method, data, token }) => {
+  if (!token) throw new Error("Token is missing");
+
+  try {
+    const response = await axios({
+      url: `${apiUrl}${url}`,
+      method,
+      data,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data", // 👈 force multipart
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("API Error:", error.response?.data || error.message);
+    throw new Error(error.response?.data?.message || "API request failed");
+  }
+};
+
+export const useMutateData_formdata = (url, method = "POST", queryKey) => {
+  const { user } = useSelector((state) => state?.reducer?.AuthSlice);
+
+  const token = user?.data?.token;
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (formData) =>
+      formdataapiRequest({ url, token, data: formData, method }),
+    onSuccess: () => {
+      if (queryKey) queryClient.invalidateQueries([queryKey]);
+    },
+    onError: (error) => {
+      console.error("FormData mutation error:", error);
+    },
   });
 };

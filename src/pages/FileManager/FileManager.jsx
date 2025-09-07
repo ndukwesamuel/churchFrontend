@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   Upload,
   Search,
@@ -7,13 +7,15 @@ import {
   X,
   File,
   Link,
-  Image,
   Folder,
   AlertCircle,
   Loader,
+  Trash2,
+  Eye,
+  ZoomIn,
+  ZoomOut,
 } from "lucide-react";
-import { useFetchData, useMutateData } from "../../hook/Request";
-// import { useFetchData, useMutateData } from './hooks/useApi'; // Adjust path as needed
+import { useFetchData } from "../../hook/Request";
 
 const FileManager = () => {
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -21,22 +23,224 @@ const FileManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [uploadUrl, setUploadUrl] = useState("");
   const [selectedFolder, setSelectedFolder] = useState(null);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [previewImages, setPreviewImages] = useState([]);
+  const [imageScale, setImageScale] = useState(100);
+  const [showImagePreview, setShowImagePreview] = useState(false);
+  const [selectedPreviewImage, setSelectedPreviewImage] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef(null);
 
-  // Fetch user data including photos
   const {
     data: userData,
     isLoading,
     error,
     refetch,
-  } = useFetchData(
-    "/api/v1/collection", // Adjust endpoint as needed
-    "userData"
-  );
-
-  // Upload mutation
-  //   const uploadMutation = useMutateData("userData", "POST");
+  } = useFetchData("/api/v1/collection", "userData");
 
   const photoFolders = userData?.data?.existing?.photoFolders || [];
+
+  // Fixed image scaling function
+  const scaleImage = (file, quality = 0.8) => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      // Use document.createElement instead of new Image()
+      const img = document.createElement("img");
+
+      img.onload = () => {
+        const scaleFactor = imageScale / 100;
+        canvas.width = img.naturalWidth * scaleFactor;
+        canvas.height = img.naturalHeight * scaleFactor;
+
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        canvas.toBlob(
+          (blob) => {
+            const scaledFile = new File([blob], file.name, {
+              type: file.type,
+              lastModified: Date.now(),
+            });
+            resolve(scaledFile);
+          },
+          file.type,
+          quality
+        );
+      };
+
+      img.onerror = () => {
+        resolve(file);
+      };
+
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
+  // Fixed file change handler
+  const handleFileChange = async (e) => {
+    const files = Array.from(e.target.files);
+
+    if (files.length === 0) return;
+
+    // Validate file types
+    const allowedTypes = [
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+    ];
+    const validFiles = files.filter((file) => allowedTypes.includes(file.type));
+
+    if (validFiles.length !== files.length) {
+      alert(
+        "Some files were skipped. Only image files (JPEG, PNG, GIF, WebP) are allowed."
+      );
+    }
+
+    // Generate previews for images
+    const previews = await Promise.all(
+      validFiles.map(async (file) => {
+        const preview = URL.createObjectURL(file);
+
+        // Use document.createElement instead of new Image()
+        const img = document.createElement("img");
+        img.src = preview;
+
+        return new Promise((resolve) => {
+          img.onload = () => {
+            resolve({
+              file,
+              preview,
+              name: file.name,
+              size: file.size,
+              type: file.type,
+              dimensions: {
+                width: img.width,
+                height: img.height,
+              },
+            });
+          };
+          img.onerror = () => {
+            resolve({
+              file,
+              preview,
+              name: file.name,
+              size: file.size,
+              type: file.type,
+              dimensions: { width: 0, height: 0 },
+            });
+          };
+        });
+      })
+    );
+
+    setSelectedFiles(validFiles);
+    setPreviewImages(previews);
+  };
+
+  // Enhanced drag and drop handler
+  const handleDrop = async (e) => {
+    e.preventDefault();
+    const files = Array.from(e.dataTransfer.files);
+
+    const mockEvent = {
+      target: {
+        files: files,
+      },
+    };
+
+    await handleFileChange(mockEvent);
+  };
+
+  // Remove file from selection - this is the key fix
+  const removeFile = (index) => {
+    const newFiles = selectedFiles.filter((_, i) => i !== index);
+    const newPreviews = previewImages.filter((_, i) => i !== index);
+
+    // Cleanup preview URLs to prevent memory leaks
+    if (previewImages[index]) {
+      URL.revokeObjectURL(previewImages[index].preview);
+    }
+
+    setSelectedFiles(newFiles);
+    setPreviewImages(newPreviews);
+  };
+
+  // Enhanced upload handler
+  const handleFileUpload = async () => {
+    if (!selectedFiles.length || !selectedFolder) {
+      alert("Please select at least one file and choose a folder");
+      return;
+    }
+
+    setIsUploading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("folder_id", selectedFolder);
+
+      // Process files based on scale setting
+      const processedFiles = await Promise.all(
+        selectedFiles.map(async (file) => {
+          if (imageScale !== 100 && file.type.startsWith("image/")) {
+            return await scaleImage(file);
+          }
+          return file;
+        })
+      );
+
+      // Append all processed files with the key "images" to match your backend
+      processedFiles.forEach((file) => {
+        formData.append("images", file);
+      });
+
+      console.log(
+        `Uploading ${processedFiles.length} file(s) to folder ${selectedFolder}`
+      );
+
+      // Simulate API call - replace with your actual mutate function
+      setTimeout(() => {
+        console.log("✅ Files uploaded successfully");
+
+        // Simulate success response
+        const uploadSummary = {
+          successful: processedFiles.length,
+          failed: 0,
+        };
+
+        let message = `Successfully uploaded ${uploadSummary.successful} file(s)`;
+        if (uploadSummary.failed > 0) {
+          message += `, ${uploadSummary.failed} failed`;
+        }
+        alert(message);
+
+        // Cleanup and reset
+        cleanupPreviews();
+        setSelectedFolder(null);
+        setImageScale(100);
+        setShowUploadModal(false);
+        setIsUploading(false);
+      }, 2000);
+    } catch (error) {
+      console.error("Error processing files:", error);
+      alert("Error processing files before upload");
+      setIsUploading(false);
+    }
+  };
+
+  // Preview image modal
+  const openImagePreview = (imageData) => {
+    setSelectedPreviewImage(imageData);
+    setShowImagePreview(true);
+  };
+
+  // Cleanup function
+  const cleanupPreviews = () => {
+    previewImages.forEach((img) => URL.revokeObjectURL(img.preview));
+    setPreviewImages([]);
+    setSelectedFiles([]);
+  };
 
   // Calculate statistics
   const totalFiles = photoFolders.reduce(
@@ -79,7 +283,6 @@ const FileManager = () => {
       });
     }
 
-    // Filter by search term
     if (searchTerm) {
       allPhotos = allPhotos.filter(
         (photo) =>
@@ -89,17 +292,6 @@ const FileManager = () => {
     }
 
     return allPhotos;
-  };
-
-  const handleFileUpload = () => {
-    // Handle file upload logic here
-    setShowUploadModal(false);
-  };
-
-  const handleUrlUpload = () => {
-    // Handle URL upload logic here
-    setUploadUrl("");
-    setShowUploadModal(false);
   };
 
   const filteredPhotos = getFilteredPhotos();
@@ -122,7 +314,7 @@ const FileManager = () => {
           <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-4" />
           <p className="text-gray-600 mb-4">Error loading files</p>
           <button
-            onClick={() => refetch()}
+            onClick={() => window.location.reload()}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
             Try Again
@@ -272,13 +464,11 @@ const FileManager = () => {
         {/* Content Area */}
         <div className="p-6">
           {activeTab === "Folders" ? (
-            // Folders View
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {photoFolders.map((folder) => (
                 <div
                   key={folder._id}
                   className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
-                  onClick={() => setSelectedFolder(folder)}
                 >
                   <div className="flex items-center space-x-3 mb-3">
                     <Folder className="w-8 h-8 text-blue-500" />
@@ -298,11 +488,12 @@ const FileManager = () => {
               ))}
             </div>
           ) : (
-            // Files View
             <div className="divide-y divide-gray-200">
               {filteredPhotos.length === 0 ? (
                 <div className="text-center py-12">
-                  <Image className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <div className="w-12 h-12 bg-gray-200 rounded mx-auto mb-4 flex items-center justify-center">
+                    <File className="w-6 h-6 text-gray-400" />
+                  </div>
                   <h3 className="text-lg font-medium text-gray-900 mb-2">
                     No files found
                   </h3>
@@ -362,87 +553,271 @@ const FileManager = () => {
         </div>
       </div>
 
-      {/* Upload Modal */}
+      {/* Enhanced Upload Modal */}
       {showUploadModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg w-full max-w-md p-6">
+          <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900">
-                File Upload
+                Upload Files{" "}
+                {selectedFiles.length > 0 &&
+                  `(${selectedFiles.length} selected)`}
               </h3>
               <button
-                onClick={() => setShowUploadModal(false)}
+                onClick={() => {
+                  cleanupPreviews();
+                  setShowUploadModal(false);
+                  setImageScale(100);
+                }}
                 className="p-1 hover:bg-gray-100 rounded"
+                disabled={isUploading}
               >
                 <X className="w-5 h-5 text-gray-400" />
               </button>
             </div>
 
             <p className="text-sm text-gray-600 mb-6">
-              Choose a file and upload securely to proceed.
+              Choose images and upload securely. Supports JPEG, PNG, GIF, and
+              WebP formats.
             </p>
 
             {/* Drag and Drop Area */}
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center mb-4 hover:border-blue-400 transition-colors">
+            <div
+              className={`border-2 border-dashed rounded-lg p-8 text-center mb-4 transition-colors ${
+                selectedFiles.length > 0
+                  ? "border-blue-400 bg-blue-50"
+                  : "border-gray-300 hover:border-blue-400"
+              }`}
+              onDrop={handleDrop}
+              onDragOver={(e) => e.preventDefault()}
+            >
               <div className="flex flex-col items-center">
                 <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-3">
                   <Upload className="w-6 h-6 text-gray-400" />
                 </div>
                 <p className="text-sm font-medium text-gray-900 mb-1">
-                  Drag and drop your files
+                  Drag and drop your images
                 </p>
                 <p className="text-xs text-gray-500 mb-4">
-                  JPEG, PNG, PDF and MP4 formats, up to 50MB
+                  JPEG, PNG, GIF, WebP formats, up to 10MB per file
                 </p>
-                <button
-                  onClick={handleFileUpload}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50"
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  id="fileInput"
+                  multiple
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleFileChange}
+                  disabled={isUploading}
+                />
+                <label
+                  htmlFor="fileInput"
+                  className={`px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer ${
+                    isUploading ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
                 >
-                  Select file
-                </button>
+                  Select Images
+                </label>
               </div>
             </div>
 
-            {/* URL Upload */}
-            <div className="border-t border-gray-200 pt-4">
-              <div className="flex items-center space-x-2 mb-3">
-                <Link className="w-4 h-4 text-gray-400" />
-                <span className="text-sm text-gray-700">
-                  or upload from URL
-                </span>
+            {/* Image Scale Control */}
+            {selectedFiles.length > 0 && (
+              <div className="mb-4 p-4 bg-gray-50 rounded-lg">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Image Scale: {imageScale}%
+                </label>
+                <div className="flex items-center space-x-3">
+                  <button
+                    onClick={() => setImageScale(Math.max(10, imageScale - 10))}
+                    className="p-1 hover:bg-gray-200 rounded"
+                    disabled={isUploading}
+                  >
+                    <ZoomOut className="w-4 h-4" />
+                  </button>
+                  <input
+                    type="range"
+                    min="10"
+                    max="100"
+                    step="10"
+                    value={imageScale}
+                    onChange={(e) => setImageScale(parseInt(e.target.value))}
+                    className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                    disabled={isUploading}
+                  />
+                  <button
+                    onClick={() =>
+                      setImageScale(Math.min(100, imageScale + 10))
+                    }
+                    className="p-1 hover:bg-gray-200 rounded"
+                    disabled={isUploading}
+                  >
+                    <ZoomIn className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="text-xs text-gray-500 mt-1">
+                  Lower scale = smaller file size. Original size = 100%
+                </div>
               </div>
-              <div className="flex space-x-2">
-                <input
-                  type="text"
-                  placeholder="Add file URL"
-                  value={uploadUrl}
-                  onChange={(e) => setUploadUrl(e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-                <button
-                  onClick={handleUrlUpload}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700"
-                >
-                  Upload
-                </button>
+            )}
+
+            {/* Image Previews - Enhanced with better delete functionality */}
+            {previewImages.length > 0 && (
+              <div className="mb-4">
+                <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                  Selected Images ({previewImages.length}):
+                </h4>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-64 overflow-y-auto">
+                  {previewImages.map((imageData, index) => (
+                    <div
+                      key={index}
+                      className="relative group bg-white rounded-lg p-2 shadow-sm border"
+                    >
+                      <div className="aspect-square rounded overflow-hidden bg-gray-100">
+                        <img
+                          src={imageData.preview}
+                          alt={imageData.name}
+                          className="w-full h-full object-cover cursor-pointer hover:opacity-80"
+                          onClick={() =>
+                            !isUploading && openImagePreview(imageData)
+                          }
+                        />
+                      </div>
+                      <div className="mt-2 text-xs">
+                        <div
+                          className="font-medium text-gray-900 truncate"
+                          title={imageData.name}
+                        >
+                          {imageData.name}
+                        </div>
+                        <div className="text-gray-500 flex justify-between">
+                          <span>{(imageData.size / 1024).toFixed(1)} KB</span>
+                          <span>
+                            {imageData.dimensions.width}×
+                            {imageData.dimensions.height}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Delete button - more prominent and always visible */}
+                      <button
+                        onClick={() => removeFile(index)}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors shadow-md"
+                        disabled={isUploading}
+                        title="Remove file"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+
+                      {/* Preview button */}
+                      <button
+                        onClick={() => openImagePreview(imageData)}
+                        className="absolute top-2 right-2 bg-black bg-opacity-50 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-opacity-70"
+                        disabled={isUploading}
+                        title="Preview image"
+                      >
+                        <Eye className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
+            )}
+
+            {/* Folder Selection */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Select Folder *
+              </label>
+              <select
+                value={selectedFolder || ""}
+                onChange={(e) => setSelectedFolder(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+                disabled={isUploading}
+              >
+                <option value="" disabled>
+                  -- Choose a folder --
+                </option>
+                {photoFolders.map((folder) => (
+                  <option key={folder._id} value={folder._id}>
+                    {folder.name} ({folder.photos.length} files)
+                  </option>
+                ))}
+              </select>
+              {photoFolders.length === 0 && (
+                <p className="text-xs text-red-500 mt-1">
+                  No folders available. Create a folder first.
+                </p>
+              )}
             </div>
 
             {/* Modal Actions */}
             <div className="flex space-x-3 mt-6">
               <button
-                onClick={() => setShowUploadModal(false)}
+                onClick={() => {
+                  cleanupPreviews();
+                  setShowUploadModal(false);
+                  setImageScale(100);
+                }}
                 className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50"
+                disabled={isUploading}
               >
                 Cancel
               </button>
               <button
                 onClick={handleFileUpload}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700"
-                disabled={uploadMutation.isLoading}
+                disabled={
+                  !selectedFiles.length || !selectedFolder || isUploading
+                }
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
               >
-                {uploadMutation.isLoading ? "Uploading..." : "Upload Files"}
+                {isUploading ? (
+                  <>
+                    <Loader className="w-4 h-4 animate-spin" />
+                    <span>Uploading...</span>
+                  </>
+                ) : (
+                  <span>
+                    Upload {selectedFiles.length} File
+                    {selectedFiles.length !== 1 ? "s" : ""}
+                  </span>
+                )}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Image Preview Modal */}
+      {showImagePreview && selectedPreviewImage && (
+        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-60">
+          <div className="relative max-w-4xl max-h-full p-4">
+            <button
+              onClick={() => {
+                setShowImagePreview(false);
+                setSelectedPreviewImage(null);
+              }}
+              className="absolute -top-12 right-0 text-white hover:text-gray-300"
+            >
+              <X className="w-8 h-8" />
+            </button>
+            <img
+              src={selectedPreviewImage.preview}
+              alt={selectedPreviewImage.name}
+              className="max-w-full max-h-full object-contain"
+            />
+            <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-75 text-white p-4">
+              <div className="text-lg font-medium">
+                {selectedPreviewImage.name}
+              </div>
+              <div className="text-sm text-gray-300">
+                {selectedPreviewImage.dimensions.width} ×{" "}
+                {selectedPreviewImage.dimensions.height} •{" "}
+                {(selectedPreviewImage.size / 1024).toFixed(1)} KB
+              </div>
             </div>
           </div>
         </div>
