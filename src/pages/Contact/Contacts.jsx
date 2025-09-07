@@ -20,9 +20,7 @@ export default function Contacts() {
   const [selectedContact, setSelectedContact] = useState(null);
 
   // const [isModalOpen, setIsModalOpen] = useState(false);
-  console.log({
-    ff: ChurchProfile?.user?.groups,
-  });
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { data: settingApiData, refetch } = useFetchData(
     `/api/v1/contacts`,

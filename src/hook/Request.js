@@ -52,7 +52,9 @@ const mutateData = async ({ url, token, data, method = "POST" }) => {
 
 export const useFetchData = (url, queryKey, options = {}) => {
   const { user } = useSelector((state) => state?.reducer?.AuthSlice);
+
   const token = user?.data?.token;
+
   return useQuery({
     queryKey: [queryKey, token],
     queryFn: () => fetchData(url, token),
@@ -62,71 +64,10 @@ export const useFetchData = (url, queryKey, options = {}) => {
   });
 };
 
-// Reusable hook for mutations (POST, PUT, DELETE)
-// export const useMutateData = (queryKey, method = "POST") => {
-//   const { user } = useSelector((state) => state?.reducer?.AuthSlice);
-//   const token = user?.data?.token;
-//   const queryClient = useQueryClient();
-
-//   const mutation = useMutation({
-//     mutationFn: ({ url, data }) => mutateData({ url, token, data, method }),
-//     onSuccess: () => {
-//       queryClient.invalidateQueries([queryKey]);
-//     },
-//     onError: (error) => {
-//       throw error?.response;
-//     },
-//   });
-//   return {
-//     ...mutation,
-//     isLoading: mutation.isPending,
-//   };
-// };
-
-// export const useMutateData = (queryKey, method = "POST") => {
-//   const { user } = useSelector((state) => state?.reducer?.AuthSlice);
-//   const token = user?.data?.token;
-//   const queryClient = useQueryClient();
-
-//   const mutation = useMutation({
-//     mutationFn: ({ url, data }) => mutateData({ url, token, data, method }), // 👈 method comes from hook, not from call
-//     onSuccess: () => {
-//       queryClient.invalidateQueries([queryKey]);
-//     },
-//     onError: (error) => {
-//       throw error?.response;
-//     },
-//   });
-//   return {
-//     ...mutation,
-//     isLoading: mutation.isPending,
-//   };
-// };
-
-// export const useMutateData = (queryKey, method = "POST") => {
-//   const { user } = useSelector((state) => state?.reducer?.AuthSlice);
-//   const token = user?.data?.token;
-//   const queryClient = useQueryClient();
-
-//   const mutation = useMutation({
-//     mutationFn: ({ url, data }) => mutateData({ url, token, data, method }), // 👈 method is fixed here
-//     onSuccess: () => {
-//       queryClient.invalidateQueries([queryKey]);
-//     },
-//     onError: (error) => {
-//       throw error?.response;
-//     },
-//   });
-
-//   return {
-//     ...mutation,
-//     isLoading: mutation.isPending,
-//   };
-// };
-
 // leave your existing hook as is
 export const useMutateData = (queryKey, method = "POST") => {
   const { user } = useSelector((state) => state?.reducer?.AuthSlice);
+
   const token = user?.data?.token;
   const queryClient = useQueryClient();
 
@@ -159,5 +100,44 @@ export const useDeleteData = (queryKey) => {
   return useMutation({
     mutationFn: ({ url }) => mutateData({ url, token, method: "DELETE" }),
     onSuccess: () => queryClient.invalidateQueries([queryKey]),
+  });
+};
+
+const formdataapiRequest = async ({ url, method, data, token }) => {
+  if (!token) throw new Error("Token is missing");
+
+  try {
+    const response = await axios({
+      url: `${apiUrl}${url}`,
+      method,
+      data,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data", // 👈 force multipart
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("API Error:", error.response?.data || error.message);
+    throw new Error(error.response?.data?.message || "API request failed");
+  }
+};
+
+export const useMutateData_formdata = (url, method = "POST", queryKey) => {
+  const { user } = useSelector((state) => state?.reducer?.AuthSlice);
+
+  const token = user?.data?.token;
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (formData) =>
+      formdataapiRequest({ url, token, data: formData, method }),
+    onSuccess: () => {
+      if (queryKey) queryClient.invalidateQueries([queryKey]);
+    },
+    onError: (error) => {
+      console.error("FormData mutation error:", error);
+    },
   });
 };
