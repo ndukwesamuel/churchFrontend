@@ -1,3 +1,29 @@
+// import React, { useState } from "react";
+// import {
+//   Upload,
+//   Search,
+//   FolderPlus,
+//   MoreVertical,
+//   X,
+//   File,
+//   Link,
+//   Image,
+//   Folder,
+//   AlertCircle,
+//   Loader,
+//   TruckElectricIcon,
+// } from "lucide-react";
+// import {
+//   useFetchData,
+//   useMutateData,
+//   useMutateData_formdata,
+// } from "../../hook/Request";
+// import FileManagerFake from "./FileManagerFake";
+// import { SiTruenas } from "react-icons/si";
+// // import { useFetchData, useMutateData } from './hooks/useApi'; // Adjust path as needed
+
+// Updated FileManager Component with Image Scaling and Preview
+
 import React, { useState, useRef } from "react";
 import {
   Upload,
@@ -7,6 +33,7 @@ import {
   X,
   File,
   Link,
+  Image,
   Folder,
   AlertCircle,
   Loader,
@@ -19,9 +46,7 @@ import {
   useFetchData,
   useMutateData,
   useMutateData_formdata,
-  useSingleImageUpload,
 } from "../../hook/Request";
-
 const FileManager = () => {
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [activeTab, setActiveTab] = useState("All Files");
@@ -29,14 +54,13 @@ const FileManager = () => {
   const [uploadUrl, setUploadUrl] = useState("");
   const [selectedFolder, setSelectedFolder] = useState(null);
   const [selectedFiles, setSelectedFiles] = useState([]);
-  const [previewImages, setPreviewImages] = useState([]);
-  const [imageScale, setImageScale] = useState(100);
+  const [previewImages, setPreviewImages] = useState([]); // For image previews
+  const [imageScale, setImageScale] = useState(100); // Scale percentage
   const [showImagePreview, setShowImagePreview] = useState(false);
-  const [showFolder, setshowFolder] = useState(true);
   const [selectedPreviewImage, setSelectedPreviewImage] = useState(null);
-  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef(null);
 
+  // Fetch user data including photos
   const {
     data: userData,
     isLoading,
@@ -44,65 +68,35 @@ const FileManager = () => {
     refetch,
   } = useFetchData("/api/v1/collection", "userData");
 
+  // Upload mutation with better error handling
+  const { mutate, isLoading: isUploading } = useMutateData_formdata(
+    "/api/v1/collection/add-fileToFolder",
+    "POST",
+    "files"
+  );
+
   const photoFolders = userData?.data?.existing?.photoFolders || [];
 
-  const [showNewFolderInput, setShowNewFolderInput] = useState(false);
-  const [newFolderName, setNewFolderName] = useState("");
-  const [folders, setFolders] = useState([]);
-  const [editFolder, setEditFolder] = useState(false);
-
-  const { mutate: addFolder, isLoading: isAddingaddFolder } =
-    useMutateData("contacts");
-
-  const handleCreateFolder = () => {
-    if (!newFolderName.trim()) return;
-
-    if (editFolder) {
-    } else {
-      // create new contact
-      addFolder(
-        {
-          url: "/api/v1/collection/add-folder",
-          data: { name: newFolderName },
-        },
-        {
-          onSuccess: (data) => {
-            console.log({
-              fgfg: data,
-            });
-            let message = `New Folder Created `;
-
-            alert(message);
-
-            setNewFolderName("");
-            setShowNewFolderInput(false);
-            refetch();
-          },
-          onError: (err) => {
-            console.error("Failed to add contact:", err);
-          },
-        }
-      );
-    }
-  };
-
-  // Fixed image scaling function
+  // Image scaling/compression function
   const scaleImage = (file, quality = 0.8) => {
     return new Promise((resolve) => {
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
-      // Use document.createElement instead of new Image()
-      const img = document.createElement("img");
+      const img = new Image();
 
       img.onload = () => {
+        // Calculate new dimensions based on scale
         const scaleFactor = imageScale / 100;
-        canvas.width = img.naturalWidth * scaleFactor;
-        canvas.height = img.naturalHeight * scaleFactor;
+        canvas.width = img.width * scaleFactor;
+        canvas.height = img.height * scaleFactor;
 
+        // Draw scaled image
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
+        // Convert to blob with specified quality
         canvas.toBlob(
           (blob) => {
+            // Create new file with scaled image
             const scaledFile = new File([blob], file.name, {
               type: file.type,
               lastModified: Date.now(),
@@ -114,15 +108,11 @@ const FileManager = () => {
         );
       };
 
-      img.onerror = () => {
-        resolve(file);
-      };
-
       img.src = URL.createObjectURL(file);
     });
   };
 
-  // Fixed file change handler
+  // Enhanced file change handler with preview generation
   const handleFileChange = async (e) => {
     const files = Array.from(e.target.files);
 
@@ -149,8 +139,8 @@ const FileManager = () => {
       validFiles.map(async (file) => {
         const preview = URL.createObjectURL(file);
 
-        // Use document.createElement instead of new Image()
-        const img = document.createElement("img");
+        // Get image dimensions
+        const img = new Image();
         img.src = preview;
 
         return new Promise((resolve) => {
@@ -167,16 +157,6 @@ const FileManager = () => {
               },
             });
           };
-          img.onerror = () => {
-            resolve({
-              file,
-              preview,
-              name: file.name,
-              size: file.size,
-              type: file.type,
-              dimensions: { width: 0, height: 0 },
-            });
-          };
         });
       })
     );
@@ -190,6 +170,7 @@ const FileManager = () => {
     e.preventDefault();
     const files = Array.from(e.dataTransfer.files);
 
+    // Create a mock event object for consistency
     const mockEvent = {
       target: {
         files: files,
@@ -199,12 +180,12 @@ const FileManager = () => {
     await handleFileChange(mockEvent);
   };
 
-  // Remove file from selection - this is the key fix
+  // Remove file from selection
   const removeFile = (index) => {
     const newFiles = selectedFiles.filter((_, i) => i !== index);
     const newPreviews = previewImages.filter((_, i) => i !== index);
 
-    // Cleanup preview URLs to prevent memory leaks
+    // Cleanup preview URLs
     if (previewImages[index]) {
       URL.revokeObjectURL(previewImages[index].preview);
     }
@@ -213,276 +194,70 @@ const FileManager = () => {
     setPreviewImages(newPreviews);
   };
 
-  const { mutate: uploadFiles, isLoading: isUploadingFiles } =
-    useMutateData_formdata(
-      "/api/v1/collection/add-fileToFolder",
-      "POST",
-      "userData" // This will invalidate the userData query after successful upload
-    );
-
-  const { mutate: uploadSingleImage, isLoading: isUploadingSingleImage } =
-    useSingleImageUpload("userData");
-
   // Enhanced upload handler
-  const handleFileUpload_fake = async () => {
-    if (!selectedFiles.length || !selectedFolder) {
-      alert("Please select at least one file and choose a folder");
-      return;
-    }
-
-    setIsUploading(true);
-
-    try {
-      const formData = new FormData();
-      formData.append("folder_id", selectedFolder);
-
-      // Process files based on scale setting
-      const processedFiles = await Promise.all(
-        selectedFiles.map(async (file) => {
-          if (imageScale !== 100 && file.type.startsWith("image/")) {
-            return await scaleImage(file);
-          }
-          return file;
-        })
-      );
-
-      // Append all processed files with the key "images" to match your backend
-      processedFiles.forEach((file) => {
-        formData.append("images", file);
-      });
-
-      console.log(
-        `Uploading ${processedFiles.length} file(s) to folder ${selectedFolder}`
-      );
-
-      // Simulate API call - replace with your actual mutate function
-      setTimeout(() => {
-        console.log("✅ Files uploaded successfully");
-
-        // Simulate success response
-        const uploadSummary = {
-          successful: processedFiles.length,
-          failed: 0,
-        };
-
-        let message = `Successfully uploaded ${uploadSummary.successful} file(s)`;
-        if (uploadSummary.failed > 0) {
-          message += `, ${uploadSummary.failed} failed`;
-        }
-        alert(message);
-
-        // Cleanup and reset
-        cleanupPreviews();
-        setSelectedFolder(null);
-        setImageScale(100);
-        setShowUploadModal(false);
-        setIsUploading(false);
-      }, 2000);
-    } catch (error) {
-      console.error("Error processing files:", error);
-      alert("Error processing files before upload");
-      setIsUploading(false);
-    }
-  };
-
-  // Enhanced upload handler - replace the existing one
-  const handleFileUpload_fake2 = async () => {
-    if (!selectedFiles.length || !selectedFolder) {
-      alert("Please select at least one file and choose a folder");
-      return;
-    }
-
-    setIsUploading(true);
-
-    try {
-      // Process files based on scale setting
-      const processedFiles = await Promise.all(
-        selectedFiles.map(async (file) => {
-          if (imageScale !== 100 && file.type.startsWith("image/")) {
-            return await scaleImage(file);
-          }
-          return file;
-        })
-      );
-
-      // Create FormData object
-      const formData = new FormData();
-      formData.append("folder_id", selectedFolder);
-
-      // Append all processed files with the key "images" to match your backend
-      processedFiles.forEach((file) => {
-        formData.append("images", file);
-      });
-
-      console.log(
-        `Uploading ${processedFiles.length} file(s) to folder ${selectedFolder}`
-      );
-
-      // Make the actual API call
-      uploadFiles(formData, {
-        onSuccess: (response) => {
-          console.log("✅ Files uploaded successfully", response);
-
-          const uploadedCount =
-            response.data?.uploadedFiles?.length || processedFiles.length;
-          const message = `Successfully uploaded ${uploadedCount} file(s)`;
-          alert(message);
-
-          // Cleanup and reset
-          cleanupPreviews();
-          setSelectedFolder(null);
-          setImageScale(100);
-          setShowUploadModal(false);
-          setIsUploading(false);
-
-          // The query will be automatically invalidated by the mutation hook
-          // which will refetch the userData to show the new files
-        },
-        onError: (error) => {
-          console.error("Upload failed:", error);
-          const errorMessage =
-            error.message || "Failed to upload files. Please try again.";
-          alert(errorMessage);
-          setIsUploading(false);
-        },
-      });
-    } catch (error) {
-      console.error("Error processing files:", error);
-      alert("Error processing files before upload");
-      setIsUploading(false);
-    }
-  };
-
   const handleFileUpload = async () => {
     if (!selectedFiles.length || !selectedFolder) {
       alert("Please select at least one file and choose a folder");
       return;
     }
 
-    setIsUploading(true);
-
     try {
+      const formData = new FormData();
+      formData.append("folder_id", selectedFolder);
+
       // Process files based on scale setting
       const processedFiles = await Promise.all(
         selectedFiles.map(async (file) => {
           if (imageScale !== 100 && file.type.startsWith("image/")) {
+            // Scale image if scale is not 100%
             return await scaleImage(file);
           }
           return file;
         })
       );
 
-      console.log("Processed files:", processedFiles); // Debug log
-
-      // Create FormData object
-      const formData = new FormData();
-      formData.append("folder_id", selectedFolder);
-
       // Append all processed files
-      processedFiles.forEach((file, index) => {
-        console.log(
-          `Appending file ${index}:`,
-          file.name,
-          file.type,
-          file.size
-        ); // Debug log
+      processedFiles.forEach((file) => {
         formData.append("images", file);
       });
-
-      // Debug: Log FormData contents
-      for (let [key, value] of formData.entries()) {
-        console.log("FormData entry:", key, value);
-      }
 
       console.log(
         `Uploading ${processedFiles.length} file(s) to folder ${selectedFolder}`
       );
 
-      // Make the actual API call
-      uploadFiles(formData, {
-        onSuccess: (response) => {
-          console.log("✅ Files uploaded successfully", response);
-          // ... rest of success handling
+      mutate(formData, {
+        onSuccess: (data) => {
+          console.log("✅ Files uploaded successfully", data);
+
+          // Show success message with details
+          const { uploadSummary } = data.data;
+          let message = `Successfully uploaded ${uploadSummary.successful} file(s)`;
+          if (uploadSummary.failed > 0) {
+            message += `, ${uploadSummary.failed} failed`;
+          }
+          alert(message);
+
+          // Cleanup and reset
+          previewImages.forEach((img) => URL.revokeObjectURL(img.preview));
+          setSelectedFiles([]);
+          setPreviewImages([]);
+          setSelectedFolder(null);
+          setImageScale(100);
+          setShowUploadModal(false);
+
+          // Refresh data
+          refetch();
         },
-        onError: (error) => {
-          console.error("Upload failed:", error);
-          console.error("Error details:", error.response?.data); // More detailed error
-          alert(error.message || "Failed to upload files. Please try again.");
-          setIsUploading(false);
+        onError: (err) => {
+          console.error("❌ Upload failed:", err);
+          alert(`Upload failed: ${err.message || "Unknown error occurred"}`);
         },
       });
     } catch (error) {
       console.error("Error processing files:", error);
       alert("Error processing files before upload");
-      setIsUploading(false);
     }
   };
-
-  const handleSingleImageUpload = async () => {
-    if (selectedFiles.length !== 1 || !selectedFolder) {
-      alert("Please select exactly one image and choose a folder");
-      return;
-    }
-
-    setIsUploading(true);
-
-    try {
-      const file = selectedFiles[0];
-
-      // Apply scaling if needed
-      const processedFile =
-        imageScale !== 100 && file.type.startsWith("image/")
-          ? await scaleImage(file)
-          : file;
-
-      console.log(
-        `Uploading single image: ${processedFile.name} to folder ${selectedFolder}`
-      );
-
-      uploadSingleImage(
-        {
-          folder_id: selectedFolder,
-          imageFile: processedFile,
-        },
-        {
-          onSuccess: (response) => {
-            console.log("✅ Single image uploaded successfully", response);
-            alert("Image uploaded successfully!");
-
-            // Cleanup and reset
-            cleanupPreviews();
-            setSelectedFolder(null);
-            setImageScale(100);
-            setShowUploadModal(false);
-            setIsUploading(false);
-          },
-          onError: (error) => {
-            console.error("Single image upload failed:", error);
-            alert(error.message || "Failed to upload image. Please try again.");
-            setIsUploading(false);
-          },
-        }
-      );
-    } catch (error) {
-      console.error("Error processing single image:", error);
-      alert("Error processing image before upload");
-      setIsUploading(false);
-    }
-  };
-
-  // Enhanced upload handler that chooses between single and multiple
-  const handleSmartUpload = async () => {
-    if (selectedFiles.length === 1) {
-      await handleSingleImageUpload();
-    } else {
-      await handleFileUpload(); // Your existing multiple upload function
-    }
-  };
-
-  // Update the upload button disabled state to use the actual loading state
-  // In your upload modal, replace the existing upload button with:
-  const uploadButtonDisabled =
-    !selectedFiles.length || !selectedFolder || isUploading || isUploadingFiles;
 
   // Preview image modal
   const openImagePreview = (imageData) => {
@@ -496,6 +271,33 @@ const FileManager = () => {
     setPreviewImages([]);
     setSelectedFiles([]);
   };
+
+  // const [showUploadModal, setShowUploadModal] = useState(false);
+  // const [activeTab, setActiveTab] = useState("All Files");
+  // const [searchTerm, setSearchTerm] = useState("");
+  // const [uploadUrl, setUploadUrl] = useState("");
+  // const [selectedFolder, setSelectedFolder] = useState(null);
+  // const [selectedFiles, setSelectedFiles] = useState([]);
+
+  // Fetch user data including photos
+  // const {
+  //   data: userData,
+  //   isLoading,
+  //   error,
+  //   refetch,
+  // } = useFetchData(
+  //   "/api/v1/collection", // Adjust endpoint as needed
+  //   "userData"
+  // );
+
+  // Upload mutation
+  //   const uploadMutation = useMutateData("userData", "POST");
+
+  // const photoFolders = userData?.data?.existing?.photoFolders || [];
+
+  console.log({
+    ffggg: photoFolders,
+  });
 
   // Calculate statistics
   const totalFiles = photoFolders.reduce(
@@ -538,6 +340,7 @@ const FileManager = () => {
       });
     }
 
+    // Filter by search term
     if (searchTerm) {
       allPhotos = allPhotos.filter(
         (photo) =>
@@ -547,6 +350,160 @@ const FileManager = () => {
     }
 
     return allPhotos;
+  };
+
+  // const { mutate, isLoading_data_data } = useMutateData_formdata(
+  //   // "api/v1/general/pickUp",
+  //   "api/v1/collection/add-fileToFolder",
+  //   "POST",
+  //   "files"
+  // );
+
+  // // const handleFileUpload = () => {
+  // //   if (!selectedFiles.length || !selectedFolder) {
+  // //     alert("Please select at least one file and choose a folder");
+  // //     return;
+  // //   }
+
+  // //   console.log({
+  // //     mail_oen: selectedFolder,
+  // //     mainGuy: selectedFiles,
+  // //   });
+
+  // //   const formData = new FormData();
+  // //   formData.append("folder_id", selectedFolder);
+
+  // //   selectedFolder.forEach((img, index) => {
+  // //     formData.append("images", {
+  // //       uri: img.uri,
+  // //       type: img.type || "image/jpeg", // make sure type exists
+  // //       name: img.name || `image_${index}.jpg`,
+  // //     });
+  // //   });
+  // //   mutate(formData, {
+  // //     onSuccess: (data) => {
+  // //       console.log({
+  // //         success: "File uploaded successfully",
+
+  // //         ddd: data,
+  // //       });
+
+  // //       // Alert.alert("Success", "Pickup Errand created successfully!", [
+  // //       //   {
+  // //       //     text: "OK",
+  // //       //     onPress: () => navigation.goBack(), // navigate back
+  // //       //   },
+  // //       // ]);
+  // //       // Alert.alert("Success", "Pickup Errand created successfully!");
+  // //       // setTitle("");
+  // //       // setDeliveryAddress("");
+  // //       // setPickUpAddress("");
+  // //       // setDescription("");
+  // //       // setPhoneNumber("");
+  // //       // setImages([]);
+  // //     },
+
+  // //     onError: (err) => {
+  // //       console.log({ err });
+
+  // //       // Alert.alert("Error", err.message || "Failed to create pickup errand");
+  // //     },
+  // //   });
+  // // };
+
+  // const handleFileUpload = () => {
+  //   if (!selectedFiles.length || !selectedFolder) {
+  //     alert("Please select at least one file and choose a folder");
+  //     return;
+  //   }
+
+  //   console.log({
+  //     mail_oen: selectedFolder, // this is just the folderId string
+  //     mainGuy: selectedFiles, // this is an array of File objects
+  //   });
+
+  //   const formData = new FormData();
+  //   formData.append("folder_id", selectedFolder);
+
+  //   // loop through the files instead
+  //   selectedFiles.forEach((file, index) => {
+  //     formData.append("images", file);
+  //     // since it's a normal File object from <input type="file" />
+  //     // you don’t need to wrap it in {uri, type, name} like React Native
+  //   });
+
+  //   mutate(formData, {
+  //     onSuccess: (data) => {
+  //       console.log({
+  //         success: "File uploaded successfully",
+  //         ddd: data,
+  //       });
+
+  //       setSelectedFiles([]);
+  //       setSelectedFolder(null);
+  //       setShowUploadModal(false);
+  //       refetch();
+  //     },
+  //     onError: (err) => {
+  //       console.log({ err });
+  //     },
+  //   });
+  // };
+
+  // const { mutate, isLoading: isUploading } = useMutateData_formdata(
+  //   "/api/v1/collection/add-fileToFolder", // endpoint
+  //   "POST",
+  //   "files" // query key for cache invalidation
+  // );
+
+  // const handleFileUpload = () => {
+  //   if (!selectedFiles.length || !selectedFolder) {
+  //     alert("Please select at least one file and choose a folder");
+  //     return;
+  //   }
+
+  //   const formData = new FormData();
+  //   formData.append("folder_id", selectedFolder); // folderId string
+
+  //   // append all selected files under key "images"
+  //   selectedFiles.forEach((file) => {
+  //     formData.append("images", file);
+  //   });
+
+  //   mutate(formData, {
+  //     onSuccess: (data) => {
+  //       console.log("✅ File uploaded successfully", data);
+  //       setSelectedFiles([]);
+  //       setSelectedFolder(null);
+  //       setShowUploadModal(false);
+  //       refetch();
+  //     },
+  //     onError: (err) => {
+  //       console.error("❌ Upload failed:", err);
+  //     },
+  //   });
+  // };
+
+  const handleUrlUpload = () => {
+    // Handle URL upload logic here
+    setUploadUrl("");
+    setShowUploadModal(false);
+  };
+
+  // const handleFileChange = (e) => {
+  //   setSelectedFiles(Array.from(e.target.files));
+  // };
+
+  // Handle drag & drop
+  // const handleDrop = (e) => {
+  //   e.preventDefault();
+  //   const files = Array.from(e.dataTransfer.files);
+  //   setSelectedFiles((prev) => [...prev, ...files]);
+  // };
+
+  // Prevent default browser behavior
+  const handleDragOver = (e) => {
+    e.preventDefault();
   };
 
   const filteredPhotos = getFilteredPhotos();
@@ -569,7 +526,7 @@ const FileManager = () => {
           <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-4" />
           <p className="text-gray-600 mb-4">Error loading files</p>
           <button
-            onClick={() => window.location.reload()}
+            onClick={() => refetch()}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
             Try Again
@@ -646,6 +603,8 @@ const FileManager = () => {
         </div>
       </div>
 
+      {/* <FileManagerFake /> */}
+
       {/* File Library Section */}
       <div className="bg-white rounded-lg shadow-sm">
         {/* Tabs */}
@@ -679,10 +638,7 @@ const FileManager = () => {
               </p>
             </div>
             <div className="flex space-x-3">
-              <button
-                onClick={() => setShowNewFolderInput(true)}
-                className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50"
-              >
+              <button className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">
                 <FolderPlus className="w-4 h-4" />
                 <span>New Folder</span>
               </button>
@@ -691,7 +647,7 @@ const FileManager = () => {
                 className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700"
               >
                 <Upload className="w-4 h-4" />
-                <span>Upload Files</span>
+                <span>Upload Files </span>
               </button>
             </div>
           </div>
@@ -722,11 +678,13 @@ const FileManager = () => {
         {/* Content Area */}
         <div className="p-6">
           {activeTab === "Folders" ? (
+            // Folders View
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {photoFolders.map((folder) => (
                 <div
                   key={folder._id}
                   className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+                  onClick={() => setSelectedFolder(folder)}
                 >
                   <div className="flex items-center space-x-3 mb-3">
                     <Folder className="w-8 h-8 text-blue-500" />
@@ -746,12 +704,11 @@ const FileManager = () => {
               ))}
             </div>
           ) : (
+            // Files View
             <div className="divide-y divide-gray-200">
               {filteredPhotos.length === 0 ? (
                 <div className="text-center py-12">
-                  <div className="w-12 h-12 bg-gray-200 rounded mx-auto mb-4 flex items-center justify-center">
-                    <File className="w-6 h-6 text-gray-400" />
-                  </div>
+                  <Image className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 mb-2">
                     No files found
                   </h3>
@@ -811,7 +768,142 @@ const FileManager = () => {
         </div>
       </div>
 
-      {/* Enhanced Upload Modal */}
+      {showUploadModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg w-full max-w-md p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">
+                File Upload
+              </h3>
+              <button
+                onClick={() => setShowUploadModal(false)}
+                className="p-1 hover:bg-gray-100 rounded"
+              >
+                <X className="w-5 h-5 text-gray-400" />
+              </button>
+            </div>
+
+            <p className="text-sm text-gray-600 mb-6">
+              Choose a file and upload securely to proceed.
+            </p>
+
+            {/* Drag and Drop Area */}
+            <div
+              className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center mb-4 hover:border-blue-400 transition-colors"
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+            >
+              <div className="flex flex-col items-center">
+                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-3">
+                  <Upload className="w-6 h-6 text-gray-400" />
+                </div>
+                <p className="text-sm font-medium text-gray-900 mb-1">
+                  Drag and drop your files
+                </p>
+                <p className="text-xs text-gray-500 mb-4">
+                  JPEG, PNG, PDF and MP4 formats, up to 50MB
+                </p>
+
+                {/* Hidden input for file selection */}
+                <input
+                  type="file"
+                  id="fileInput"
+                  multiple
+                  className="hidden"
+                  onChange={handleFileChange}
+                />
+                <label
+                  htmlFor="fileInput"
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer"
+                >
+                  Select file
+                </label>
+              </div>
+            </div>
+
+            {/* Show selected files */}
+            {selectedFiles.length > 0 && (
+              <div className="mb-4">
+                <h4 className="text-sm font-semibold text-gray-700 mb-2">
+                  Selected Files:
+                </h4>
+                <ul className="space-y-1 max-h-32 overflow-y-auto text-sm text-gray-600">
+                  {selectedFiles.map((file, index) => (
+                    <li key={index} className="flex justify-between">
+                      <span>{file.name}</span>
+                      <span className="text-xs text-gray-400">
+                        {(file.size / 1024).toFixed(1)} KB
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Select Folder
+              </label>
+              <select
+                value={selectedFolder || ""}
+                onChange={(e) => setSelectedFolder(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="" disabled>
+                  -- Choose a folder --
+                </option>
+                {photoFolders.map((folder) => (
+                  <option key={folder._id} value={folder._id}>
+                    {folder.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* URL Upload */}
+            <div className="border-t border-gray-200 pt-4">
+              <div className="flex items-center space-x-2 mb-3">
+                <Link className="w-4 h-4 text-gray-400" />
+                <span className="text-sm text-gray-700">
+                  or upload from URL
+                </span>
+              </div>
+              <div className="flex space-x-2">
+                <input
+                  type="text"
+                  placeholder="Add file URL"
+                  value={uploadUrl}
+                  onChange={(e) => setUploadUrl(e.target.value)}
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <button
+                  onClick={handleUrlUpload}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700"
+                >
+                  Upload
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="flex space-x-3 mt-6">
+              <button
+                onClick={() => setShowUploadModal(false)}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleFileUpload}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700"
+              >
+                Upload Files
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showUploadModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6">
@@ -828,7 +920,6 @@ const FileManager = () => {
                   setImageScale(100);
                 }}
                 className="p-1 hover:bg-gray-100 rounded"
-                disabled={isUploading}
               >
                 <X className="w-5 h-5 text-gray-400" />
               </button>
@@ -857,7 +948,7 @@ const FileManager = () => {
                   Drag and drop your images
                 </p>
                 <p className="text-xs text-gray-500 mb-4">
-                  JPEG, PNG, GIF, WebP formats, up to 10MB per file
+                  JPEG, PNG, GIF, WebP formats, up to 50MB per file
                 </p>
 
                 <input
@@ -868,13 +959,10 @@ const FileManager = () => {
                   accept="image/*"
                   className="hidden"
                   onChange={handleFileChange}
-                  disabled={isUploading}
                 />
                 <label
                   htmlFor="fileInput"
-                  className={`px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer ${
-                    isUploading ? "opacity-50 cursor-not-allowed" : ""
-                  }`}
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer"
                 >
                   Select Images
                 </label>
@@ -891,7 +979,6 @@ const FileManager = () => {
                   <button
                     onClick={() => setImageScale(Math.max(10, imageScale - 10))}
                     className="p-1 hover:bg-gray-200 rounded"
-                    disabled={isUploading}
                   >
                     <ZoomOut className="w-4 h-4" />
                   </button>
@@ -903,14 +990,12 @@ const FileManager = () => {
                     value={imageScale}
                     onChange={(e) => setImageScale(parseInt(e.target.value))}
                     className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                    disabled={isUploading}
                   />
                   <button
                     onClick={() =>
                       setImageScale(Math.min(100, imageScale + 10))
                     }
                     className="p-1 hover:bg-gray-200 rounded"
-                    disabled={isUploading}
                   >
                     <ZoomIn className="w-4 h-4" />
                   </button>
@@ -921,7 +1006,7 @@ const FileManager = () => {
               </div>
             )}
 
-            {/* Image Previews - Enhanced with better delete functionality */}
+            {/* Image Previews */}
             {previewImages.length > 0 && (
               <div className="mb-4">
                 <h4 className="text-sm font-semibold text-gray-700 mb-3">
@@ -931,16 +1016,14 @@ const FileManager = () => {
                   {previewImages.map((imageData, index) => (
                     <div
                       key={index}
-                      className="relative group bg-white rounded-lg p-2 shadow-sm border"
+                      className="relative group bg-white rounded-lg p-2 shadow-sm"
                     >
                       <div className="aspect-square rounded overflow-hidden bg-gray-100">
                         <img
                           src={imageData.preview}
                           alt={imageData.name}
                           className="w-full h-full object-cover cursor-pointer hover:opacity-80"
-                          onClick={() =>
-                            !isUploading && openImagePreview(imageData)
-                          }
+                          onClick={() => openImagePreview(imageData)}
                         />
                       </div>
                       <div className="mt-2 text-xs">
@@ -958,23 +1041,15 @@ const FileManager = () => {
                           </span>
                         </div>
                       </div>
-
-                      {/* Delete button - more prominent and always visible */}
                       <button
                         onClick={() => removeFile(index)}
-                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors shadow-md"
-                        disabled={isUploading}
-                        title="Remove file"
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                       >
                         <X className="w-3 h-3" />
                       </button>
-
-                      {/* Preview button */}
                       <button
                         onClick={() => openImagePreview(imageData)}
-                        className="absolute top-2 right-2 bg-black bg-opacity-50 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-opacity-70"
-                        disabled={isUploading}
-                        title="Preview image"
+                        className="absolute top-2 right-2 bg-black bg-opacity-50 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                       >
                         <Eye className="w-3 h-3" />
                       </button>
@@ -994,7 +1069,6 @@ const FileManager = () => {
                 onChange={(e) => setSelectedFolder(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 required
-                disabled={isUploading}
               >
                 <option value="" disabled>
                   -- Choose a folder --
@@ -1025,61 +1099,22 @@ const FileManager = () => {
               >
                 Cancel
               </button>
-              {/* <button
-                onClick={handleFileUpload}
-                disabled={
-                  !selectedFiles.length || !selectedFolder || isUploading
-                }
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
-              >
-                {isUploading ? (
-                  <>
-                    <Loader className="w-4 h-4 animate-spin" />
-                    <span>Uploading...</span>
-                  </>
-                ) : (
-                  <span>
-                    Upload {selectedFiles.length} File
-                    {selectedFiles.length !== 1 ? "s" : ""}
-                  </span>
-                )}
-              </button> */}
-
-              {/* <button
-                onClick={handleFileUpload}
-                disabled={
-                  !selectedFiles.length || !selectedFolder || isUploading
-                }
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
-              >
-                {isUploading ? (
-                  <>
-                    <Loader className="w-4 h-4 animate-spin" />
-                    <span>Uploading...</span>
-                  </>
-                ) : (
-                  <span>
-                    Upload {selectedFiles.length} File
-                    {selectedFiles.length !== 1 ? "s" : ""}
-                  </span>
-                )}
-              </button> */}
-
               <button
-                onClick={handleSmartUpload} // Use smart upload function
-                disabled={uploadButtonDisabled}
+                onClick={handleFileUpload}
+                disabled={
+                  !selectedFiles.length || !selectedFolder || isUploading
+                }
                 className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
               >
-                {isUploading || isUploadingFiles || isUploadingSingleImage ? (
+                {isUploading ? (
                   <>
                     <Loader className="w-4 h-4 animate-spin" />
                     <span>Uploading...</span>
                   </>
                 ) : (
                   <span>
-                    Upload {selectedFiles.length}{" "}
-                    {selectedFiles.length === 1 ? "Image" : "Files"}
-                    {selectedFiles.length === 1 ? " (Single)" : " (Multiple)"}
+                    Upload {selectedFiles.length} File
+                    {selectedFiles.length !== 1 ? "s" : ""}
                   </span>
                 )}
               </button>
@@ -1115,52 +1150,6 @@ const FileManager = () => {
                 {selectedPreviewImage.dimensions.height} •{" "}
                 {(selectedPreviewImage.size / 1024).toFixed(1)} KB
               </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showNewFolderInput && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative">
-            <button
-              onClick={() => setShowNewFolderInput(false)}
-              className="absolute top-3 right-3 text-gray-600 hover:text-gray-800"
-            >
-              <X className="w-6 h-6" />
-            </button>
-
-            <h2 className="text-xl font-semibold mb-4">Create New Folder</h2>
-
-            <input
-              type="text"
-              value={newFolderName}
-              onChange={(e) => setNewFolderName(e.target.value)}
-              placeholder="Enter folder name"
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-
-            <div className="mt-4 flex justify-end gap-2">
-              <button
-                onClick={() => setShowNewFolderInput(false)}
-                className="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300 text-gray-800"
-              >
-                Cancel
-              </button>
-
-              {isAddingaddFolder ? (
-                <div className="flex items-center space-x-2 ml-3">
-                  <Loader className="w-5 h-5 animate-spin text-blue-600" />
-                  <span className="text-gray-600">Creating...</span>
-                </div>
-              ) : (
-                <button
-                  onClick={handleCreateFolder}
-                  className="px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  Create
-                </button>
-              )}
             </div>
           </div>
         </div>

@@ -141,3 +141,47 @@ export const useMutateData_formdata = (url, method = "POST", queryKey) => {
     },
   });
 };
+
+export const useSingleImageUpload = (queryKey) => {
+  const { user } = useSelector((state) => state?.reducer?.AuthSlice);
+  const token = user?.data?.token;
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ folder_id, imageFile }) => {
+      if (!token) throw new Error("Token is missing");
+
+      const formData = new FormData();
+      formData.append("folder_id", folder_id);
+      formData.append("image", imageFile); // Single image key
+
+      try {
+        const response = await axios({
+          url: `${apiUrl}/api/v1/collection/add-fileToFolder`, // New endpoint
+          method: "PATCH",
+          data: formData,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
+        return response.data;
+      } catch (error) {
+        console.error(
+          "Single image upload error:",
+          error.response?.data || error.message
+        );
+        throw new Error(
+          error.response?.data?.message || "Failed to upload image"
+        );
+      }
+    },
+    onSuccess: () => {
+      if (queryKey) queryClient.invalidateQueries([queryKey]);
+    },
+    onError: (error) => {
+      console.error("Single image upload mutation error:", error);
+    },
+  });
+};
