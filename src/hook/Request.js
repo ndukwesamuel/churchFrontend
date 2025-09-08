@@ -2,10 +2,10 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useSelector } from "react-redux";
 
-const apiUrl = import.meta.env.VITE_API_URL;
+// const apiUrl = import.meta.env.VITE_API_URL;
 const apiUrl = "http://localhost:8080";
 
-const apiUrl = "https://churchbackend-r0x2.onrender.com";
+// const apiUrl = "https://churchbackend-r0x2.onrender.com";
 
 const fetchData = async (url, token) => {
   try {
