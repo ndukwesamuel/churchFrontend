@@ -1,4 +1,3 @@
-import "./App.css";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Login from "./pages/Login/Login";
 import RootLayout from "./layouts/RootLayout";
@@ -13,7 +12,9 @@ import Contacts from "./pages/Contact/Contacts";
 import SettingsDashboard from "./pages/Setting/SettingsDashboard";
 import FileManager from "./pages/FileManager/FileManager";
 // import ErrorPage from "./pages/ErrorPage"; // 👈 create this page
-
+import TemplateManager from "./pages/Template/template";
+import CreateTemplate from "./pages/Template/_components/createTemplate";
+import EditTemplate from "./pages/Template/_components/editTemplate";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -49,6 +50,28 @@ const router = createBrowserRouter([
           // {
           //   path: "/campaigns",
           //   element: <Campaigns />, // Create this component
+          // },
+          {
+            path: "templates",
+            children: [
+              { index: true, element: <TemplateManager /> },
+              {
+                path: "create",
+                element: <CreateTemplate />,
+              },
+              {
+                path: ":templateId",
+                element: <EditTemplate />,
+              },
+            ],
+          },
+          // {
+          //   path: "/files",
+          //   element: <Files />, // Create this component
+          // },
+          // {
+          //   path: "/settings",
+          //   element: <Settings />, // Create this component
           // },
           // {
           //   path: "/templates",
