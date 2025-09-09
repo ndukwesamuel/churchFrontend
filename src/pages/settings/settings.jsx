@@ -5,9 +5,10 @@ import EmailConfigContent from "./_components/emailConfiguration";
 import NotificationContent from "./_components/notification";
 import ChurchProfileContent from "./_components/churchProfile";
 import SettingsItem from "./_components/settingsItems";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+
 const SettingsPage = () => {
-  const [activeTab, setActiveTab] = useState("profile");
-  const [mobileView, setMobileView] = useState(null);
+  const [mobileView, setMobileView] = useState();
 
   const tabs = [
     {
@@ -15,44 +16,34 @@ const SettingsPage = () => {
       label: "Church Profile",
       icon: User,
       description: "Update your Church Information",
+      content: <ChurchProfileContent />,
     },
     {
       id: "sms",
       label: "SMS Configuration",
       icon: Phone,
       description: "Configure the SMS services settings",
+      content: <SMSConfigContent />,
     },
     {
       id: "email",
       label: "Email Configuration",
       icon: Mail,
       description: "Configure the email services settings",
+      content: <EmailConfigContent />,
     },
     {
       id: "notification",
       label: "Notification",
       icon: Bell,
       description: "Configure your email notification preferences",
+      content: <NotificationContent />,
     },
   ];
 
-  const renderContent = (tabId) => {
-    switch (tabId) {
-      case "profile":
-        return <ChurchProfileContent />;
-      case "sms":
-        return <SMSConfigContent />;
-      case "email":
-        return <EmailConfigContent />;
-      case "notification":
-        return <NotificationContent />;
-      default:
-        return <ChurchProfileContent />;
-    }
-  };
-
-  // Mobile view - individual tab content
+  // Mobile view - single tab content with back button
   if (mobileView) {
+    const activeTab = tabs.find((t) => t.id === mobileView);
     return (
       <div className="min-h-screen bg-white">
         <div className="sticky top-0 bg-white border-b border-gray-200 p-4">
@@ -61,16 +52,15 @@ const SettingsPage = () => {
             className="flex items-center text-gray-600 hover:text-gray-900"
           >
             <ArrowLeft className="w-5 h-5 mr-2" />
-            Back
           </button>
         </div>
-        <div className="p-4">{renderContent(mobileView)}</div>
+        <div className="p-4">{activeTab?.content}</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen ">
+    <div className="min-h-screen">
       <div className="max-w-7xl mx-auto p-6">
         {/* Header */}
         <div className="mb-8">
@@ -81,31 +71,32 @@ const SettingsPage = () => {
         </div>
 
         {/* Desktop Tabs */}
-        <div className="hidden md:block">
-          <div className="border-b border-gray-200 mb-6">
-            <nav className="flex space-x-8">
+        <div className="hidden  md:block">
+          <Tabs defaultValue="profile" className="flex flex-col w-full">
+            <TabsList className="flex-1 border-b border--200 mb-6 space-x-4 justify-start">
               {tabs.map((tab) => (
-                <button
+                <TabsTrigger
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
-                    activeTab === tab.id
-                      ? "border-[#5B38DB] text-[#5B38DB]"
-                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                  }`}
+                  value={tab.id}
+                  className="relative  border-red-400 py-2 px-3 text-sm font-medium data-[state=active]:text-[#5B38DB] data-[state=active]:border-b-2 data-[state=active]:border-[#5B38DB] border-b-2 border-transparent hover:text-gray-700 hover:border-gray-300"
                 >
                   {tab.label}
-                </button>
+                </TabsTrigger>
               ))}
-            </nav>
-          </div>
-          <div className="bg-white">{renderContent(activeTab)}</div>
+            </TabsList>
+
+            {tabs.map((tab) => (
+              <TabsContent key={tab.id} value={tab.id}>
+                <div className="bg-white">{tab.content}</div>
+              </TabsContent>
+            ))}
+          </Tabs>
         </div>
 
         {/* Mobile Column Layout */}
         <div className="md:hidden">
           <div className="bg-white rounded-lg border border-gray-200">
-            {tabs.map((tab, index) => (
+            {tabs.map((tab) => (
               <SettingsItem
                 key={tab.id}
                 icon={tab.icon}

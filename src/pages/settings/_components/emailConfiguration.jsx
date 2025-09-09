@@ -1,11 +1,53 @@
-import { useState } from "react";
 import { Mail } from "lucide-react";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 
-const EmailConfigContent = () => {
-  const [enableEmail, setEnableEmail] = useState(false);
+const emailConfigSchema = z.object({
+  provider: z.enum(["SendGrid", "Mailgun", "AWS SES"], {
+    required_error: "Please select a provider",
+  }),
+  fromEmail: z.string().email("Enter a valid email address"),
+  apiKey: z.string().min(6, "API key must be at least 6 characters"),
+  enableEmail: z.boolean().default(false),
+});
+
+export default function EmailConfigContent() {
+  const form = useForm({
+    resolver: zodResolver(emailConfigSchema),
+    defaultValues: {
+      provider: undefined,
+      fromEmail: "",
+      apiKey: "",
+      enableEmail: false,
+    },
+  });
+
+  const onSubmit = (values) => {
+    console.log("Email Config Submitted:", values);
+  };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-gray-50">
+      {/* Header */}
       <div className="flex items-start space-x-3">
         <div className="w-8 h-8 bg-gray-100 rounded-md flex items-center justify-center">
           <Mail className="w-4 h-4 text-gray-600" />
@@ -18,74 +60,108 @@ const EmailConfigContent = () => {
         </div>
       </div>
 
-      <form className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Email Provider
-          </label>
-          <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option>Select Provider</option>
-            <option>SendGrid</option>
-            <option>Mailgun</option>
-            <option>AWS SES</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            From Email
-          </label>
-          <input
-            type="email"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="noreply@yourchurch.com"
+      {/* Form */}
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          {/* Provider */}
+          <FormField
+            control={form.control}
+            name="provider"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email Provider</FormLabel>
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Provider" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="SendGrid">SendGrid</SelectItem>
+                    <SelectItem value="Mailgun">Mailgun</SelectItem>
+                    <SelectItem value="AWS SES">AWS SES</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            API Key
-          </label>
-          <input
-            type="password"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          {/* From Email */}
+          <FormField
+            control={form.control}
+            name="fromEmail"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>From Email</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="noreply@yourchurch.com"
+                    {...field}
+                    className="bg-lightBlueGray"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </div>
 
-        <div className="flex items-center justify-between py-2">
-          <span className="text-sm font-medium text-gray-700">
-            Enable email messaging
-          </span>
-          <button
-            type="button"
-            onClick={() => setEnableEmail(!enableEmail)}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              enableEmail ? "bg-blue-600" : "bg-gray-200"
-            }`}
-          >
-            <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                enableEmail ? "translate-x-6" : "translate-x-1"
-              }`}
-            />
-          </button>
-        </div>
+          {/* API Key */}
+          <FormField
+            control={form.control}
+            name="apiKey"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>API Key</FormLabel>
+                <FormControl>
+                  <Input
+                    type="password"
+                    placeholder="••••••••"
+                    {...field}
+                    className="bg-lightBlueGray"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-          <div className="text-sm font-medium text-gray-700">Email Balance</div>
-          <div className="text-lg font-semibold text-purple-700">Unlimited</div>
-        </div>
+          {/* Enable Email */}
+          <FormField
+            control={form.control}
+            name="enableEmail"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center justify-between rounded-lg p-3 ">
+                <div className="space-y-0.5">
+                  <FormLabel>Enable Email Messaging</FormLabel>
+                </div>
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                    className="data-[state=checked]:bg-vividBlue data-[state=unchecked]:bg-gray-200"
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
 
-        <div className="flex justify-start">
-          <button
-            type="button"
-            className="bg-[#5B38DB] text-white px-6 py-2 rounded-full hover:bg-[#4A2FB8] transition-colors"
-          >
+          {/* Balance Info */}
+          <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+            <div className="flex gap-2 items-center">
+              <div className="text-lg font-medium ">Email Balance</div>
+              <div className="text-sm bg-[#D1C5FD] rounded-md p-1 font-semibold text-deepPurple">
+                Unlimited
+              </div>
+            </div>
+          </div>
+
+          {/* Submit */}
+          <Button type="submit" className="bg-[#5B38DB] hover:bg-[#4A2FB8]">
             Save Email Settings
-          </button>
-        </div>
-      </form>
+          </Button>
+        </form>
+      </Form>
     </div>
   );
-};
-export default EmailConfigContent;
+}

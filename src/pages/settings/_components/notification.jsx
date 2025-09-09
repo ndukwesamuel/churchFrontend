@@ -1,20 +1,40 @@
-import { useState } from "react";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Bell } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+} from "@/components/ui/form";
+import { Card, CardContent } from "@/components/ui/card";
 
-const NotificationContent = () => {
-  const [notifications, setNotifications] = useState({
-    campaignCompletion: false,
-    deliveryFailure: true,
-    weeklyReports: false,
-    emailNotifications: true,
+const notificationSchema = z.object({
+  campaignCompletion: z.boolean(),
+  deliveryFailure: z.boolean(),
+  weeklyReports: z.boolean(),
+  emailNotifications: z.boolean(),
+});
+
+export default function NotificationContent() {
+  const form = useForm({
+    resolver: zodResolver(notificationSchema),
+    defaultValues: {
+      campaignCompletion: false,
+      deliveryFailure: true,
+      weeklyReports: false,
+      emailNotifications: true,
+    },
   });
 
-  const toggleNotification = (key) => {
-    setNotifications((prev) => ({
-      ...prev,
-      [key]: !prev[key],
-    }));
-  };
+  function onSubmit(values) {
+    console.log("Submitted values:", values);
+    // TODO: send to backend API
+  }
 
   const notificationItems = [
     {
@@ -40,56 +60,62 @@ const NotificationContent = () => {
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-start space-x-3">
-        <div className="w-8 h-8 bg-gray-100 rounded-md flex items-center justify-center">
-          <Bell className="w-4 h-4 text-gray-600" />
-        </div>
-        <div>
-          <h3 className="font-bold text-gray-900">Notification</h3>
-          <p className="text-sm text-gray-500">
-            Configure your email notification preferences
-          </p>
-        </div>
-      </div>
-
-      <div className="space-y-4">
-        {notificationItems.map((item) => (
-          <div
-            key={item.key}
-            className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0"
-          >
-            <div className="flex-1">
-              <div className="font-medium text-gray-900">{item.title}</div>
-              <div className="text-sm text-gray-500">{item.description}</div>
-            </div>
-            <button
-              type="button"
-              onClick={() => toggleNotification(item.key)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                notifications[item.key] ? "bg-blue-600" : "bg-gray-200"
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  notifications[item.key] ? "translate-x-6" : "translate-x-1"
-                }`}
-              />
-            </button>
+    <Card className="bg-gray-50 border-0 shadow-none">
+      <CardContent className="space-y-6 p-0">
+        {/* Header */}
+        <div className="flex items-start space-x-3">
+          <div className="w-8 h-8 bg-gray-100 rounded-md flex items-center justify-center">
+            <Bell className="w-4 h-4 text-gray-600" />
           </div>
-        ))}
-
-        <div className="flex justify-start pt-4">
-          <button
-            type="button"
-            className="bg-[#5B38DB] text-white px-6 py-2 rounded-full hover:bg-[#4A2FB8] transition-colors"
-          >
-            Save Notification Settings
-          </button>
+          <div>
+            <h3 className="font-bold text-gray-900">Notification</h3>
+            <p className="text-sm text-gray-500">
+              Configure your email notification preferences
+            </p>
+          </div>
         </div>
-      </div>
-    </div>
-  );
-};
 
-export default NotificationContent;
+        {/* Form */}
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {notificationItems.map((item) => (
+              <FormField
+                key={item.key}
+                control={form.control}
+                name={item.key}
+                render={({ field }) => (
+                  <FormItem className="flex items-center justify-between py-3 border-b border-gray-200 last:border-b-0">
+                    <div className="flex-1">
+                      <FormLabel className="font-medium text-gray-900">
+                        {item.title}
+                      </FormLabel>
+                      <div className="text-sm text-gray-500">
+                        {item.description}
+                      </div>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        className="data-[state=checked]:bg-vividBlue"
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            ))}
+
+            <div className="flex justify-start pt-4">
+              <Button
+                type="submit"
+                className="bg-vividBlue hover:bg-[#4A2FB8] rounded-full px-6"
+              >
+                Save Notification Settings
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
+  );
+}
