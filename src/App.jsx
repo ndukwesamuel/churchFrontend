@@ -13,6 +13,7 @@ import Contacts from "./pages/Contact/Contacts";
 import TemplateManager from "./pages/Template/template";
 import CreateTemplate from "./pages/Template/_components/createTemplate";
 import EditTemplate from "./pages/Template/_components/editTemplate";
+import SettingsPage from "./pages/settings/settings";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -67,10 +68,10 @@ const router = createBrowserRouter([
           //   path: "/files",
           //   element: <Files />, // Create this component
           // },
-          // {
-          //   path: "/settings",
-          //   element: <Settings />, // Create this component
-          // },
+          {
+            path: "/settings",
+            element: <SettingsPage />,
+          },
           // {
           //   path: "/customers/all",
           //   element: <AllCustomers />, // Create this component
