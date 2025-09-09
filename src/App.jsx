@@ -9,6 +9,8 @@ import RouteGuard from "./utils/RouteGuard";
 import Dashboard from "./pages/UserDashboard/Dashboard";
 import ErrorPage from "./pages/ErrorPage";
 import Contacts from "./pages/Contact/Contacts";
+import SettingsDashboard from "./pages/Setting/SettingsDashboard";
+import FileManager from "./pages/FileManager/FileManager";
 // import ErrorPage from "./pages/ErrorPage"; // 👈 create this page
 import TemplateManager from "./pages/Template/template";
 import CreateTemplate from "./pages/Template/_components/createTemplate";
@@ -71,6 +73,18 @@ const router = createBrowserRouter([
           {
             path: "/settings",
             element: <SettingsPage />,
+          },
+          // {
+          //   path: "/templates",
+          //   element: <Templates />, // Create this component
+          // },
+          {
+            path: "/files",
+            element: <FileManager />, // Create this component
+          },
+          {
+            path: "/settings",
+            element: <SettingsDashboard />, // Create this component
           },
           // {
           //   path: "/customers/all",
