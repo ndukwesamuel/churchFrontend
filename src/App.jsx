@@ -34,16 +34,6 @@ const router = createBrowserRouter([
     element: <SignUp />,
     errorElement: <ErrorPage />,
   },
-  {
-    path: "/step2",
-    element: <SignUpStep2 />,
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: "/step3",
-    element: <SignUpStep3 />,
-    errorElement: <ErrorPage />,
-  },
 
   {
     element: <RouteGuard />,
