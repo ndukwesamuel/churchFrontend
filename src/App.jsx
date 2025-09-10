@@ -16,6 +16,7 @@ import TemplateManager from "./pages/Template/template";
 import CreateTemplate from "./pages/Template/_components/createTemplate";
 import EditTemplate from "./pages/Template/_components/editTemplate";
 import SignUp from "./pages/Login/siginup";
+import MainSignUp from "./pages/Login/MainSignUp";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -29,7 +30,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/signup",
-    element: <SignUp />,
+    element: <MainSignUp />,
     errorElement: <ErrorPage />,
   },
 
