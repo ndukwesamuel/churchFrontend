@@ -903,6 +903,257 @@ const FileManager = () => {
           </div>
         </div>
       )}
+
+      {showUploadModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">
+                Upload Files{" "}
+                {selectedFiles.length > 0 &&
+                  `(${selectedFiles.length} selected)`}
+              </h3>
+              <button
+                onClick={() => {
+                  cleanupPreviews();
+                  setShowUploadModal(false);
+                  setImageScale(100);
+                }}
+                className="p-1 hover:bg-gray-100 rounded"
+              >
+                <X className="w-5 h-5 text-gray-400" />
+              </button>
+            </div>
+
+            <p className="text-sm text-gray-600 mb-6">
+              Choose images and upload securely. Supports JPEG, PNG, GIF, and
+              WebP formats.
+            </p>
+
+            {/* Drag and Drop Area */}
+            <div
+              className={`border-2 border-dashed rounded-lg p-8 text-center mb-4 transition-colors ${
+                selectedFiles.length > 0
+                  ? "border-blue-400 bg-blue-50"
+                  : "border-gray-300 hover:border-blue-400"
+              }`}
+              onDrop={handleDrop}
+              onDragOver={(e) => e.preventDefault()}
+            >
+              <div className="flex flex-col items-center">
+                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-3">
+                  <Upload className="w-6 h-6 text-gray-400" />
+                </div>
+                <p className="text-sm font-medium text-gray-900 mb-1">
+                  Drag and drop your images
+                </p>
+                <p className="text-xs text-gray-500 mb-4">
+                  JPEG, PNG, GIF, WebP formats, up to 50MB per file
+                </p>
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  id="fileInput"
+                  multiple
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleFileChange}
+                />
+                <label
+                  htmlFor="fileInput"
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer"
+                >
+                  Select Images
+                </label>
+              </div>
+            </div>
+
+            {/* Image Scale Control */}
+            {selectedFiles.length > 0 && (
+              <div className="mb-4 p-4 bg-gray-50 rounded-lg">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Image Scale: {imageScale}%
+                </label>
+                <div className="flex items-center space-x-3">
+                  <button
+                    onClick={() => setImageScale(Math.max(10, imageScale - 10))}
+                    className="p-1 hover:bg-gray-200 rounded"
+                  >
+                    <ZoomOut className="w-4 h-4" />
+                  </button>
+                  <input
+                    type="range"
+                    min="10"
+                    max="100"
+                    step="10"
+                    value={imageScale}
+                    onChange={(e) => setImageScale(parseInt(e.target.value))}
+                    className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                  />
+                  <button
+                    onClick={() =>
+                      setImageScale(Math.min(100, imageScale + 10))
+                    }
+                    className="p-1 hover:bg-gray-200 rounded"
+                  >
+                    <ZoomIn className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="text-xs text-gray-500 mt-1">
+                  Lower scale = smaller file size. Original size = 100%
+                </div>
+              </div>
+            )}
+
+            {/* Image Previews */}
+            {previewImages.length > 0 && (
+              <div className="mb-4">
+                <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                  Selected Images ({previewImages.length}):
+                </h4>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-64 overflow-y-auto">
+                  {previewImages.map((imageData, index) => (
+                    <div
+                      key={index}
+                      className="relative group bg-white rounded-lg p-2 shadow-sm"
+                    >
+                      <div className="aspect-square rounded overflow-hidden bg-gray-100">
+                        <img
+                          src={imageData.preview}
+                          alt={imageData.name}
+                          className="w-full h-full object-cover cursor-pointer hover:opacity-80"
+                          onClick={() => openImagePreview(imageData)}
+                        />
+                      </div>
+                      <div className="mt-2 text-xs">
+                        <div
+                          className="font-medium text-gray-900 truncate"
+                          title={imageData.name}
+                        >
+                          {imageData.name}
+                        </div>
+                        <div className="text-gray-500 flex justify-between">
+                          <span>{(imageData.size / 1024).toFixed(1)} KB</span>
+                          <span>
+                            {imageData.dimensions.width}×
+                            {imageData.dimensions.height}
+                          </span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => removeFile(index)}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                      <button
+                        onClick={() => openImagePreview(imageData)}
+                        className="absolute top-2 right-2 bg-black bg-opacity-50 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <Eye className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Folder Selection */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Select Folder *
+              </label>
+              <select
+                value={selectedFolder || ""}
+                onChange={(e) => setSelectedFolder(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+              >
+                <option value="" disabled>
+                  -- Choose a folder --
+                </option>
+                {photoFolders.map((folder) => (
+                  <option key={folder._id} value={folder._id}>
+                    {folder.name} ({folder.photos.length} files)
+                  </option>
+                ))}
+              </select>
+              {photoFolders.length === 0 && (
+                <p className="text-xs text-red-500 mt-1">
+                  No folders available. Create a folder first.
+                </p>
+              )}
+            </div>
+
+            {/* Modal Actions */}
+            <div className="flex space-x-3 mt-6">
+              <button
+                onClick={() => {
+                  cleanupPreviews();
+                  setShowUploadModal(false);
+                  setImageScale(100);
+                }}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50"
+                disabled={isUploading}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleFileUpload}
+                disabled={
+                  !selectedFiles.length || !selectedFolder || isUploading
+                }
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+              >
+                {isUploading ? (
+                  <>
+                    <Loader className="w-4 h-4 animate-spin" />
+                    <span>Uploading...</span>
+                  </>
+                ) : (
+                  <span>
+                    Upload {selectedFiles.length} File
+                    {selectedFiles.length !== 1 ? "s" : ""}
+                  </span>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Image Preview Modal */}
+      {showImagePreview && selectedPreviewImage && (
+        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-60">
+          <div className="relative max-w-4xl max-h-full p-4">
+            <button
+              onClick={() => {
+                setShowImagePreview(false);
+                setSelectedPreviewImage(null);
+              }}
+              className="absolute -top-12 right-0 text-white hover:text-gray-300"
+            >
+              <X className="w-8 h-8" />
+            </button>
+            <img
+              src={selectedPreviewImage.preview}
+              alt={selectedPreviewImage.name}
+              className="max-w-full max-h-full object-contain"
+            />
+            <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-75 text-white p-4">
+              <div className="text-lg font-medium">
+                {selectedPreviewImage.name}
+              </div>
+              <div className="text-sm text-gray-300">
+                {selectedPreviewImage.dimensions.width} ×{" "}
+                {selectedPreviewImage.dimensions.height} •{" "}
+                {(selectedPreviewImage.size / 1024).toFixed(1)} KB
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -15,7 +15,12 @@ import {
   ZoomIn,
   ZoomOut,
 } from "lucide-react";
-import { useFetchData } from "../../hook/Request";
+import {
+  useFetchData,
+  useMutateData,
+  useMutateData_formdata,
+  useSingleImageUpload,
+} from "../../hook/Request";
 
 const FileManager = () => {
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -27,6 +32,7 @@ const FileManager = () => {
   const [previewImages, setPreviewImages] = useState([]);
   const [imageScale, setImageScale] = useState(100);
   const [showImagePreview, setShowImagePreview] = useState(false);
+  const [showFolder, setshowFolder] = useState(true);
   const [selectedPreviewImage, setSelectedPreviewImage] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef(null);
@@ -39,6 +45,46 @@ const FileManager = () => {
   } = useFetchData("/api/v1/collection", "userData");
 
   const photoFolders = userData?.data?.existing?.photoFolders || [];
+
+  const [showNewFolderInput, setShowNewFolderInput] = useState(false);
+  const [newFolderName, setNewFolderName] = useState("");
+  const [folders, setFolders] = useState([]);
+  const [editFolder, setEditFolder] = useState(false);
+
+  const { mutate: addFolder, isLoading: isAddingaddFolder } =
+    useMutateData("contacts");
+
+  const handleCreateFolder = () => {
+    if (!newFolderName.trim()) return;
+
+    if (editFolder) {
+    } else {
+      // create new contact
+      addFolder(
+        {
+          url: "/api/v1/collection/add-folder",
+          data: { name: newFolderName },
+        },
+        {
+          onSuccess: (data) => {
+            console.log({
+              fgfg: data,
+            });
+            let message = `New Folder Created `;
+
+            alert(message);
+
+            setNewFolderName("");
+            setShowNewFolderInput(false);
+            refetch();
+          },
+          onError: (err) => {
+            console.error("Failed to add contact:", err);
+          },
+        }
+      );
+    }
+  };
 
   // Fixed image scaling function
   const scaleImage = (file, quality = 0.8) => {
@@ -167,8 +213,18 @@ const FileManager = () => {
     setPreviewImages(newPreviews);
   };
 
+  const { mutate: uploadFiles, isLoading: isUploadingFiles } =
+    useMutateData_formdata(
+      "/api/v1/collection/add-fileToFolder",
+      "POST",
+      "userData" // This will invalidate the userData query after successful upload
+    );
+
+  const { mutate: uploadSingleImage, isLoading: isUploadingSingleImage } =
+    useSingleImageUpload("userData");
+
   // Enhanced upload handler
-  const handleFileUpload = async () => {
+  const handleFileUpload_fake = async () => {
     if (!selectedFiles.length || !selectedFolder) {
       alert("Please select at least one file and choose a folder");
       return;
@@ -228,6 +284,205 @@ const FileManager = () => {
       setIsUploading(false);
     }
   };
+
+  // Enhanced upload handler - replace the existing one
+  const handleFileUpload_fake2 = async () => {
+    if (!selectedFiles.length || !selectedFolder) {
+      alert("Please select at least one file and choose a folder");
+      return;
+    }
+
+    setIsUploading(true);
+
+    try {
+      // Process files based on scale setting
+      const processedFiles = await Promise.all(
+        selectedFiles.map(async (file) => {
+          if (imageScale !== 100 && file.type.startsWith("image/")) {
+            return await scaleImage(file);
+          }
+          return file;
+        })
+      );
+
+      // Create FormData object
+      const formData = new FormData();
+      formData.append("folder_id", selectedFolder);
+
+      // Append all processed files with the key "images" to match your backend
+      processedFiles.forEach((file) => {
+        formData.append("images", file);
+      });
+
+      console.log(
+        `Uploading ${processedFiles.length} file(s) to folder ${selectedFolder}`
+      );
+
+      // Make the actual API call
+      uploadFiles(formData, {
+        onSuccess: (response) => {
+          console.log("✅ Files uploaded successfully", response);
+
+          const uploadedCount =
+            response.data?.uploadedFiles?.length || processedFiles.length;
+          const message = `Successfully uploaded ${uploadedCount} file(s)`;
+          alert(message);
+
+          // Cleanup and reset
+          cleanupPreviews();
+          setSelectedFolder(null);
+          setImageScale(100);
+          setShowUploadModal(false);
+          setIsUploading(false);
+
+          // The query will be automatically invalidated by the mutation hook
+          // which will refetch the userData to show the new files
+        },
+        onError: (error) => {
+          console.error("Upload failed:", error);
+          const errorMessage =
+            error.message || "Failed to upload files. Please try again.";
+          alert(errorMessage);
+          setIsUploading(false);
+        },
+      });
+    } catch (error) {
+      console.error("Error processing files:", error);
+      alert("Error processing files before upload");
+      setIsUploading(false);
+    }
+  };
+
+  const handleFileUpload = async () => {
+    if (!selectedFiles.length || !selectedFolder) {
+      alert("Please select at least one file and choose a folder");
+      return;
+    }
+
+    setIsUploading(true);
+
+    try {
+      // Process files based on scale setting
+      const processedFiles = await Promise.all(
+        selectedFiles.map(async (file) => {
+          if (imageScale !== 100 && file.type.startsWith("image/")) {
+            return await scaleImage(file);
+          }
+          return file;
+        })
+      );
+
+      console.log("Processed files:", processedFiles); // Debug log
+
+      // Create FormData object
+      const formData = new FormData();
+      formData.append("folder_id", selectedFolder);
+
+      // Append all processed files
+      processedFiles.forEach((file, index) => {
+        console.log(
+          `Appending file ${index}:`,
+          file.name,
+          file.type,
+          file.size
+        ); // Debug log
+        formData.append("images", file);
+      });
+
+      // Debug: Log FormData contents
+      for (let [key, value] of formData.entries()) {
+        console.log("FormData entry:", key, value);
+      }
+
+      console.log(
+        `Uploading ${processedFiles.length} file(s) to folder ${selectedFolder}`
+      );
+
+      // Make the actual API call
+      uploadFiles(formData, {
+        onSuccess: (response) => {
+          console.log("✅ Files uploaded successfully", response);
+          // ... rest of success handling
+        },
+        onError: (error) => {
+          console.error("Upload failed:", error);
+          console.error("Error details:", error.response?.data); // More detailed error
+          alert(error.message || "Failed to upload files. Please try again.");
+          setIsUploading(false);
+        },
+      });
+    } catch (error) {
+      console.error("Error processing files:", error);
+      alert("Error processing files before upload");
+      setIsUploading(false);
+    }
+  };
+
+  const handleSingleImageUpload = async () => {
+    if (selectedFiles.length !== 1 || !selectedFolder) {
+      alert("Please select exactly one image and choose a folder");
+      return;
+    }
+
+    setIsUploading(true);
+
+    try {
+      const file = selectedFiles[0];
+
+      // Apply scaling if needed
+      const processedFile =
+        imageScale !== 100 && file.type.startsWith("image/")
+          ? await scaleImage(file)
+          : file;
+
+      console.log(
+        `Uploading single image: ${processedFile.name} to folder ${selectedFolder}`
+      );
+
+      uploadSingleImage(
+        {
+          folder_id: selectedFolder,
+          imageFile: processedFile,
+        },
+        {
+          onSuccess: (response) => {
+            console.log("✅ Single image uploaded successfully", response);
+            alert("Image uploaded successfully!");
+
+            // Cleanup and reset
+            cleanupPreviews();
+            setSelectedFolder(null);
+            setImageScale(100);
+            setShowUploadModal(false);
+            setIsUploading(false);
+          },
+          onError: (error) => {
+            console.error("Single image upload failed:", error);
+            alert(error.message || "Failed to upload image. Please try again.");
+            setIsUploading(false);
+          },
+        }
+      );
+    } catch (error) {
+      console.error("Error processing single image:", error);
+      alert("Error processing image before upload");
+      setIsUploading(false);
+    }
+  };
+
+  // Enhanced upload handler that chooses between single and multiple
+  const handleSmartUpload = async () => {
+    if (selectedFiles.length === 1) {
+      await handleSingleImageUpload();
+    } else {
+      await handleFileUpload(); // Your existing multiple upload function
+    }
+  };
+
+  // Update the upload button disabled state to use the actual loading state
+  // In your upload modal, replace the existing upload button with:
+  const uploadButtonDisabled =
+    !selectedFiles.length || !selectedFolder || isUploading || isUploadingFiles;
 
   // Preview image modal
   const openImagePreview = (imageData) => {
@@ -424,7 +679,10 @@ const FileManager = () => {
               </p>
             </div>
             <div className="flex space-x-3">
-              <button className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">
+              <button
+                onClick={() => setShowNewFolderInput(true)}
+                className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
                 <FolderPlus className="w-4 h-4" />
                 <span>New Folder</span>
               </button>
@@ -767,7 +1025,7 @@ const FileManager = () => {
               >
                 Cancel
               </button>
-              <button
+              {/* <button
                 onClick={handleFileUpload}
                 disabled={
                   !selectedFiles.length || !selectedFolder || isUploading
@@ -783,6 +1041,45 @@ const FileManager = () => {
                   <span>
                     Upload {selectedFiles.length} File
                     {selectedFiles.length !== 1 ? "s" : ""}
+                  </span>
+                )}
+              </button> */}
+
+              {/* <button
+                onClick={handleFileUpload}
+                disabled={
+                  !selectedFiles.length || !selectedFolder || isUploading
+                }
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+              >
+                {isUploading ? (
+                  <>
+                    <Loader className="w-4 h-4 animate-spin" />
+                    <span>Uploading...</span>
+                  </>
+                ) : (
+                  <span>
+                    Upload {selectedFiles.length} File
+                    {selectedFiles.length !== 1 ? "s" : ""}
+                  </span>
+                )}
+              </button> */}
+
+              <button
+                onClick={handleSmartUpload} // Use smart upload function
+                disabled={uploadButtonDisabled}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+              >
+                {isUploading || isUploadingFiles || isUploadingSingleImage ? (
+                  <>
+                    <Loader className="w-4 h-4 animate-spin" />
+                    <span>Uploading...</span>
+                  </>
+                ) : (
+                  <span>
+                    Upload {selectedFiles.length}{" "}
+                    {selectedFiles.length === 1 ? "Image" : "Files"}
+                    {selectedFiles.length === 1 ? " (Single)" : " (Multiple)"}
                   </span>
                 )}
               </button>
@@ -818,6 +1115,52 @@ const FileManager = () => {
                 {selectedPreviewImage.dimensions.height} •{" "}
                 {(selectedPreviewImage.size / 1024).toFixed(1)} KB
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showNewFolderInput && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative">
+            <button
+              onClick={() => setShowNewFolderInput(false)}
+              className="absolute top-3 right-3 text-gray-600 hover:text-gray-800"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            <h2 className="text-xl font-semibold mb-4">Create New Folder</h2>
+
+            <input
+              type="text"
+              value={newFolderName}
+              onChange={(e) => setNewFolderName(e.target.value)}
+              placeholder="Enter folder name"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                onClick={() => setShowNewFolderInput(false)}
+                className="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300 text-gray-800"
+              >
+                Cancel
+              </button>
+
+              {isAddingaddFolder ? (
+                <div className="flex items-center space-x-2 ml-3">
+                  <Loader className="w-5 h-5 animate-spin text-blue-600" />
+                  <span className="text-gray-600">Creating...</span>
+                </div>
+              ) : (
+                <button
+                  onClick={handleCreateFolder}
+                  className="px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  Create
+                </button>
+              )}
             </div>
           </div>
         </div>
