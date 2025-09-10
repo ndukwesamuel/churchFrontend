@@ -15,6 +15,7 @@ import FileManager from "./pages/FileManager/FileManager";
 import TemplateManager from "./pages/Template/template";
 import CreateTemplate from "./pages/Template/_components/createTemplate";
 import EditTemplate from "./pages/Template/_components/editTemplate";
+import SignUp from "./pages/Login/siginup";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -24,6 +25,11 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: "/signup",
+    element: <SignUp />,
     errorElement: <ErrorPage />,
   },
 
