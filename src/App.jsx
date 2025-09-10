@@ -15,7 +15,7 @@ import FileManager from "./pages/FileManager/FileManager";
 import TemplateManager from "./pages/Template/template";
 import CreateTemplate from "./pages/Template/_components/createTemplate";
 import EditTemplate from "./pages/Template/_components/editTemplate";
-import SignUp from "./pages/Login/siginup";
+import SettingsPage from "./pages/settings/settings";
 import MainSignUp from "./pages/Login/MainSignUp";
 const router = createBrowserRouter([
   {
@@ -76,10 +76,10 @@ const router = createBrowserRouter([
           //   path: "/files",
           //   element: <Files />, // Create this component
           // },
-          // {
-          //   path: "/settings",
-          //   element: <Settings />, // Create this component
-          // },
+          {
+            path: "/settings",
+            element: <SettingsPage />,
+          },
           // {
           //   path: "/templates",
           //   element: <Templates />, // Create this component

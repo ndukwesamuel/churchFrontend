@@ -174,7 +174,7 @@ const TemplateManager = () => {
       loadingMessage="Loading templates..."
       errorMessage="Error loading template"
     >
-      <div className="p-3 sm:p-6 max-w-7xl mx-auto bg-[#F2F4F7]">
+      <div className="p-3 sm:p-6 max-w-7xl mx-auto bg-lightBlueGray">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold mb-2">
