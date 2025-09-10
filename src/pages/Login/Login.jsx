@@ -331,6 +331,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useMutateData } from "../../hook/Request";
 import { logindispatch } from "../../redux/AuthSlice";
+import LoginSideBar from "../../components/Sidebar/loginSideBar";
+
 
 export default function Login() {
   const dispatch = useDispatch();
@@ -375,17 +377,7 @@ export default function Login() {
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-white">
       {/* Left Side */}
-      <div className="hidden lg:flex w-1/2 bg-[#F6F0FF] items-center justify-center p-10">
-        <div className="border-2 border-purple-500 rounded-xl p-6 bg-gradient-to-b from-[#F6F0FF] to-[#E9E0FF]">
-          <div className="bg-white rounded-[50%] p-1 w-[320px] h-[420px] overflow-hidden shadow-md">
-            <img
-              src="https://images.unsplash.com/photo-1603415526960-f7e0328e40f3"
-              alt="People using phones"
-              className="object-cover w-full h-full"
-            />
-          </div>
-        </div>
-      </div>
+      <LoginSideBar/>
 
       {/* Right Side */}
       <div className="flex flex-col justify-center items-center w-full lg:w-1/2 p-6 md:p-12">
