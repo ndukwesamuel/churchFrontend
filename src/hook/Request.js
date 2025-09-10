@@ -3,13 +3,13 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 
 // const apiUrl = import.meta.env.VITE_API_URL;
-<<<<<<< HEAD
-const apiUrl = "http://localhost:8080";
-=======
-// const apiUrl = "http://localhost:8080";
->>>>>>> a7b4df93cea3f38fb1f8ee58be37d8b5eb28fbc6
 
-// const apiUrl = "https://churchbackend-r0x2.onrender.com";
+// const apiUrl = "http://localhost:8080";
+// const apiUrl = "http://localhost:8080";
+
+//const apiUrl = "http://localhost:8080";
+
+const apiUrl = "https://churchbackend-r0x2.onrender.com";
 
 const fetchData = async (url, token) => {
   try {
