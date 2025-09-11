@@ -16,6 +16,7 @@ import TemplateManager from "./pages/Template/template";
 import CreateTemplate from "./pages/Template/_components/createTemplate";
 import EditTemplate from "./pages/Template/_components/editTemplate";
 import SettingsPage from "./pages/settings/settings";
+import MainSignUp from "./pages/Login/MainSignUp";
 import MessageComposer from "./pages/message/messageComposer";
 const router = createBrowserRouter([
   {
@@ -26,6 +27,11 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: "/signup",
+    element: <MainSignUp />,
     errorElement: <ErrorPage />,
   },
 
