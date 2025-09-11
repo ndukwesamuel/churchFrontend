@@ -1,7 +1,3 @@
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import {
   Card,
   CardContent,
@@ -10,7 +6,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
   SelectContent,
@@ -20,7 +15,6 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import {
   Form,
   FormControl,
@@ -31,18 +25,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import {
-  Send,
-  Clock,
-  Save,
   ArrowRight,
-  ArrowLeft,
-  Users,
   Bold,
   Italic,
   Underline,
-  Smartphone,
-  Mail,
-  MessageCircle,
 } from "lucide-react";
 
 const ComposeForm = ({ form, recipientGroups, onNext, isMobile }) => {

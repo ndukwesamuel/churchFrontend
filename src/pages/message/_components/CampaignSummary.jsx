@@ -6,20 +6,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-
 import {
   Send,
   Clock,
   Save,
-  ArrowRight,
-  ArrowLeft,
   Users,
-  Bold,
-  Italic,
-  Underline,
-  Smartphone,
-  Mail,
-  MessageCircle,
+
 } from "lucide-react";
 
 const CampaignSummary = ({
