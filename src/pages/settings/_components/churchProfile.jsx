@@ -14,6 +14,14 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import {
+  useFetchData,
+  useMutateData,
+  usePatchData,
+} from "../../../hook/Request";
+import { ChurchProfile } from "../../../redux/AuthSlice";
 
 const churchProfileSchema = z.object({
   churchName: z.string().min(1, "Church name is required"),
@@ -25,6 +33,22 @@ const churchProfileSchema = z.object({
 });
 
 export default function ChurchProfileContent() {
+  const { ChurchProfile: churchprofileInfo } = useSelector(
+    (state) => state?.reducer?.AuthSlice
+  );
+  const dispatch = useDispatch();
+  const {
+    data: settingData,
+    refetch,
+    isLoading,
+  } = useFetchData(`/api/v1/setting`, "setting");
+
+  // Dispatch contacts to Redux when they load
+  useEffect(() => {
+    if (settingData?.data) {
+      dispatch(ChurchProfile(settingData?.data));
+    }
+  }, [settingData, dispatch, churchprofileInfo]);
   const form = useForm({
     resolver: zodResolver(churchProfileSchema),
     defaultValues: {
@@ -36,9 +60,83 @@ export default function ChurchProfileContent() {
       website: "",
     },
   });
+  // 🔥 Prefill form when ChurchProfile is available
+  useEffect(() => {
+    if (churchprofileInfo?.user) {
+      form.reset({
+        churchName: churchprofileInfo?.user?.user?.churchName || "",
+        pastorName: churchprofileInfo?.user?.user?.pastorName || "",
+        address: churchprofileInfo?.user?.user?.address || "",
+        email: churchprofileInfo?.user?.user?.email || "",
+        phone: churchprofileInfo?.user?.user?.phone || "",
+        website: churchprofileInfo?.user?.user?.website || "",
+      });
+    }
+  }, [churchprofileInfo, form]);
+
+  const { mutate: Updateprofile, isLoading: isUpdating } =
+    usePatchData("contacts");
+
+  // function onSubmit(values) {
+  //   console.log("Form submitted:", values);
+
+  //   Updateprofile(
+  //     {
+  //       url: `/api/v1/setting`,
+  //       data: {
+  //         churchName: values?.churchName, //"Jaja Church",
+  //         pastorName: values?.pastorName, //"Skjdskjd",
+  //         address: values?.address, // "123 Main Street, Lagos",
+  //         //   "email": "q@mail.com",
+  //         phone: values?.phone, // "+2348012345678",
+  //         website: values?.website, // "https://jajachurch.org",
+  //       },
+  //     },
+  //     {
+  //       onSuccess: (data) => {
+  //         // onClose();
+  //         console.log({
+  //           dfdd: data,
+  //         });
+  //       },
+  //       onError: (err) => {
+  //         console.error("Failed to update contact:", err);
+  //       },
+  //     }
+  //   );
+  // }
 
   function onSubmit(values) {
     console.log("Form submitted:", values);
+
+    Updateprofile(
+      {
+        url: `/api/v1/setting`,
+        data: {
+          churchName: values?.churchName,
+          pastorName: values?.pastorName,
+          address: values?.address,
+          phone: values?.phone,
+          website: values?.website,
+        },
+      },
+      {
+        onSuccess: async () => {
+          // ✅ After successful update, refetch the new setting
+          const updated = await refetch();
+
+          // ✅ Dispatch updated setting to Redux
+          if (updated?.data) {
+            dispatch(ChurchProfile(updated?.data));
+          }
+
+          console.log("Profile updated successfully:", updated?.data);
+        },
+        onError: (err) => {
+          console.error("Failed to update church profile:", err);
+        },
+      }
+    );
   }
 
   return (

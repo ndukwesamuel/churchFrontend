@@ -6,16 +6,23 @@ import NotificationContent from "./_components/notification";
 import ChurchProfileContent from "./_components/churchProfile";
 import SettingsItem from "./_components/settingsItems";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { useSelector } from "react-redux";
 
 const SettingsPage = () => {
   const [mobileView, setMobileView] = useState();
+
+  const { ChurchProfile } = useSelector((state) => state?.reducer?.AuthSlice);
+
+  console.log({
+    ffff: ChurchProfile,
+  });
 
   const tabs = [
     {
       id: "profile",
       label: "Church Profile",
       icon: User,
-      description: "Update your Church Information",
+      description: "Update your Church Information ",
       content: <ChurchProfileContent />,
     },
     {
