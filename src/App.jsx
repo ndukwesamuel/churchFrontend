@@ -16,6 +16,7 @@ import TemplateManager from "./pages/Template/template";
 import CreateTemplate from "./pages/Template/_components/createTemplate";
 import EditTemplate from "./pages/Template/_components/editTemplate";
 import SettingsPage from "./pages/settings/settings";
+import MessageComposer from "./pages/message/messageComposer";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -44,10 +45,10 @@ const router = createBrowserRouter([
             element: <Contacts />,
           },
           // Add these new routes
-          // {
-          //   path: "/compose",
-          //   element: <Compose />, // Create this component
-          // },
+          {
+            path: "/compose",
+            element: <MessageComposer />,
+          },
           // {
           //   path: "/campaigns",
           //   element: <Campaigns />, // Create this component
