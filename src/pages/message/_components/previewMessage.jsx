@@ -19,6 +19,7 @@ const PreviewMessage = ({
   onSaveDraft,
   isMobile,
   isFormValid,
+  isLoading,
 }) => {
   const formatMessage = (text, type) => {
     if (!text) return "";
@@ -144,6 +145,7 @@ const PreviewMessage = ({
         onSchedule={onSchedule}
         onSaveDraft={onSaveDraft}
         isFormValid={isFormValid}
+        isLoading={isLoading}
       />
     </div>
   );

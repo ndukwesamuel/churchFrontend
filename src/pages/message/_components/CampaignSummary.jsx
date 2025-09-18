@@ -6,7 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Send, Clock, Save, Users } from "lucide-react";
+import { Send, Clock, Save, Users, Loader2 } from "lucide-react";
 
 const CampaignSummary = ({
   totalRecipients,
@@ -16,6 +16,7 @@ const CampaignSummary = ({
   onSchedule,
   onSaveDraft,
   isFormValid,
+  isLoading,
 }) => {
   return (
     <Card>
@@ -45,13 +46,19 @@ const CampaignSummary = ({
         </div>
 
         <Button
-          className="w-full bg-vividBlue"
+          className="w-full bg-vividBlue hover:bg-purple-700"
           size="lg"
           disabled={!isFormValid}
           onClick={onSend}
         >
-          <Send className="mr-2 h-4 w-4" />
-          Send Now
+          {isLoading ? (
+            <Loader2 />
+          ) : (
+            <div className="flex items-center">
+              <Send className="mr-2 h-4 w-4" />
+              Send Now
+            </div>
+          )}
         </Button>
 
         <div className="flex gap-2">
@@ -62,8 +69,14 @@ const CampaignSummary = ({
             onClick={onSchedule}
             type="button"
           >
-            <Clock className="mr-2 h-4 w-4" />
-            Schedule for Later
+            {isLoading ? (
+              <Loader2 />
+            ) : (
+              <div className="flex items-center">
+                <Clock className="mr-2 h-4 w-4" />
+                Schedule for Later
+              </div>
+            )}
           </Button>
           <Button
             variant="outline"
@@ -71,8 +84,14 @@ const CampaignSummary = ({
             onClick={onSaveDraft}
             type="button"
           >
-            <Save className="mr-2 h-4 w-4" />
-            Save as Draft
+            {isLoading ? (
+              <Loader2 />
+            ) : (
+              <div className="flex items-center">
+                <Save className="mr-2 h-4 w-4" />
+                Save as Draft
+              </div>
+            )}
           </Button>
         </div>
       </CardContent>

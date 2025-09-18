@@ -4,7 +4,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import ComposeForm from "./_components/composeForm";
 import PreviewMessage from "./_components/previewMessage";
-import { useFetchData } from "../../hook/Request";
+import { useFetchData, useMutateData } from "../../hook/Request";
+import ScheduleModal from "./_components/scheduleModal";
+import { toast } from "sonner";
 const messageSchema = z.object({
   messageType: z.enum(["sms", "whatsapp", "email"], {
     required_error: "Please select a message type",
@@ -16,6 +18,8 @@ const messageSchema = z.object({
   recipients: z
     .array(z.string())
     .min(1, "Please select at least one recipient group"),
+  status: z.enum(["draft", "scheduled", "sent"]).default("draft"),
+  scheduleAt: z.date().optional(),
 });
 
 const MessageComposer = () => {
@@ -25,6 +29,7 @@ const MessageComposer = () => {
     `/api/v1/contacts`,
     "contacts"
   );
+  const { mutateAsync, isLoading } = useMutateData(`createMessage`, "POST");
 
   const recipientGroups = contactData?.data?.groupCounts || [];
   // Form setup
@@ -35,6 +40,7 @@ const MessageComposer = () => {
       message: "",
       recipients: [],
     },
+    mode: "onChange",
   });
 
   const {
@@ -56,29 +62,78 @@ const MessageComposer = () => {
     setCurrentView("preview");
   };
 
-  const handleBack = () => {
-    setCurrentView("compose");
-  };
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
 
   const handleSend = () => {
     if (isValid) {
-      handleSubmit((data) => {
-        console.log("Sending message:", data);
-        // Handle send logic
+      handleSubmit(async (data) => {
+        const payload = { ...data, status: "sent" };
+        console.log("🚀 Sending immediately:", payload);
+        try {
+          const response = await mutateAsync({
+            url: "/api/v1/messages",
+            data: payload,
+          });
+          console.log({ response });
+          toast.success(response.message);
+        } catch (error) {
+          console.log(error);
+          toast.error(
+            error.errors?.map((err) => err.message)?.join(", ") ||
+              error?.message ||
+              "Failed to complete request."
+          );
+        }
       })();
     }
   };
-
+  const handleBack = () => {
+    setCurrentView("compose");
+  };
   const handleSchedule = () => {
     if (isValid) {
-      console.log("Schedule for later:", watchedFields);
-      // Handle scheduling logic
+      setShowScheduleModal(true);
     }
   };
 
-  const handleSaveDraft = () => {
-    console.log("Save as draft:", watchedFields);
-    // Handle save draft logic
+  const confirmSchedule = async (date) => {
+    const payload = { ...watchedFields, status: "scheduled", scheduleAt: date };
+    console.log("📅 Scheduling:", payload);
+    try {
+      const response = await mutateAsync({
+        url: "/api/v1/messages",
+        data: payload,
+      });
+      console.log({ response });
+      toast.success(response.message);
+    } catch (error) {
+      console.log(error);
+      toast.error(
+        error.errors?.map((err) => err.message)?.join(", ") ||
+          error?.message ||
+          "Failed to complete request."
+      );
+    }
+  };
+
+  const handleSaveDraft = async () => {
+    const payload = { ...watchedFields, status: "draft" };
+    console.log("💾 Saving draft:", payload);
+    try {
+      const response = await mutateAsync({
+        url: "/api/v1/messages",
+        data: payload,
+      });
+      console.log({ response });
+      toast.success(response.message);
+    } catch (error) {
+      console.log(error);
+      toast.error(
+        error.errors?.map((err) => err.message)?.join(", ") ||
+          error?.message ||
+          "Failed to complete request."
+      );
+    }
   };
 
   return (
@@ -136,11 +191,17 @@ const MessageComposer = () => {
                 onSaveDraft={handleSaveDraft}
                 isMobile={isMobile}
                 isFormValid={isValid}
+                isLoading={isLoading}
               />
             </div>
           </div>
         )}
       </div>
+      <ScheduleModal
+        isOpen={showScheduleModal}
+        onClose={() => setShowScheduleModal(false)}
+        onConfirm={confirmSchedule}
+      />
     </div>
   );
 };
