@@ -12,7 +12,7 @@ import {
 import { useSelector } from "react-redux";
 
 export default function Contacts() {
-  const { ChurchProfile } = useSelector((state) => state?.reducer?.AuthSlice);
+  const { contact } = useSelector((state) => state?.reducer?.AuthSlice);
   const [editingContact, setEditingContact] = useState(null);
   const [editContact, setEditContact] = useState(null);
 
@@ -22,12 +22,12 @@ export default function Contacts() {
   // const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { data: settingApiData, refetch } = useFetchData(
+  const { data: contactData, refetch } = useFetchData(
     `/api/v1/contacts`,
     "contacts"
   );
 
-  const contacts = settingApiData?.data?.members || [];
+  const contacts = contactData?.data?.members || [];
 
   const { mutate: deleteContact, isLoading: isDeleting } =
     useDeleteData("contacts");
@@ -84,7 +84,7 @@ export default function Contacts() {
         <div className="bg-white shadow rounded-lg p-4">
           <p className="text-gray-500">Total Contact</p>
           <h2 className="text-2xl font-bold">
-            {settingApiData?.data?.memberCount || 0}
+            {contactData?.data?.memberCount || 0}
           </h2>
         </div>
         <div className="bg-white shadow rounded-lg p-4">
@@ -96,7 +96,7 @@ export default function Contacts() {
         <div className="bg-white shadow rounded-lg p-4">
           <p className="text-gray-500">Groups</p>
           <h2 className="text-2xl font-bold">
-            {[...new Set(contacts.map((c) => c.group))].length}
+            {contactData?.data?.groupTotal}
           </h2>
         </div>
       </div>
@@ -157,9 +157,7 @@ export default function Contacts() {
 
             <div className="flex gap-2 flex-wrap mt-2">
               <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-md">
-                {ChurchProfile?.user?.groups?.find(
-                  (g) => g._id === contact.groupId || g._id === contact.group // depending on how backend returns
-                )?.name || "No Group"}
+                {contact?.group?.name || "No Group"}
               </span>
             </div>
           </div>
@@ -188,174 +186,19 @@ export default function Contacts() {
   );
 }
 
-// function AddContactModal({ onClose }) {
-//   const [formData, setFormData] = useState({
-//     fullName: "",
-//     email: "",
-//     phoneNumber: "",
-//     status: "Active",
-//     role: "Member",
-//     groupId: "",
-//   });
-
-//   const { data: settingApiData } = useFetchData(
-//     `/api/v1/setting`,
-//     "profilesetting"
-//   );
-
-//   const { mutate: addContact, isLoading } = useMutateData("contacts");
-
-//   const handleChange = (e) => {
-//     const { name, value } = e.target;
-//     setFormData((prev) => ({ ...prev, [name]: value }));
-//   };
-
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-//     addContact(
-//       {
-//         url: "/api/v1/contacts", // 👈 adjust to your contact creation endpoint
-//         data: formData,
-//       },
-//       {
-//         onSuccess: (data) => {
-//           console.log({
-//             ddddd: data,
-//           });
-
-//           onClose(); // close modal after success
-//         },
-//         onError: (err) => {
-//           console.error("Failed to add contact:", err);
-//         },
-//       }
-//     );
-//   };
-
-//   return (
-//     <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-end z-50">
-//       <div className="bg-white w-full sm:w-[400px] h-full p-6 overflow-y-auto shadow-lg">
-//         {/* Header */}
-//         <div className="flex justify-between items-center mb-6">
-//           <h2 className="text-xl font-semibold">Add Contact Info</h2>
-//           <button onClick={onClose} className="text-gray-500 hover:text-black">
-//             <IoClose size={24} />
-//           </button>
-//         </div>
-//         <p className="text-gray-500 mb-4">
-//           Fill in the details below to add a new contact to your records
-//         </p>
-
-//         {/* Form */}
-//         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-//           <div>
-//             <label className="block text-sm text-gray-700">Full Name</label>
-//             <input
-//               type="text"
-//               name="fullName"
-//               value={formData.fullName}
-//               onChange={handleChange}
-//               placeholder="John Smith"
-//               className="w-full border rounded-md px-3 py-2"
-//             />
-//           </div>
-
-//           <div>
-//             <label className="block text-sm text-gray-700">Status</label>
-//             <select
-//               name="status"
-//               value={formData.status}
-//               onChange={handleChange}
-//               className="w-full border rounded-md px-3 py-2"
-//             >
-//               <option>Active</option>
-//               <option>Inactive</option>
-//             </select>
-//           </div>
-
-//           <div>
-//             <label className="block text-sm text-gray-700">Email</label>
-//             <input
-//               type="email"
-//               name="email"
-//               value={formData.email}
-//               onChange={handleChange}
-//               placeholder="johnsmith@email.com"
-//               className="w-full border rounded-md px-3 py-2"
-//             />
-//           </div>
-
-//           <div>
-//             <label className="block text-sm text-gray-700">Phone Number</label>
-//             <input
-//               type="tel"
-//               name="phoneNumber"
-//               value={formData.phoneNumber}
-//               onChange={handleChange}
-//               placeholder="+1 (555) 345-7890"
-//               className="w-full border rounded-md px-3 py-2"
-//             />
-//           </div>
-
-//           <div>
-//             <label className="block text-sm text-gray-700">Role</label>
-//             <select
-//               name="role"
-//               value={formData.role}
-//               onChange={handleChange}
-//               className="w-full border rounded-md px-3 py-2"
-//             >
-//               <option>Member</option>
-//               <option>Leader</option>
-//             </select>
-//           </div>
-
-//           <div>
-//             <label className="block text-sm text-gray-700">Group</label>
-//             <select
-//               name="groupId"
-//               value={formData.groupId}
-//               onChange={handleChange}
-//               className="w-full border rounded-md px-3 py-2"
-//             >
-//               {settingApiData?.data?.user?.groups?.map((group) => (
-//                 <option key={group?._id} value={group?._id}>
-//                   {group?.name}
-//                 </option>
-//               ))}
-//             </select>
-//           </div>
-
-//           <button
-//             type="submit"
-//             disabled={isLoading}
-//             className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 disabled:opacity-50"
-//           >
-//             {isLoading ? "Saving..." : "Save Contact"}
-//           </button>
-//         </form>
-//       </div>
-//     </div>
-//   );
-// }
-
 function AddContactModal({ onClose, contact }) {
   const isEditing = Boolean(contact);
-
+  console.log(contact);
   const [formData, setFormData] = useState({
     fullName: contact?.fullName || "",
     email: contact?.email || "",
     phoneNumber: contact?.phoneNumber || "",
     status: contact?.status || "Active",
     role: contact?.role || "Member",
-    groupId: contact?.groupId || "",
+    groupId: contact?.group?._id || "",
   });
 
-  const { data: settingApiData } = useFetchData(
-    `/api/v1/setting`,
-    "profilesetting"
-  );
-
+  const { data: groupData } = useFetchData(`/api/v1/groups`, "groups");
   // create
   const { mutate: addContact, isLoading: isAdding } = useMutateData("contacts");
   // update
@@ -372,10 +215,6 @@ function AddContactModal({ onClose, contact }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    console.log({
-      ffg: isEditing,
-    });
 
     if (isEditing) {
       // update contact
@@ -496,7 +335,10 @@ function AddContactModal({ onClose, contact }) {
               onChange={handleChange}
               className="w-full border rounded-md px-3 py-2"
             >
-              {settingApiData?.data?.user?.groups?.map((group) => (
+              <option value="" disabled>
+                -- Select a group --
+              </option>
+              {groupData?.data?.groups?.map((group) => (
                 <option key={group?._id} value={group?._id}>
                   {group?.name}
                 </option>

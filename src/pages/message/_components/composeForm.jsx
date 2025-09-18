@@ -24,12 +24,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  ArrowRight,
-  Bold,
-  Italic,
-  Underline,
-} from "lucide-react";
+import { ArrowRight, Bold, Italic, Underline } from "lucide-react";
 
 const ComposeForm = ({ form, recipientGroups, onNext, isMobile }) => {
   const {
@@ -143,7 +138,7 @@ const ComposeForm = ({ form, recipientGroups, onNext, isMobile }) => {
                   <div className="space-y-3">
                     {recipientGroups.map((group) => (
                       <FormField
-                        key={group.id}
+                        key={group.groupId}
                         control={form.control}
                         name="recipients"
                         render={({ field }) => {
@@ -155,23 +150,25 @@ const ComposeForm = ({ form, recipientGroups, onNext, isMobile }) => {
                               <div className="flex items-center space-x-2">
                                 <FormControl>
                                   <Checkbox
-                                    checked={field.value?.includes(group.id)}
+                                    checked={field.value?.includes(
+                                      group.groupId
+                                    )}
                                     onCheckedChange={(checked) => {
                                       return checked
                                         ? field.onChange([
                                             ...field.value,
-                                            group.id,
+                                            group.groupId,
                                           ])
                                         : field.onChange(
                                             field.value?.filter(
-                                              (value) => value !== group.id
+                                              (value) => value !== group.groupId
                                             )
                                           );
                                     }}
                                   />
                                 </FormControl>
                                 <FormLabel className="font-medium">
-                                  {group.name}
+                                  {group.groupName}
                                 </FormLabel>
                               </div>
                               <span className="text-sm text-gray-500">
@@ -194,7 +191,7 @@ const ComposeForm = ({ form, recipientGroups, onNext, isMobile }) => {
           <Button
             type="button"
             onClick={onNext}
-            className="w-full"
+            className="w-full bg-vividBlue"
             disabled={!isValid}
           >
             Next <ArrowRight className="ml-2 h-4 w-4" />

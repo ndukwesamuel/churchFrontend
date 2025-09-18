@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import ComposeForm from "./_components/composeForm";
 import PreviewMessage from "./_components/previewMessage";
+import { useFetchData } from "../../hook/Request";
 const messageSchema = z.object({
   messageType: z.enum(["sms", "whatsapp", "email"], {
     required_error: "Please select a message type",
@@ -16,18 +17,16 @@ const messageSchema = z.object({
     .array(z.string())
     .min(1, "Please select at least one recipient group"),
 });
-const recipientGroups = [
-  { id: "members", name: "Members", count: 1250 },
-  { id: "choir", name: "Choir", count: 45 },
-  { id: "sunday-school", name: "Sunday School", count: 180 },
-  { id: "youth", name: "Youth Ministry", count: 95 },
-  { id: "elders", name: "Church Elders", count: 12 },
-  { id: "volunteers", name: "Volunteers", count: 85 },
-];
+
 const MessageComposer = () => {
   const [currentView, setCurrentView] = useState("compose");
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const { data: contactData, refetch } = useFetchData(
+    `/api/v1/contacts`,
+    "contacts"
+  );
 
+  const recipientGroups = contactData?.data?.groupCounts || [];
   // Form setup
   const form = useForm({
     resolver: zodResolver(messageSchema),
@@ -105,7 +104,7 @@ const MessageComposer = () => {
                 isMobile={isMobile}
               />
             ) : (
-              <PreviewColumn
+              <PreviewMessage
                 formData={watchedFields}
                 recipientGroups={recipientGroups}
                 onBack={handleBack}

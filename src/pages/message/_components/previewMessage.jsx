@@ -7,12 +7,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  ArrowLeft,
-  Smartphone,
-  Mail,
-  MessageCircle,
-} from "lucide-react";
+import { ArrowLeft, Smartphone, Mail, MessageCircle } from "lucide-react";
 import CampaignSummary from "./CampaignSummary";
 
 const PreviewMessage = ({
@@ -46,7 +41,7 @@ const PreviewMessage = ({
   const getTotalRecipients = () => {
     return (
       formData.recipients?.reduce((total, groupId) => {
-        const group = recipientGroups.find((g) => g.id === groupId);
+        const group = recipientGroups.find((g) => g.groupId === groupId);
         return total + (group?.count || 0);
       }, 0) || 0
     );
@@ -56,11 +51,11 @@ const PreviewMessage = ({
     const totalRecipients = getTotalRecipients();
     switch (formData.messageType) {
       case "sms":
-        return (totalRecipients * 0.05).toFixed(2);
+        return (totalRecipients * 3.0).toFixed(2);
       case "email":
-        return (totalRecipients * 0.02).toFixed(2);
+        return (totalRecipients * 2.0).toFixed(2);
       case "whatsapp":
-        return (totalRecipients * 0.03).toFixed(2);
+        return (totalRecipients * 3.0).toFixed(2);
       default:
         return "0.00";
     }

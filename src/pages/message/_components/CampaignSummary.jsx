@@ -6,13 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Send,
-  Clock,
-  Save,
-  Users,
-
-} from "lucide-react";
+import { Send, Clock, Save, Users } from "lucide-react";
 
 const CampaignSummary = ({
   totalRecipients,
@@ -47,7 +41,7 @@ const CampaignSummary = ({
 
         <div className="flex items-center justify-between">
           <span className="text-sm">Amount to Pay</span>
-          <span className="font-medium">${price}</span>
+          <span className="font-medium">#{price}</span>
         </div>
 
         <Button
