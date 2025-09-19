@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useMutateData } from "../../hook/Request";
 import { logindispatch } from "../../redux/AuthSlice";
 import LoginSideBar from "../../components/Sidebar/loginSideBar";
-
+import { toast } from "sonner";
 export default function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -26,12 +26,12 @@ export default function Login() {
   }, [user, navigate]);
 
   const onSubmit = async (formData) => {
+    console.log(formData);
     try {
       const response = await loginMutation.mutateAsync({
         url: "/api/v1/auth/signin",
         data: formData,
       });
-
       if (response?.error) {
         console.error(response.error);
         // toast.error(response.error); // Optional
@@ -41,8 +41,7 @@ export default function Login() {
         navigate("/dashboard");
       }
     } catch (err) {
-      console.error("Login failed:", err);
-      // toast.error(err?.message || "Login failed"); // Optional
+      toast.error(err?.message || "Login failed");
     }
   };
 
