@@ -10,11 +10,14 @@ import {
   usePatchData,
 } from "../../hook/Request";
 import { useSelector } from "react-redux";
+import BulkUploadContacts from "./BulkUploadContacts";
 
 export default function Contacts() {
   const { contact } = useSelector((state) => state?.reducer?.AuthSlice);
   const [editingContact, setEditingContact] = useState(null);
   const [editContact, setEditContact] = useState(null);
+
+  const [isBulkOpen, setIsBulkOpen] = useState(false);
 
   // const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState(null);
@@ -76,6 +79,15 @@ export default function Contacts() {
           className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700"
         >
           + Add Contact
+        </button>
+
+        <button
+          onClick={() => setIsBulkOpen(true)}
+          className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700"
+
+          // className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 ml-2"
+        >
+          Bulk Upload
         </button>
       </div>
 
@@ -180,6 +192,10 @@ export default function Contacts() {
           onClose={() => setIsModalOpen(false)}
           contact={selectedContact} // null = create, object = edit
         />
+      )}
+
+      {isBulkOpen && (
+        <BulkUploadContacts onClose={() => setIsBulkOpen(false)} />
       )}
       {/* {isModalOpen && <AddContactModal onClose={() => setIsModalOpen(false)} />} */}
     </div>
