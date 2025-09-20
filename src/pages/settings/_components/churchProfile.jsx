@@ -2,7 +2,6 @@ import { User } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -14,17 +13,24 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
-
+import { useFetchData, useMutateData } from "../../../hook/Request";
+import { useEffect } from "react";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 const churchProfileSchema = z.object({
   churchName: z.string().min(1, "Church name is required"),
   pastorName: z.string().min(1, "Pastor name is required"),
   address: z.string().min(5, "Address must be at least 5 characters"),
-  email: z.string().email("Invalid email address"),
+  email: z.email("Invalid email address"),
   phone: z.string().min(7, "Phone number is too short"),
-  website: z.string().url("Invalid website URL").optional().or(z.literal("")),
+  website: z.url("Invalid website URL").optional().or(z.literal("")),
 });
 
 export default function ChurchProfileContent() {
+  const { data } = useFetchData("/api/v1/setting", "getProfile");
+  const userData = data?.data?.user?.user;
+  const { mutateAsync, isLoading } = useMutateData(`updateProfile`, "PATCH");
+
   const form = useForm({
     resolver: zodResolver(churchProfileSchema),
     defaultValues: {
@@ -36,10 +42,33 @@ export default function ChurchProfileContent() {
       website: "",
     },
   });
-
-  function onSubmit(values) {
-    console.log("Form submitted:", values);
-  }
+  useEffect(() => {
+    if (userData) {
+      form.reset({
+        churchName: userData.churchName || "",
+        pastorName: userData.pastorName || "",
+        address: userData.address || "",
+        email: userData.email || "",
+        phone: userData.phone || "",
+        website: userData.website || "",
+      });
+    }
+  }, [userData, form]);
+  const onSubmit = async (payload) => {
+    try {
+      const response = await mutateAsync({
+        url: "/api/v1/setting",
+        data: payload,
+      });
+      toast.success(response.message);
+    } catch (error) {
+      toast.error(
+        error.errors?.map((err) => err.message)?.join(", ") ||
+          error?.message ||
+          "Failed to complete request."
+      );
+    }
+  };
 
   return (
     <div className="space-y-6 bg-gray-50 p-4 rounded-md">
@@ -64,7 +93,9 @@ export default function ChurchProfileContent() {
             name="churchName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Church Name</FormLabel>
+                <FormLabel>
+                  Church Name <span className="text-red-500">*</span>
+                </FormLabel>
                 <FormControl>
                   <Input placeholder="Enter church name" {...field} />
                 </FormControl>
@@ -78,7 +109,9 @@ export default function ChurchProfileContent() {
             name="pastorName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Pastor Name</FormLabel>
+                <FormLabel>
+                  Pastor Name <span className="text-red-500">*</span>
+                </FormLabel>
                 <FormControl>
                   <Input placeholder="Enter pastor name" {...field} />
                 </FormControl>
@@ -92,7 +125,9 @@ export default function ChurchProfileContent() {
             name="address"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Address</FormLabel>
+                <FormLabel>
+                  Address <span className="text-red-500">*</span>
+                </FormLabel>
                 <FormControl>
                   <Textarea
                     placeholder="Enter church address"
@@ -112,7 +147,9 @@ export default function ChurchProfileContent() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>
+                    Email <span className="text-red-500">*</span>
+                  </FormLabel>
                   <FormControl>
                     <Input type="email" placeholder="Enter email" {...field} />
                   </FormControl>
@@ -126,7 +163,9 @@ export default function ChurchProfileContent() {
               name="phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Phone</FormLabel>
+                  <FormLabel>
+                    Phone <span className="text-red-500">*</span>
+                  </FormLabel>
                   <FormControl>
                     <Input
                       type="tel"
@@ -163,7 +202,13 @@ export default function ChurchProfileContent() {
               type="submit"
               className="bg-[#5B38DB] hover:bg-[#4A2FB8] rounded-full px-6"
             >
-              Save Changes
+              {isLoading ? (
+                <div className="flex gap-2">
+                  <Loader2 /> Saving...
+                </div>
+              ) : (
+                "Save Changes"
+              )}
             </Button>
           </div>
         </form>
