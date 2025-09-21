@@ -96,7 +96,7 @@ export default function Contacts() {
         <div className="bg-white shadow rounded-lg p-4">
           <p className="text-gray-500">Groups</p>
           <h2 className="text-2xl font-bold">
-            {contactData?.data?.groupTotal}
+            {contactData?.data?.groupTotal || 0}
           </h2>
         </div>
       </div>
@@ -309,7 +309,7 @@ function AddContactModal({ onClose, contact }) {
               name="phoneNumber"
               value={formData.phoneNumber}
               onChange={handleChange}
-              placeholder="+1 (555) 345-7890"
+              placeholder="1 (555) 345-7890"
               className="w-full border rounded-md px-3 py-2"
             />
           </div>
