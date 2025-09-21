@@ -54,11 +54,11 @@ export default function Sidebar() {
       label: "Contacts",
       icon: Users,
     },
-    // {
-    //   path: "/compose",
-    //   label: "Compose",
-    //   icon: PenTool,
-    // },
+    {
+      path: "/compose",
+      label: "Compose",
+      icon: PenTool,
+    },
     // {
     //   path: "/campaigns",
     //   label: "Campaigns",

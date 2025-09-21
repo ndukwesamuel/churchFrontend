@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useMutateData } from "../../hook/Request";
 import LoginSideBar from "../../components/Sidebar/loginSideBar";
 import Dashboard from "./Dashboard";
-
+import { toast } from "sonner";
 const MainSignUp = () => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -48,7 +48,7 @@ const MainSignUp = () => {
           setIsSubmitted(true);
         },
         onError: (err) => {
-          console.error("Failed to add contact:", err);
+          toast.error(err.message);
         },
       }
     );
