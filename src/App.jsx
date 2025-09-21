@@ -89,10 +89,10 @@ const router = createBrowserRouter([
             path: "/files",
             element: <FileManager />, // Create this component
           },
-          {
-            path: "/settings",
-            element: <SettingsDashboard />, // Create this component
-          },
+          // {
+          //   path: "/settings",
+          //   element: <SettingsDashboard />, // Create this component
+          // },
           // {
           //   path: "/customers/all",
           //   element: <AllCustomers />, // Create this component
