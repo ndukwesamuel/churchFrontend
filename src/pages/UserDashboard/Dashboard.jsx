@@ -7,46 +7,41 @@ import { ChurchProfile } from "../../redux/AuthSlice";
 const Dashboard = () => {
   const dispatch = useDispatch();
 
-  const selectedEstate = useSelector((state) => state?.reducer);
-
-  console.log({
-    ff: selectedEstate,
-  });
-
-  const {
-    data: settingData,
-    refetch,
-    isLoading,
-  } = useFetchData(`/api/v1/setting`, "setting");
-
+  const { data, refetch, isLoading } = useFetchData(
+    `/api/v1/dashboard`,
+    "setting"
+  );
+  console.log(data?.data);
+  const statsDetails = data?.data;
   // Dispatch contacts to Redux when they load
-  useEffect(() => {
-    if (settingData?.data) {
-      console.log({
-        jaja: settingData?.data,
-      });
 
-      dispatch(ChurchProfile(settingData?.data));
-    }
-  }, [settingData, dispatch]);
   const stats = [
     {
       title: "Total messages sent",
-      value: "247",
+      value: statsDetails?.totalMessagesSent || 0,
       change: "+12% this month",
       icon: MessageSquare,
     },
     {
       title: "Active contact",
-      value: "247",
-      change: "+12% this month",
+      value: statsDetails?.activeUsers || 0,
+      change: "6% this month",
       icon: Users,
     },
-    { title: "SMS Sent", value: "447", change: "+12% this month", icon: Send },
+    {
+      title: "SMS Sent",
+      value:
+        statsDetails?.messageTypeCounts.find((m) => m.messageType === "sms")
+          ?.count || 0,
+      change: "+10% this month",
+      icon: Send,
+    },
     {
       title: "Email sent",
-      value: "127",
-      change: "+12% this month",
+      value:
+        statsDetails?.messageTypeCounts.find((m) => m.messageType === "email")
+          ?.count || 0,
+      change: "+22% this month",
       icon: Mail,
     },
   ];
@@ -133,7 +128,7 @@ const Dashboard = () => {
               Recent Campaigns
             </h2>
             <p className="text-gray-600 mt-1 text-sm">
-              You latest message campaigns
+              Your latest message campaigns
             </p>
           </div>
 
