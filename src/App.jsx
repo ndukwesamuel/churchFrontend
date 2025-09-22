@@ -17,6 +17,8 @@ import CreateTemplate from "./pages/Template/_components/createTemplate";
 import EditTemplate from "./pages/Template/_components/editTemplate";
 import SettingsPage from "./pages/settings/settings";
 import MainSignUp from "./pages/Login/MainSignUp";
+import MessageComposer from "./pages/message/messageComposer";
+import BulkUploadContacts from "./pages/Contact/BulkUploadContacts";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -50,14 +52,29 @@ const router = createBrowserRouter([
             element: <Contacts />,
           },
           // Add these new routes
-          // {
-          //   path: "/compose",
-          //   element: <Compose />, // Create this component
-          // },
+          {
+            path: "/compose",
+            element: <MessageComposer />,
+          },
           // {
           //   path: "/campaigns",
           //   element: <Campaigns />, // Create this component
           // },
+          // {
+          //   path: "contacts",
+          //   children: [
+          //     { index: true, element: <Contacts /> },
+          //     {
+          //       path: "bulk",
+          //       element: <BulkUploadContacts />,
+          //     },
+          //     // {
+          //     //   path: ":templateId",
+          //     //   element: <EditTemplate />,
+          //     // },
+          //   ],
+          // },
+
           {
             path: "templates",
             children: [

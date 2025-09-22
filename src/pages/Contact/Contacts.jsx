@@ -18,6 +18,29 @@
 
 //   // const [isModalOpen, setIsModalOpen] = useState(false);
 //   const [selectedContact, setSelectedContact] = useState(null);
+import React, { useState } from "react";
+import { FiMail, FiPhone, FiEdit2, FiTrash } from "react-icons/fi";
+import { AiOutlineUser } from "react-icons/ai";
+// import React from "react";
+import { IoClose } from "react-icons/io5";
+import {
+  useDeleteData,
+  useFetchData,
+  useMutateData,
+  usePatchData,
+} from "../../hook/Request";
+import { useSelector } from "react-redux";
+import BulkUploadContacts from "./BulkUploadContacts";
+
+export default function Contacts() {
+  const { contact } = useSelector((state) => state?.reducer?.AuthSlice);
+  const [editingContact, setEditingContact] = useState(null);
+  const [editContact, setEditContact] = useState(null);
+
+  const [isBulkOpen, setIsBulkOpen] = useState(false);
+
+  // const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedContact, setSelectedContact] = useState(null);
 
 //   // const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -30,6 +53,13 @@
 //   console.log({
 //     fgf: settingApiData,
 //   });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { data: contactData, refetch } = useFetchData(
+    `/api/v1/contacts`,
+    "contacts"
+  );
+
+  const contacts = contactData?.data?.members || [];
 
 //   const contacts = settingApiData?.data?.members || [];
 
@@ -76,6 +106,47 @@
 //           + Add Contact
 //         </button>
 //       </div>
+        <button
+          onClick={() => {
+            setSelectedContact(null); // new contact
+            setIsModalOpen(true);
+          }}
+          className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700"
+        >
+          + Add Contact
+        </button>
+
+        <button
+          onClick={() => setIsBulkOpen(true)}
+          className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700"
+
+          // className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 ml-2"
+        >
+          Bulk Upload
+        </button>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="bg-white shadow rounded-lg p-4">
+          <p className="text-gray-500">Total Contact</p>
+          <h2 className="text-2xl font-bold">
+            {contactData?.data?.memberCount || 0}
+          </h2>
+        </div>
+        <div className="bg-white shadow rounded-lg p-4">
+          <p className="text-gray-500">Active Members</p>
+          <h2 className="text-2xl font-bold">
+            {contacts.filter((c) => c.status === "active").length}
+          </h2>
+        </div>
+        <div className="bg-white shadow rounded-lg p-4">
+          <p className="text-gray-500">Groups</p>
+          <h2 className="text-2xl font-bold">
+            {contactData?.data?.groupTotal}
+          </h2>
+        </div>
+      </div>
 
 //       {/* Stats */}
 //       <div className="grid grid-cols-3 gap-4 mb-6">
@@ -153,6 +224,14 @@
 //       {/* {isModalOpen && !editContact && (
 //         <AddContactModal onClose={() => setIsModalOpen(false)} />
 //       )}
+            <div className="flex gap-2 flex-wrap mt-2">
+              <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-md">
+                {contact?.group?.name || "No Group"}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
 
 //       {editContact && (
 //         <AddContactModal
@@ -639,16 +718,31 @@ export default function Contacts() {
   );
 }
 
+      {isModalOpen && (
+        <AddContactModal
+          onClose={() => setIsModalOpen(false)}
+          contact={selectedContact} // null = create, object = edit
+        />
+      )}
+
+      {isBulkOpen && (
+        <BulkUploadContacts onClose={() => setIsBulkOpen(false)} />
+      )}
+      {/* {isModalOpen && <AddContactModal onClose={() => setIsModalOpen(false)} />} */}
+    </div>
+  );
+}
+
 function AddContactModal({ onClose, contact }) {
   const isEditing = Boolean(contact);
-
+  console.log(contact);
   const [formData, setFormData] = useState({
     fullName: contact?.fullName || "",
     email: contact?.email || "",
     phoneNumber: contact?.phoneNumber || "",
     status: contact?.status || "Active",
     role: contact?.role || "Member",
-    groupId: contact?.groupId || "",
+    groupId: contact?.group?._id || "",
   });
 
   const { data: settingApiData } = useFetchData(
@@ -656,6 +750,8 @@ function AddContactModal({ onClose, contact }) {
     "profilesetting"
   );
 
+  const { data: groupData } = useFetchData(`/api/v1/groups`, "groups");
+  // create
   const { mutate: addContact, isLoading: isAdding } = useMutateData("contacts");
   const { mutate: updateContact, isLoading: isUpdating } =
     usePatchData("contacts");
@@ -784,7 +880,10 @@ function AddContactModal({ onClose, contact }) {
               onChange={handleChange}
               className="w-full border rounded-md px-3 py-2"
             >
-              {settingApiData?.data?.user?.groups?.map((group) => (
+              <option value="" disabled>
+                -- Select a group --
+              </option>
+              {groupData?.data?.groups?.map((group) => (
                 <option key={group?._id} value={group?._id}>
                   {group?.name}
                 </option>

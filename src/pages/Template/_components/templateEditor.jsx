@@ -88,7 +88,7 @@ export const TemplateEditor = ({
       <button
         type="submit"
         disabled={!canSave || isSubmitting}
-        className="w-full bg-purple-700 text-white px-6 py-3 rounded-lg flex items-center justify-center gap-2 hover:bg-purple-600 transition-colors font-medium disabled:bg-gray-300 disabled:cursor-not-allowed"
+        className="w-full bg-vividBlue text-white px-6 py-3 rounded-lg flex items-center justify-center gap-2 hover:bg-purple-600 transition-colors font-medium disabled:bg-gray-300 disabled:cursor-not-allowed"
       >
         <Save className="w-4 h-4" />
         {isSubmitting ? "Saving..." : "Save Template"}
