@@ -16,6 +16,8 @@ import {
 import { mainlogout } from "../../redux/AuthSlice";
 import { useDispatch } from "react-redux";
 
+import logo from "../../assets/images/logo.svg";
+
 export default function Sidebar() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -85,13 +87,9 @@ export default function Sidebar() {
     <>
       {/* Logo Section */}
       <div className="flex items-center mb-8 px-4 pt-2">
-        <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
-          <span className="text-white font-bold text-sm">CC</span>
-        </div>
         <div className="min-w-0">
-          <h1 className="text-lg font-bold text-gray-900 truncate">
-            Churchcomm
-          </h1>
+          <img src={logo} alt="App Logo" className=" h-6  w-40" />
+
           <p className="text-xs text-gray-500 truncate">
             Grace community church
           </p>

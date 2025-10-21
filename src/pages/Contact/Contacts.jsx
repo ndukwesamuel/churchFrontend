@@ -9,12 +9,13 @@ import {
   usePatchData,
 } from "../../hook/Request";
 import { useSelector } from "react-redux";
+import BulkUploadContacts from "./BulkUploadContacts";
 
 export default function Contacts() {
   const { contact } = useSelector((state) => state?.reducer?.AuthSlice);
   const [editingContact, setEditingContact] = useState(null);
   const [editContact, setEditContact] = useState(null);
-
+  const [isBulkUploadModalOpen, setIsBulkUploadModalOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState(null);
 
   // const [isModalOpen, setIsModalOpen] = useState(false);
@@ -51,8 +52,37 @@ export default function Contacts() {
 
   return (
     <div className="p-6 flex-1">
-      {/* Header */}
       <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-2xl font-semibold">Contact Management</h1>
+          <p className="text-gray-500">
+            Manage your congregation contacts and groups
+          </p>
+        </div>
+
+        <div className="flex gap-3">
+          {/* ADD BULK UPLOAD BUTTON */}
+          <button
+            onClick={() => setIsBulkUploadModalOpen(true)}
+            className="bg-gray-200 text-purple-600 px-4 py-2 rounded-md hover:bg-gray-300 font-medium"
+          >
+            Bulk Upload
+          </button>
+
+          {/* EXISTING ADD CONTACT BUTTON */}
+          <button
+            onClick={() => {
+              setSelectedContact(null); // new contact
+              setIsModalOpen(true);
+            }}
+            className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700"
+          >
+            + Add Contact
+          </button>
+        </div>
+      </div>
+      {/* Header */}
+      {/* <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-semibold">Contact Management</h1>
           <p className="text-gray-500">
@@ -69,7 +99,7 @@ export default function Contacts() {
         >
           + Add Contact
         </button>
-      </div>
+      </div> */}
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="bg-white shadow rounded-lg p-4">
@@ -156,6 +186,15 @@ export default function Contacts() {
           contact={selectedContact} // null = create, object = edit
         />
       )}
+
+      {isBulkUploadModalOpen && (
+        <BulkUploadContacts
+          onClose={() => {
+            setIsBulkUploadModalOpen(false);
+            refetch(); // 👈 IMPORTANT: Refetch contacts after a successful bulk upload
+          }}
+        />
+      )}
       {/* {isModalOpen && <AddContactModal onClose={() => setIsModalOpen(false)} />} */}
     </div>
   );
@@ -164,6 +203,20 @@ export default function Contacts() {
 function AddContactModal({ onClose, contact }) {
   const isEditing = Boolean(contact);
   console.log(contact);
+  const standardizePhoneNumber = (inputNumber) => {
+    // 1. Remove non-digit characters
+    const digitsOnly = inputNumber.replace(/\D/g, "");
+
+    // 2. Check if it starts with '0' and is long enough to be a local Nigerian number (e.g., 11 digits)
+    if (digitsOnly.length > 0 && digitsOnly.startsWith("0")) {
+      // Remove the leading '0' and prepend '234'
+      return "234" + digitsOnly.substring(1);
+    }
+
+    // 3. If it already starts with '234' or is not a typical local format, return as is
+    // This allows for other international formats if needed, or if '234' was manually typed
+    return digitsOnly;
+  };
   const [formData, setFormData] = useState({
     fullName: contact?.fullName || "",
     email: contact?.email || "",
@@ -179,9 +232,21 @@ function AddContactModal({ onClose, contact }) {
   const { mutate: updateContact, isLoading: isUpdating } =
     usePatchData("contacts");
 
+  // const handleChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setFormData((prev) => ({ ...prev, [name]: value }));
+  // };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    if (name === "phoneNumber") {
+      // Standardize the phone number when the user types
+      const standardizedValue = standardizePhoneNumber(value);
+      setFormData((prev) => ({ ...prev, [name]: standardizedValue }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = (e) => {
@@ -277,7 +342,7 @@ function AddContactModal({ onClose, contact }) {
               name="phoneNumber"
               value={formData.phoneNumber}
               onChange={handleChange}
-              placeholder="1 (555) 345-7890"
+              placeholder="08011111111"
               className="w-full border rounded-md px-3 py-2"
             />
           </div>

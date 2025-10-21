@@ -14,6 +14,7 @@ import {
   Eye,
   ZoomIn,
   ZoomOut,
+  Plus,
 } from "lucide-react";
 import {
   useFetchData,
@@ -43,6 +44,10 @@ const FileManager = () => {
     error,
     refetch,
   } = useFetchData("/api/v1/collection", "userData");
+
+  console.log({
+    fgfg: userData?.data?.existing,
+  });
 
   const photoFolders = userData?.data?.existing?.photoFolders || [];
 
@@ -523,6 +528,29 @@ const FileManager = () => {
     return new Date(dateString).toLocaleDateString();
   };
 
+  const { mutate: createCollection, isLoading: isCreatingCollection } =
+    useMutateData("userData");
+
+  const handleCreateCollection = () => {
+    createCollection(
+      {
+        url: "/api/v1/collection/create", // Adjust URL as needed
+        data: {},
+      },
+      {
+        onSuccess: (data) => {
+          console.log("Collection created:", data);
+          alert("Collection created successfully!");
+          refetch();
+        },
+        onError: (err) => {
+          console.error("Failed to create collection:", err);
+          alert("Failed to create collection. Please try again.");
+        },
+      }
+    );
+  };
+
   const getFilteredPhotos = () => {
     let allPhotos = [];
 
@@ -579,12 +607,77 @@ const FileManager = () => {
     );
   }
 
+  // Show "Create Collection" interface when userData?.data?.existing is null
+  // if (!userData?.data?.existing) {
+  //   return (
+  //     <div className="flex-1 bg-gray-50 p-6">
+  //       {/* Header */}
+  //       <div className="mb-6">
+  //         <h1 className="text-2xl font-semibold text-gray-900 mb-2">
+  //           File Manager
+  //         </h1>
+  //         <p className="text-gray-600">
+  //           Upload, organise and manage your media file with AI-Powered
+  //           optimization
+  //         </p>
+  //       </div>
+
+  //       {/* Create Collection Card */}
+  //       <div className="bg-white rounded-lg shadow-sm p-12">
+  //         <div className="text-center max-w-md mx-auto">
+  //           <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+  //             <Plus className="w-8 h-8 text-blue-600" />
+  //           </div>
+
+  //           <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+  //             Create Your First Collection
+  //           </h2>
+
+  //           <p className="text-gray-600 mb-8">
+  //             Get started by creating a collection to organize and manage your
+  //             media files. You can then create folders and upload your images
+  //             with AI-powered optimization.
+  //           </p>
+
+  //           <button
+  //             onClick={handleCreateCollection}
+  //             disabled={isCreatingCollection}
+  //             className="inline-flex items-center space-x-3 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+  //           >
+  //             {isCreatingCollection ? (
+  //               <>
+  //                 <Loader className="w-5 h-5 animate-spin" />
+  //                 <span>Creating Collection...</span>
+  //               </>
+  //             ) : (
+  //               <>
+  //                 <Plus className="w-5 h-5" />
+  //                 <span>Create Collection</span>
+  //               </>
+  //             )}
+  //           </button>
+
+  //           <div className="mt-8 text-sm text-gray-500">
+  //             <p>Once created, you'll be able to:</p>
+  //             <ul className="mt-2 space-y-1">
+  //               <li>• Create and organize folders</li>
+  //               <li>• Upload and manage images</li>
+  //               <li>• Use AI-powered optimization</li>
+  //               <li>• Track storage usage</li>
+  //             </ul>
+  //           </div>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   );
+  // }
+
   return (
     <div className="flex-1 bg-gray-50 p-6">
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-semibold text-gray-900 mb-2">
-          File Manager
+          File Manager jaja
         </h1>
         <p className="text-gray-600">
           Upload, organise and manage your media file with AI-Powered
@@ -758,11 +851,23 @@ const FileManager = () => {
                   <p className="text-gray-500 mb-4">
                     Upload some files to get started
                   </p>
+
                   <button
-                    onClick={() => setShowUploadModal(true)}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    onClick={handleCreateCollection}
+                    disabled={isCreatingCollection}
+                    className="inline-flex items-center space-x-3 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
-                    Upload Files
+                    {isCreatingCollection ? (
+                      <>
+                        <Loader className="w-5 h-5 animate-spin" />
+                        <span>Creating Collection...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="w-5 h-5" />
+                        <span>Create Collection</span>
+                      </>
+                    )}
                   </button>
                 </div>
               ) : (
@@ -1025,45 +1130,6 @@ const FileManager = () => {
               >
                 Cancel
               </button>
-              {/* <button
-                onClick={handleFileUpload}
-                disabled={
-                  !selectedFiles.length || !selectedFolder || isUploading
-                }
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
-              >
-                {isUploading ? (
-                  <>
-                    <Loader className="w-4 h-4 animate-spin" />
-                    <span>Uploading...</span>
-                  </>
-                ) : (
-                  <span>
-                    Upload {selectedFiles.length} File
-                    {selectedFiles.length !== 1 ? "s" : ""}
-                  </span>
-                )}
-              </button> */}
-
-              {/* <button
-                onClick={handleFileUpload}
-                disabled={
-                  !selectedFiles.length || !selectedFolder || isUploading
-                }
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
-              >
-                {isUploading ? (
-                  <>
-                    <Loader className="w-4 h-4 animate-spin" />
-                    <span>Uploading...</span>
-                  </>
-                ) : (
-                  <span>
-                    Upload {selectedFiles.length} File
-                    {selectedFiles.length !== 1 ? "s" : ""}
-                  </span>
-                )}
-              </button> */}
 
               <button
                 onClick={handleSmartUpload} // Use smart upload function

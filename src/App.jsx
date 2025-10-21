@@ -17,6 +17,7 @@ import CreateTemplate from "./pages/Template/_components/createTemplate";
 import EditTemplate from "./pages/Template/_components/editTemplate";
 import SettingsPage from "./pages/settings/settings";
 import MessageComposer from "./pages/message/messageComposer";
+import BulkUploadContacts from "./pages/Contact/BulkUploadContacts";
 import MainSignUp from "./pages/auth/MainSignUp";
 const router = createBrowserRouter([
   {
@@ -59,6 +60,21 @@ const router = createBrowserRouter([
           //   path: "/campaigns",
           //   element: <Campaigns />, // Create this component
           // },
+          // {
+          //   path: "contacts",
+          //   children: [
+          //     { index: true, element: <Contacts /> },
+          //     {
+          //       path: "bulk",
+          //       element: <BulkUploadContacts />,
+          //     },
+          //     // {
+          //     //   path: ":templateId",
+          //     //   element: <EditTemplate />,
+          //     // },
+          //   ],
+          // },
+
           {
             path: "templates",
             children: [
