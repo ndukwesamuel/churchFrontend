@@ -1,5 +1,5 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import Login from "./pages/Login/Login";
+import Login from "./pages/auth/Login";
 import RootLayout from "./layouts/RootLayout";
 import { Toaster } from "sonner";
 // import Candidates from "./pages/Candidates/Candidates";
@@ -16,8 +16,8 @@ import TemplateManager from "./pages/Template/template";
 import CreateTemplate from "./pages/Template/_components/createTemplate";
 import EditTemplate from "./pages/Template/_components/editTemplate";
 import SettingsPage from "./pages/settings/settings";
-import MainSignUp from "./pages/Login/MainSignUp";
 import MessageComposer from "./pages/message/messageComposer";
+import MainSignUp from "./pages/auth/MainSignUp";
 const router = createBrowserRouter([
   {
     path: "/",
