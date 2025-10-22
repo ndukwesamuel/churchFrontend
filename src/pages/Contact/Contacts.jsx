@@ -52,10 +52,12 @@ export default function Contacts() {
 
   return (
     <div className="p-6 flex-1">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-6 ">
         <div>
-          <h1 className="text-2xl font-semibold">Contact Management</h1>
-          <p className="text-gray-500">
+          <h1 className=" sm:text-2xl font-semibold text-darkBlueGray">
+            Contact Management
+          </h1>
+          <p className="text-slateBlue text-sm sm:text-base font-normal">
             Manage your congregation contacts and groups
           </p>
         </div>

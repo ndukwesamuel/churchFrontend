@@ -27,6 +27,7 @@ import {
 import { ArrowRight, Bold, Italic, Underline } from "lucide-react";
 
 const ComposeForm = ({ form, recipientGroups, onNext, isMobile }) => {
+  console.log(isMobile);
   const {
     handleSubmit,
     formState: { isValid },
@@ -41,7 +42,9 @@ const ComposeForm = ({ form, recipientGroups, onNext, isMobile }) => {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <Card>
           <CardHeader>
-            <CardTitle>Message Details</CardTitle>
+            <CardTitle className="text-base font-semibold text-darkBlueGray">
+              Message Details
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <FormField
@@ -55,7 +58,7 @@ const ComposeForm = ({ form, recipientGroups, onNext, isMobile }) => {
                     defaultValue={field.value}
                   >
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="bg-paleBlueGray">
                         <SelectValue placeholder="Select message type" />
                       </SelectTrigger>
                     </FormControl>
@@ -77,36 +80,10 @@ const ComposeForm = ({ form, recipientGroups, onNext, isMobile }) => {
                 <FormItem>
                   <FormLabel>Message</FormLabel>
                   <div className="border rounded-md">
-                    <div className="flex gap-1 p-2 border-b bg-gray-50">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-8 px-2"
-                        type="button"
-                      >
-                        <Bold className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-8 px-2"
-                        type="button"
-                      >
-                        <Italic className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-8 px-2"
-                        type="button"
-                      >
-                        <Underline className="h-4 w-4" />
-                      </Button>
-                    </div>
                     <FormControl>
                       <Textarea
                         placeholder="Type your message here..."
-                        className="border-0 resize-none focus-visible:ring-0"
+                        className="border-0 resize-none focus-visible:ring-0 bg-paleBlueGray"
                         rows={8}
                         {...field}
                       />
@@ -191,7 +168,7 @@ const ComposeForm = ({ form, recipientGroups, onNext, isMobile }) => {
           <Button
             type="button"
             onClick={onNext}
-            className="w-full bg-vividBlue"
+            className="w-full bg-deepPurple hover:bg-deepPurple rounded-full"
             disabled={!isValid}
           >
             Next <ArrowRight className="ml-2 h-4 w-4" />

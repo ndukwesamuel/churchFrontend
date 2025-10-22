@@ -1,8 +1,15 @@
 import React, { useEffect } from "react";
-import { MessageSquare, Users, Send, Mail, Eye, Settings } from "lucide-react";
+import {
+  MessageSquareText,
+  MessageSquare,
+  Users,
+  Send,
+  Mail,
+  Eye,
+  Settings,
+} from "lucide-react";
 import { useFetchData } from "../../hook/Request";
 import { useDispatch, useSelector } from "react-redux";
-import { ChurchProfile } from "../../redux/AuthSlice";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -20,7 +27,7 @@ const Dashboard = () => {
       title: "Total messages sent",
       value: statsDetails?.totalMessagesSent || 0,
       change: "+12% this month",
-      icon: MessageSquare,
+      icon: Send,
     },
     {
       title: "Active contact",
@@ -34,7 +41,7 @@ const Dashboard = () => {
         statsDetails?.messageTypeCounts.find((m) => m.messageType === "sms")
           ?.count || 0,
       change: "+10% this month",
-      icon: Send,
+      icon: MessageSquareText,
     },
     {
       title: "Email sent",
@@ -62,28 +69,31 @@ const Dashboard = () => {
       <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-4">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
-            <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">
+            <h1 className="text-xl sm:text-2xl font-semibold text-darkBlueGray">
               Church communication Dashboard
             </h1>
-            <p className="text-gray-600 mt-1 text-sm sm:text-base">
+            <p className="text-slateBlue mt-1 text-sm sm:text-base">
               Manage your church's SMS and email communication
             </p>
           </div>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
-            <button className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 text-sm">
-              <Users size={16} />
-              <span className="hidden sm:inline">Manage contacts</span>
-              <span className="sm:hidden">Contacts</span>
-            </button>
-            <button className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 text-sm">
-              <Eye size={16} />
-              <span className="hidden sm:inline">View Campaigns</span>
-              <span className="sm:hidden">Campaigns</span>
-            </button>
-            <button className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 text-sm">
+            {/* Left group of 2 buttons */}
+            <div className="flex flex-1 gap-2">
+              <button className="flex flex-1 items-center justify-center gap-2 px-4 py-4 text-darkBlueGray bg-paleBlueGray rounded-full font-medium hover:bg-gray-50 text-sm whitespace-nowrap">
+                <Users size={16} />
+                <span>Manage contacts</span>
+              </button>
+
+              <button className="flex flex-1 items-center justify-center gap-2 px-4 py-4 text-darkBlueGray bg-paleBlueGray rounded-full font-medium hover:bg-gray-50 text-sm whitespace-nowrap">
+                <Eye size={16} />
+                <span>View campaigns</span>
+              </button>
+            </div>
+
+            {/* Right button */}
+            <button className="flex flex-1 items-center justify-center gap-2 px-4 py-4 rounded-full text-paleBlue bg-deepPurple hover:bg-deepPurple/90 font-medium text-sm whitespace-nowrap">
               <Send size={16} />
-              <span className="hidden sm:inline">Send new message</span>
-              <span className="sm:hidden">Send</span>
+              <span>Send new message</span>
             </button>
           </div>
         </div>
@@ -96,105 +106,95 @@ const Dashboard = () => {
           {stats.map((stat, index) => (
             <div
               key={index}
-              className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6"
+              className="bg-white rounded-xl border-none p-4 sm:p-6"
             >
-              <div className="flex items-center justify-between mb-3 sm:mb-4">
-                <div className="p-2 bg-gray-100 rounded-lg">
-                  <stat.icon size={18} className="text-gray-600" />
-                </div>
-                <MessageSquare size={14} className="text-gray-400" />
-              </div>
-              <div>
-                <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">
+              <div className="flex justify-between items-center mb-2 p-2">
+                <p className="text-xs sm:text-sm font-medium text-inkyBlue mb-1">
                   {stat.title}
                 </p>
-                <p className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
-                  {stat.value}
-                </p>
-                <div className="flex items-center text-xs sm:text-sm">
-                  <span className="text-green-600 font-medium">
-                    📈 {stat.change}
-                  </span>
+
+                <div className="bg-lightGrayishBlue flex items-center p-1 rounded-sm">
+                  <stat.icon size={14} className="text-darkBlueGray " />
                 </div>
+              </div>
+
+              <p className="text-2xl sm:text-3xl font-semibold text-darkBlueGray mb-2">
+                {stat.value}
+              </p>
+              <div className="flex items-center text-xs sm:text-sm">
+                <span className=" font-normal">
+                  📈 <span className="text-inkyBlue"> {stat.change}</span>
+                </span>
               </div>
             </div>
           ))}
         </div>
 
         {/* Recent Campaigns Section */}
-        <div className="bg-white rounded-lg border border-gray-200">
-          <div className="p-4 sm:p-6 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">
+        <div className="space-y-5">
+          <div className=" ">
+            <h2 className="text-lg font-semibold text-darkBlueGray">
               Recent Campaigns
             </h2>
-            <p className="text-gray-600 mt-1 text-sm">
+            <p className="text-inkyBlue mt-1 text-sm">
               Your latest message campaigns
             </p>
           </div>
 
           {/* Campaigns Grid */}
-          <div className="p-4 sm:p-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {campaigns.map((campaign, index) => (
-                <div
-                  key={index}
-                  className={`border-2 rounded-lg p-4 ${
-                    index === 0
-                      ? "border-blue-500 border-dashed bg-blue-50"
-                      : "border-gray-200 bg-white"
-                  }`}
-                >
-                  <div className="flex items-center justify-center mb-4">
-                    <div className="p-3 bg-blue-100 rounded-lg">
-                      <MessageSquare size={20} className="text-blue-600" />
-                    </div>
-                  </div>
-
-                  <div className="text-center mb-4">
-                    <div className="flex items-center justify-center gap-1 sm:gap-2 mb-2 flex-wrap">
-                      <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                        SMS
-                      </span>
-                      <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                        Email
-                      </span>
-                      <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded">
-                        Completed
-                      </span>
-                    </div>
-                  </div>
-
-                  <h3 className="font-medium text-gray-900 text-center mb-4 text-sm sm:text-base leading-tight">
-                    {campaign.title}
-                  </h3>
-
-                  <div className="space-y-2 mb-4">
-                    <div className="flex justify-between text-xs sm:text-sm">
-                      <span className="text-gray-600">
-                        Sent: {campaign.sent}
-                      </span>
-                      <span className="text-gray-600">
-                        Delivered: {campaign.delivered}
-                      </span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div
-                        className="bg-blue-600 h-2 rounded-full"
-                        style={{
-                          width: `${
-                            (campaign.delivered / campaign.sent) * 100
-                          }%`,
-                        }}
-                      ></div>
-                    </div>
-                  </div>
-
-                  <p className="text-xs text-gray-500 text-center">
-                    {campaign.date}
-                  </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {campaigns.map((campaign, index) => (
+              <div key={index} className="border- rounded-lg bg-white p-4 ">
+                <div className="bg-lightGrayishBlue p-1 w-6 rounded-sm mb-4">
+                  <MessageSquareText size={16} className="text-deepPurple" />
                 </div>
-              ))}
-            </div>
+
+                <div className="text-center mb-4">
+                  <div className="flex gap-1 sm:gap-2 mb-2 flex-wrap">
+                    <span className="text-xs font-normal bg-paleBlueGray text-darkBlueGray px-2 py-1 rounded-[6px]">
+                      SMS
+                    </span>
+                    <span className="text-xs font-normal bg-paleBlueGray text-darkBlueGray px-2 py-1 rounded-[6px]">
+                      Email
+                    </span>
+                    <span className="text-xs font-normal bg-fadedGreen text-whatsappGreen px-2 py-1 rounded-[6px]">
+                      Completed
+                    </span>
+                  </div>
+                </div>
+
+                <h3 className="font-semibold text-darkBlueGray text-center mb-4 text-sm sm:text-base leading-tight">
+                  {campaign.title}
+                </h3>
+
+                <div className="space-y-2 mb-4">
+                  <div className="flex justify-between text-xs sm:text-sm">
+                    <span className="text-lightSlateGray text-sm sm:text-base font-medium">
+                      Sent:{" "}
+                      <span className="text-blueBayoux">{campaign.sent}</span>
+                    </span>
+                    <span className="text-lightSlateGray text-sm sm:text-base font-medium">
+                      Delivered:
+                      <span className="text-blueBayoux">
+                        {campaign.delivered}
+                      </span>
+                    </span>
+                  </div>
+                  <div className="w-full bg-paleBlueGray rounded-full h-2">
+                    <div
+                      className="bg-deepPurple h-2 rounded-full"
+                      style={{
+                        width: `${(campaign.delivered / campaign.sent) * 100}%`,
+                      }}
+                    ></div>
+                  </div>
+                </div>
+
+                <p className="text-sm font-medium text-blueBayoux">
+                  {campaign.date}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </div>
