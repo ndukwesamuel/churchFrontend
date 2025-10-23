@@ -28,8 +28,8 @@ export const ChannelSelector = ({ selectedChannels, onChannelChange }) => {
 
   return (
     <div className="space-y-3">
-      <label className="block text-sm font-medium text-gray-700">
-        Channel *
+      <label className="block text-sm font-medium text-darkBlueGray">
+        Channel <span className="text-red-500">*</span>
       </label>
 
       {/* Dropdown */}
@@ -37,9 +37,11 @@ export const ChannelSelector = ({ selectedChannels, onChannelChange }) => {
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="w-full px-3 py-2 text-left bg-lightGray border border-gray-300 rounded-md shadow-sm outline-none flex items-center justify-between"
+          className="w-full px-3 py-2 text-left bg-lightBlueGray border border-gray-300 rounded-md shadow-sm outline-none flex items-center justify-between"
         >
-          <span className="text-sm text-gray-700">{getPlaceholderText()}</span>
+          <span className="text-sm text-darkBlueGray ">
+            {getPlaceholderText()}
+          </span>
           <ChevronDown
             className={`w-4 h-4 text-gray-400 transition-transform ${
               isOpen ? "transform rotate-180" : ""
@@ -63,9 +65,9 @@ export const ChannelSelector = ({ selectedChannels, onChannelChange }) => {
                       type="checkbox"
                       checked={selectedChannels.includes(channel.id)}
                       onChange={() => {}} // Handled by button onClick
-                      className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 pointer-events-none"
+                      className="w-4 h-4 text-deepPurple border-gray-300 rounded focus:ring-purple-500 pointer-events-none"
                     />
-                    <span className="text-gray-700">{channel.name}</span>
+                    <span className="text-darkBlueGray">{channel.name}</span>
                   </div>
                 </button>
               ))}

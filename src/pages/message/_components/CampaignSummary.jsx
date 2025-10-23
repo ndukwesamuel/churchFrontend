@@ -54,7 +54,7 @@ const CampaignSummary = ({
         onClick={onSend}
       >
         {isLoading ? (
-          <Loader2 />
+          <Loader2 className="animate-spin" />
         ) : (
           <div className="flex items-center text-paleBlue font-medium text-sm">
             <Send className="mr-2 h-4 w-4 " />
@@ -72,7 +72,7 @@ const CampaignSummary = ({
           type="button"
         >
           {isLoading ? (
-            <Loader2 />
+            <Loader2 className="animate-spin" />
           ) : (
             <div className="flex items-center text-darkBlueGray font-medium text-sm">
               <Clock className="mr-2 h-4 w-4" />
@@ -87,7 +87,7 @@ const CampaignSummary = ({
           type="button"
         >
           {isLoading ? (
-            <Loader2 />
+            <Loader2 className="animate-spin" />
           ) : (
             <div className="flex items-center text-darkBlueGray font-medium text-sm">
               <Save className="mr-2 h-4 w-4" />

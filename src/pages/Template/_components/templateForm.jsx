@@ -29,18 +29,18 @@ export const TemplateForm = ({
       {/* Category Dropdown */}
       <div className="space-y-2">
         <label className="block text-sm font-medium text-gray-700">
-          Category *
+          Category <span className="text-red-500">*</span>
         </label>
         <div className="relative">
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="w-full appearance-none bg-lightGray border border-gray-300 rounded-lg px-4 py-2 pr-10 outline-none text-sm"
+            className="w-full appearance-none bg-lightBlueGray border border-gray-300 rounded-lg px-4 py-2 pr-10 outline-none text-sm"
           >
             <option value="">Select a category</option>
             {categories &&
               categories.map((cat) => (
-                <option key={cat} value={cat._id}>
+                <option key={cat._id} value={cat._id}>
                   {cat.name}
                 </option>
               ))}
@@ -63,7 +63,7 @@ export const TemplateForm = ({
           value={note}
           onChange={(e) => setNote(e.target.value)}
           rows={3}
-          className="w-full p-3 bg-lightGray border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm resize-none"
+          className="w-full p-3 bg-lightBlueGray border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm resize-none"
           placeholder="Add any notes about this template..."
         />
       </div>

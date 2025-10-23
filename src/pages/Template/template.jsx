@@ -177,10 +177,10 @@ const TemplateManager = () => {
       <div className="p-3 sm:p-6 max-w-7xl mx-auto bg-lightBlueGray">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold mb-2">
+          <h1 className="text-2xl font-semibold mb-2 text-darkBlueGray">
             Template Manager
           </h1>
-          <p className="text-sm sm:text-base text-gray-600">
+          <p className="text-sm font-normal text-slateBlue">
             Create and manage message templates for SMS, Email, and WhatsApp
           </p>
         </div>
@@ -204,7 +204,7 @@ const TemplateManager = () => {
               </p>
             </div>
             <Link to="/templates/create">
-              <button className="bg-purple-700 text-white px-4 py-2 rounded-full flex items-center justify-center gap-2 hover:bg-purple-600 transition-colors w-full sm:w-auto">
+              <button className="bg-deepPurple text-white px-4 py-2 rounded-full flex items-center justify-center gap-2 hover:bg-deepPurple transition-colors w-full sm:w-auto">
                 <Plus className="w-4 h-4" />
                 <span>Create Template</span>
               </button>
@@ -287,7 +287,7 @@ const TemplateManager = () => {
                   (!channelFilter || channelFilter === " ") &&
                   (!categoryFilter || categoryFilter === " ") && (
                     <Link to="/templates/create">
-                      <button className="bg-purple-700 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition-colors">
+                      <button className="bg-deepPurple text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition-colors">
                         Create Your First Template
                       </button>
                     </Link>
@@ -300,7 +300,7 @@ const TemplateManager = () => {
         {showUpdatingIndicator && (
           <div className="fixed bottom-4 right-4 bg-white border border-gray-200 rounded-lg p-3 shadow-lg z-50">
             <div className="flex items-center gap-2">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-700"></div>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-deepPurple"></div>
               <span className="text-sm text-gray-600">Updating...</span>
             </div>
           </div>
