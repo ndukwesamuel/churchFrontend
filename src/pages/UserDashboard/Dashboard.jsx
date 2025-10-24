@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { useFetchData } from "../../hook/Request";
 import { useDispatch, useSelector } from "react-redux";
-
+import { Link } from "react-router-dom";
 const Dashboard = () => {
   const dispatch = useDispatch();
 
@@ -79,22 +79,30 @@ const Dashboard = () => {
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
             {/* Left group of 2 buttons */}
             <div className="flex flex-1 gap-2">
-              <button className="flex flex-1 items-center justify-center gap-2 px-4 py-4 text-darkBlueGray bg-paleBlueGray rounded-full font-medium hover:bg-gray-50 text-sm whitespace-nowrap">
+              <Link
+                to="/contacts"
+                className="flex flex-1 items-center justify-center gap-2 px-4 py-4 text-darkBlueGray bg-paleBlueGray rounded-full font-medium hover:bg-gray-50 text-sm whitespace-nowrap"
+              >
                 <Users size={16} />
                 <span>Manage contacts</span>
-              </button>
+              </Link>
 
-              <button className="flex flex-1 items-center justify-center gap-2 px-4 py-4 text-darkBlueGray bg-paleBlueGray rounded-full font-medium hover:bg-gray-50 text-sm whitespace-nowrap">
+              <Link
+                to="#"
+                className="flex flex-1 items-center justify-center gap-2 px-4 py-4 text-darkBlueGray bg-paleBlueGray rounded-full font-medium hover:bg-gray-50 text-sm whitespace-nowrap"
+              >
                 <Eye size={16} />
                 <span>View campaigns</span>
-              </button>
+              </Link>
             </div>
 
-            {/* Right button */}
-            <button className="flex flex-1 items-center justify-center gap-2 px-4 py-4 rounded-full text-paleBlue bg-deepPurple hover:bg-deepPurple/90 font-medium text-sm whitespace-nowrap">
+            <Link
+              to="/compose"
+              className="flex flex-1 items-center justify-center gap-2 px-4 py-4 rounded-full text-paleBlue bg-deepPurple hover:bg-deepPurple/90 font-medium text-sm whitespace-nowrap"
+            >
               <Send size={16} />
               <span>Send new message</span>
-            </button>
+            </Link>
           </div>
         </div>
       </div>
