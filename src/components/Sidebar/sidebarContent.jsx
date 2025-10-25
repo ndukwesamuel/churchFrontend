@@ -1,4 +1,4 @@
-import { Users, ChevronDown, LogOut, X } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { assets } from "../../assets/assets";
 import { tabs } from "../../routes";
 
