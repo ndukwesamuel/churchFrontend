@@ -13,13 +13,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 
-// ✅ Zod schema for validation
+// Zod schema for validation
 const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-  password: z
-    .string()
-    .min(8, "Password must be at least 8 characters long")
-    .max(64, "Password is too long"),
+  email: z.email("Please enter a valid email address"),
+  password: z.string().min(1, "Password is required"),
 });
 
 export default function Login() {
