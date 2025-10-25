@@ -21,7 +21,7 @@ const Dashboard = ({ data }) => {
         console.error(response.error);
       } else {
         dispatch(logindispatch(response));
-        navigate("/dashboard"); // go to real dashboard
+        navigate("/dashboard");
       }
     } catch (err) {
       console.error("Login failed:", err);
@@ -39,13 +39,14 @@ const Dashboard = ({ data }) => {
       <p className="text-blueBayoux mb-3 text-sm nd:text-base">
         You're all set to manage your church operations with ChurchComm.
       </p>
-
-      <button
-        type="submit"
-        className="bg-deepPurple text-white px-7 py-3 rounded-full hover:bg-deepPurpletransition"
-      >
-        Go To Dashboard <ArrowRight />
-      </button>
+      <div className="flex justify-center items-center">
+        <button
+          type="submit"
+          className="flex bg-deepPurple text-white px-7 py-3 rounded-full hover:bg-deepPurpletransition"
+        >
+          Go To Dashboard <ArrowRight />
+        </button>
+      </div>
     </form>
   );
 };
