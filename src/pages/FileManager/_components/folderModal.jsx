@@ -52,8 +52,15 @@ export default function FolderModal({ open, onClose, onSubmit, isSubmitting }) {
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting && <Loader className="w-4 h-4 animate-spin mr-2" />}
+            <Button
+              variant="default"
+              type="submit"
+              disabled={isSubmitting}
+              className="bg-deepPurple hover:bg-deepPurple"
+            >
+              {isSubmitting && (
+                <Loader className="w-4 h-4 animate-spin mr-2 " />
+              )}
               Create
             </Button>
           </DialogFooter>

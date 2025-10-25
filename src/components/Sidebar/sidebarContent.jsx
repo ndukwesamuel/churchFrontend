@@ -10,9 +10,8 @@ export default function SidebarContent({
   setIsCustomersExpanded,
   isMobile = false,
 }) {
-  console.log({ isMobile });
   return (
-    <>
+    <div className="flex flex-col  h-screen">
       {/* Logo */}
       <div
         className={`flex items-center mb-8 ${
@@ -117,6 +116,6 @@ export default function SidebarContent({
           <span className="truncate">Log Out</span>
         </button>
       </div>
-    </>
+    </div>
   );
 }

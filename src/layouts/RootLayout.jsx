@@ -23,7 +23,7 @@ export default function RootLayout() {
       <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm flex items-center gap-2 px-4 py-3">
         <button
           onClick={toggleMobileMenu}
-          className="p-2 rounded-lg border border-gray-200 shadow-sm bg-white hover:bg-gray-50 transition"
+          className="p-2 ml-4 rounded-lg border border-gray-200 shadow-sm bg-white hover:bg-gray-50 transition"
           aria-label="Toggle menu"
         >
           <Menu className="w-6 h-6 text-gray-600" />

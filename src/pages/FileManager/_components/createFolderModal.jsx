@@ -33,7 +33,11 @@ const CreateFolderModal = ({
         <Button variant="outline" onClick={onClose} disabled={isLoading}>
           Cancel
         </Button>
-        <Button onClick={onCreateFolder} disabled={isLoading}>
+        <Button
+          onClick={onCreateFolder}
+          disabled={isLoading}
+          className="bg-deepPurple hover:bg-deepPurple"
+        >
           {isLoading ? (
             <>
               <Loader className="w-4 h-4 animate-spin mr-2" />

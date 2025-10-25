@@ -538,7 +538,7 @@ const FileManager = () => {
               {photoFolders.length === 0 ? (
                 <div className="text-center py-12">
                   <div className="w-12 h-12 bg-gray-200 rounded mx-auto mb-4 flex items-center justify-center">
-                    <Folder className="w-6 h-6 text-gray-400" />
+                    <FolderIcon className="w-6 h-6 text-gray-400" />
                   </div>
                   <h3 className="text-lg font-medium text-gray-900 mb-2">
                     No folders yet
