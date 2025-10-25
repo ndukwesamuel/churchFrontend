@@ -74,7 +74,6 @@ const TemplateManager = () => {
     `/api/v1/templates?${queryParams}`,
     queryKey
   );
-
   const templates = data?.data?.templates || [];
   const pagination = data?.data?.pagination;
 
@@ -83,7 +82,6 @@ const TemplateManager = () => {
     "categoriesStats"
   );
   const categoryStats = categoryData?.data || [];
-
   // Optimized filter handlers that reset page to 1
   const handleSearchChange = useCallback((newSearchTerm) => {
     setSearchTerm(newSearchTerm);
@@ -189,7 +187,7 @@ const TemplateManager = () => {
         {categoryStats && categoryStats.length !== 0 ? (
           <CategoryStats categoryStats={categoryStats} />
         ) : (
-          "No Template Category yet"
+          <p className="mb-10">No Template Category in use.</p>
         )}
 
         {/* Message Templates Section */}

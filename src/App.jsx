@@ -1,29 +1,35 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import Login from "./pages/auth/Login";
-import RootLayout from "./layouts/RootLayout";
+import { lazy, Suspense } from "react";
 import { Toaster } from "sonner";
-// import Candidates from "./pages/Candidates/Candidates";
-import FieldOfficers from "./pages/FieldOfficers/FieldOfficers";
-// import CandidateDetail from "./pages/CandidateDetail/CandidateDetail";
 import RouteGuard from "./utils/RouteGuard";
-import Dashboard from "./pages/UserDashboard/Dashboard";
+import RootLayout from "./layouts/RootLayout";
 import ErrorPage from "./pages/ErrorPage";
-import Contacts from "./pages/Contact/Contacts";
-import SettingsDashboard from "./pages/Setting/SettingsDashboard";
-import FileManager from "./pages/FileManager/FileManager";
-// import ErrorPage from "./pages/ErrorPage"; // 👈 create this page
-import TemplateManager from "./pages/Template/template";
-import CreateTemplate from "./pages/Template/_components/createTemplate";
-import EditTemplate from "./pages/Template/_components/editTemplate";
-import SettingsPage from "./pages/settings/settings";
-import MessageComposer from "./pages/message/messageComposer";
-import BulkUploadContacts from "./pages/Contact/BulkUploadContacts";
-import MainSignUp from "./pages/auth/MainSignUp";
+
+// 🔹 Lazy-loaded pages
+const Login = lazy(() => import("./pages/auth/Login"));
+const MainSignUp = lazy(() => import("./pages/auth/MainSignUp"));
+const Dashboard = lazy(() => import("./pages/UserDashboard/Dashboard"));
+const Contacts = lazy(() => import("./pages/Contact/Contacts"));
+const BulkUploadContacts = lazy(() =>
+  import("./pages/Contact/BulkUploadContacts")
+);
+const MessageComposer = lazy(() => import("./pages/message/messageComposer"));
+const TemplateManager = lazy(() => import("./pages/Template/template"));
+const CreateTemplate = lazy(() =>
+  import("./pages/Template/_components/createTemplate")
+);
+const EditTemplate = lazy(() =>
+  import("./pages/Template/_components/editTemplate")
+);
+const FileManager = lazy(() => import("./pages/FileManager/FileManager"));
+const SettingsPage = lazy(() => import("./pages/settings/settings"));
+const FieldOfficers = lazy(() => import("./pages/FieldOfficers/FieldOfficers"));
+
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Login />,
-    errorElement: <ErrorPage />, // 👈 fallback error UI
+    errorElement: <ErrorPage />,
   },
   {
     path: "/login",
@@ -35,7 +41,6 @@ const router = createBrowserRouter([
     element: <MainSignUp />,
     errorElement: <ErrorPage />,
   },
-
   {
     element: <RouteGuard />,
     errorElement: <ErrorPage />,
@@ -43,104 +48,37 @@ const router = createBrowserRouter([
       {
         element: <RootLayout />,
         children: [
-          {
-            path: "/dashboard",
-            element: <Dashboard />,
-          },
-          {
-            path: "/contacts",
-            element: <Contacts />,
-          },
-          // Add these new routes
-          {
-            path: "/compose",
-            element: <MessageComposer />,
-          },
-          // {
-          //   path: "/campaigns",
-          //   element: <Campaigns />, // Create this component
-          // },
-          // {
-          //   path: "contacts",
-          //   children: [
-          //     { index: true, element: <Contacts /> },
-          //     {
-          //       path: "bulk",
-          //       element: <BulkUploadContacts />,
-          //     },
-          //     // {
-          //     //   path: ":templateId",
-          //     //   element: <EditTemplate />,
-          //     // },
-          //   ],
-          // },
-
+          { path: "/dashboard", element: <Dashboard /> },
+          { path: "/contacts", element: <Contacts /> },
+          { path: "/contacts/bulk", element: <BulkUploadContacts /> },
+          { path: "/compose", element: <MessageComposer /> },
           {
             path: "templates",
             children: [
               { index: true, element: <TemplateManager /> },
-              {
-                path: "create",
-                element: <CreateTemplate />,
-              },
-              {
-                path: ":templateId",
-                element: <EditTemplate />,
-              },
+              { path: "create", element: <CreateTemplate /> },
+              { path: ":templateId", element: <EditTemplate /> },
             ],
           },
-          // {
-          //   path: "/files",
-          //   element: <Files />, // Create this component
-          // },
-          {
-            path: "/settings",
-            element: <SettingsPage />,
-          },
-          // {
-          //   path: "/templates",
-          //   element: <Templates />, // Create this component
-          // },
-          {
-            path: "/files",
-            element: <FileManager />, // Create this component
-          },
-          // {
-          //   path: "/settings",
-          //   element: <SettingsDashboard />, // Create this component
-          // },
-          // {
-          //   path: "/customers/all",
-          //   element: <AllCustomers />, // Create this component
-          // },
-          // {
-          //   path: "/customers/active",
-          //   element: <ActiveMembers />, // Create this component
-          // },
-          {
-            path: "/field-officers",
-            element: <FieldOfficers />,
-          },
-          {
-            path: "*",
-            element: <ErrorPage />,
-          },
+          { path: "/files", element: <FileManager /> },
+          { path: "/settings", element: <SettingsPage /> },
+          { path: "/field-officers", element: <FieldOfficers /> },
+          { path: "*", element: <ErrorPage /> },
         ],
       },
     ],
   },
-  // 👇 catch-all for routes outside RouteGuard
-  {
-    path: "*",
-    element: <ErrorPage />,
-  },
+  { path: "*", element: <ErrorPage /> },
 ]);
 
 function App() {
   return (
     <>
       <Toaster position="top-right" richColors />
-      <RouterProvider router={router} />
+      {/* 🔹 Wrap the router with Suspense fallback */}
+      <Suspense fallback={<div className="p-10 text-center">Loading...</div>}>
+        <RouterProvider router={router} />
+      </Suspense>
     </>
   );
 }

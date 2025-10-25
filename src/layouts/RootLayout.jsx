@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Sidebar from "../components/Sidebar/Sidebar";
 import { Outlet } from "react-router-dom";
 import { Menu } from "lucide-react";
@@ -12,14 +12,12 @@ export default function RootLayout() {
   };
 
   return (
-    <div className="flex bg-gray-50 relative min-h-screen overflow-hidden">
-      {/* Fixed Sidebar (Desktop) */}
-      <div className="hidden md:block fixed left-0 top-0 h-screen w-64 bg-white shadow-lg z-30">
-        <Sidebar
-          isMobileMenuOpen={isMobileMenuOpen}
-          setIsMobileMenuOpen={setIsMobileMenuOpen}
-        />
-      </div>
+    <div className="bg-gray-50 min-h-screen">
+      {/* Sidebar Component (handles both mobile and desktop) */}
+      <Sidebar
+        isMobileMenuOpen={isMobileMenuOpen}
+        setIsMobileMenuOpen={setIsMobileMenuOpen}
+      />
 
       {/* Sticky Mobile Header */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm flex items-center gap-2 px-4 py-3">
@@ -34,7 +32,7 @@ export default function RootLayout() {
       </div>
 
       {/* Main Content Area */}
-      <main className="flex-1 w-full md:ml-64 pt-14 md:pt-0 h-screen overflow-y-auto bg-gray-50">
+      <main className="pt-14 md:pt-0 md:ml-64 min-h-screen overflow-y-auto bg-gray-50">
         <Outlet />
       </main>
     </div>

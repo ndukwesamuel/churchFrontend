@@ -35,14 +35,16 @@ export default function Sidebar({ isMobileMenuOpen, setIsMobileMenuOpen }) {
       )}
 
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex md:flex-col w-64 bg-white shadow-lg min-h-screen">
-        <SidebarContent
-          isActiveLink={isActiveLink}
-          handleTabClick={handleTabClick}
-          handleLogout={handleLogout}
-          isCustomersExpanded={isCustomersExpanded}
-          setIsCustomersExpanded={setIsCustomersExpanded}
-        />
+      <aside className="hidden md:block fixed left-0 top-0 w-64 bg-white shadow-lg min-h-screen z-30">
+        <div className="flex flex-col h-full">
+          <SidebarContent
+            isActiveLink={isActiveLink}
+            handleTabClick={handleTabClick}
+            handleLogout={handleLogout}
+            isCustomersExpanded={isCustomersExpanded}
+            setIsCustomersExpanded={setIsCustomersExpanded}
+          />
+        </div>
       </aside>
 
       {/* Mobile Sidebar */}
@@ -51,18 +53,6 @@ export default function Sidebar({ isMobileMenuOpen, setIsMobileMenuOpen }) {
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        {/* Mobile Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-700">Menu</h2>
-          <button
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200 flex-shrink-0 ml-2"
-            aria-label="Close menu"
-          >
-            <X className="w-5 h-5 text-gray-500" />
-          </button>
-        </div>
-
         <SidebarContent
           isActiveLink={isActiveLink}
           handleTabClick={handleTabClick}

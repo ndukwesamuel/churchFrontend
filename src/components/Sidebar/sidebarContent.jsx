@@ -1,4 +1,4 @@
-import { Users, ChevronDown, LogOut } from "lucide-react";
+import { Users, ChevronDown, LogOut, X } from "lucide-react";
 import { assets } from "../../assets/assets";
 import { tabs } from "../../routes";
 
@@ -10,6 +10,7 @@ export default function SidebarContent({
   setIsCustomersExpanded,
   isMobile = false,
 }) {
+  console.log({ isMobile });
   return (
     <>
       {/* Logo */}
