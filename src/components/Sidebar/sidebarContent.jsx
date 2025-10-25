@@ -53,7 +53,7 @@ export default function SidebarContent({
         </ul>
 
         {/* Customers Section */}
-        <div className="mt-6">
+        {/* <div className="mt-6">
           <button
             onClick={() => setIsCustomersExpanded(!isCustomersExpanded)}
             className={`flex items-center justify-between w-full ${
@@ -99,7 +99,7 @@ export default function SidebarContent({
               </button>
             </div>
           )}
-        </div>
+        </div> */}
       </nav>
 
       {/* Bottom Section - Log Out */}
