@@ -56,13 +56,13 @@ export const RichTextEditor = ({ content, onChange, variables, error }) => {
   return (
     <div className="space-y-3">
       {/* Toolbar */}
-      <div className="flex items-center justify-between border-b border-gray-200 pb-3">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-200 pb-3">
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => editor.commands.toggleBold()}
             className={`p-2 hover:bg-gray-100 rounded transition-colors ${
-              isActive("bold") ? "bg-gray-200 text-purple-600" : "text-gray-600"
+              isActive("bold") ? "bg-gray-200 text-deepPurple" : "text-gray-600"
             }`}
             title="Bold"
           >
@@ -73,7 +73,7 @@ export const RichTextEditor = ({ content, onChange, variables, error }) => {
             onClick={() => editor.commands.toggleItalic()}
             className={`p-2 hover:bg-gray-100 rounded transition-colors ${
               isActive("italic")
-                ? "bg-gray-200 text-purple-600"
+                ? "bg-gray-200 text-deepPurple"
                 : "text-gray-600"
             }`}
             title="Italic"
@@ -85,7 +85,7 @@ export const RichTextEditor = ({ content, onChange, variables, error }) => {
             onClick={() => editor.commands.toggleUnderline()}
             className={`p-2 hover:bg-gray-100 rounded transition-colors ${
               isActive("underline")
-                ? "bg-gray-200 text-purple-600"
+                ? "bg-gray-200 text-deepPurple"
                 : "text-gray-600"
             }`}
             title="Underline"
@@ -108,7 +108,7 @@ export const RichTextEditor = ({ content, onChange, variables, error }) => {
             onClick={() => editor.commands.toggleBulletList()}
             className={`p-2 hover:bg-gray-100 rounded transition-colors ${
               isActive("bulletList")
-                ? "bg-gray-200 text-purple-600"
+                ? "bg-gray-200 text-deepPurple"
                 : "text-gray-600"
             }`}
             title="Bullet List"
@@ -189,7 +189,7 @@ export const RichTextEditor = ({ content, onChange, variables, error }) => {
                     onClick={() => insertVariable(variable)}
                     className="w-full text-left px-3 py-2 hover:bg-gray-50 border-b border-gray-100 last:border-b-0 transition-colors"
                   >
-                    <div className="font-mono text-sm text-purple-600 font-medium">
+                    <div className="font-mono text-sm text-deepPurple font-medium">
                       {variable.placeholder}
                     </div>
                     <div className="text-xs text-gray-500 mt-0.5">
@@ -219,17 +219,20 @@ export const RichTextEditor = ({ content, onChange, variables, error }) => {
           error ? "border-red-500" : "border-gray-200"
         }`}
       >
-        <EditorContent editor={editor} className="rich-text-editor" />
+        <EditorContent
+          editor={editor}
+          className="rich-text-editor bg-lightBlueGray"
+        />
       </div>
 
       {/* Character/Word Count */}
       <div className="flex justify-between items-center text-xs text-gray-500">
-        <div>
+        {/* <div>
           {editor.storage.characterCount?.characters() || 0} characters,{" "}
           {editor.storage.characterCount?.words() || 0} words
-        </div>
+        </div> */}
         {editor.isFocused && (
-          <div className="text-purple-600">Currently editing</div>
+          <div className="text-deepPurple">Currently editing</div>
         )}
       </div>
 

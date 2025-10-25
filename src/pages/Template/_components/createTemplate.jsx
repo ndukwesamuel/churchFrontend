@@ -158,13 +158,13 @@ const CreateTemplate = () => {
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             aria-label="Go back to template list"
           >
-            <ArrowLeft className="w-5 h-5 text-gray-600" />
+            <ArrowLeft className="w-8 h-8 text-darkBlueGray p-1 bg-paleBlueGray rounded-full" />
           </button>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+            <h1 className="text-xl font-semibold text-darkBlueGray">
               Create Template
             </h1>
-            <p className="text-sm sm:text-base text-gray-600 mt-1">
+            <p className="text-sm font-normal text-slateBlue mt-1">
               Design a reusable email template for messages, campaigns, or
               newsletters.
             </p>
@@ -179,7 +179,7 @@ const CreateTemplate = () => {
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
                 currentStep === 1
-                  ? "bg-purple-600 text-white"
+                  ? "bg-deepPurple text-white"
                   : canProceedToStep2
                   ? "bg-green-500 text-white"
                   : "bg-gray-200 text-gray-600"
@@ -189,13 +189,13 @@ const CreateTemplate = () => {
             </div>
             <div
               className={`h-1 w-8 ${
-                currentStep === 2 ? "bg-purple-600" : "bg-gray-200"
+                currentStep === 2 ? "bg-deepPurple" : "bg-gray-200"
               }`}
             ></div>
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
                 currentStep === 2
-                  ? "bg-purple-600 text-white"
+                  ? "bg-deepPurple text-white"
                   : "bg-gray-200 text-gray-600"
               }`}
             >
@@ -232,7 +232,7 @@ const CreateTemplate = () => {
                   type="button"
                   onClick={handleStepTwo}
                   disabled={!canProceedToStep2}
-                  className="w-full bg-purple-700 text-white px-6 py-3 rounded-lg flex items-center justify-center gap-2 hover:bg-purple-600 transition-colors font-medium disabled:bg-gray-300 disabled:cursor-not-allowed"
+                  className="w-full bg-purple-700 text-white px-6 py-3 rounded-lg flex items-center justify-center gap-2 hover:bg-deepPurple transition-colors font-medium disabled:bg-gray-300 disabled:cursor-not-allowed"
                 >
                   Next: Message Content
                   <ChevronRight className="w-4 h-4" />
@@ -263,7 +263,7 @@ const CreateTemplate = () => {
                 <button
                   type="button"
                   onClick={handleStepOne}
-                  className="text-purple-600 hover:text-purple-700 text-sm flex items-center gap-1"
+                  className="text-deepPurple hover:text-purple-700 text-sm flex items-center gap-1"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   Back

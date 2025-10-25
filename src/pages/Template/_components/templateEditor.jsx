@@ -24,14 +24,14 @@ export const TemplateEditor = ({
 
       {/* Template Name */}
       <div className="space-y-2">
-        <label className="block text-sm font-medium text-gray-700">
-          Template Name *
+        <label className="block text-sm font-medium text-darkBlueGray">
+          Template Name <span className="text-red-500">*</span>
         </label>
         <input
           type="text"
           value={templateName}
           onChange={(e) => setTemplateName(e.target.value)}
-          className={`w-full px-4 py-2 bg-lightGray border rounded-lg outline-none text-sm ${
+          className={`w-full px-4 py-2 bg-lightBlueGray border rounded-lg outline-none text-sm ${
             errors?.templateName
               ? "border-red-500 focus:border-red-500"
               : "border-gray-300 focus:border-purple-500"
@@ -46,7 +46,7 @@ export const TemplateEditor = ({
       {/* Rich Text Editor */}
       <div className="space-y-2">
         <label className="block text-sm font-medium text-gray-700">
-          Message Content *
+          Message Content <span className="text-red-500">*</span>
         </label>
         <RichTextEditor
           content={content}
@@ -88,7 +88,7 @@ export const TemplateEditor = ({
       <button
         type="submit"
         disabled={!canSave || isSubmitting}
-        className="w-full bg-vividBlue text-white px-6 py-3 rounded-lg flex items-center justify-center gap-2 hover:bg-purple-600 transition-colors font-medium disabled:bg-gray-300 disabled:cursor-not-allowed"
+        className="w-full bg-deepPurple text-white px-6 py-3 rounded-lg flex items-center justify-center gap-2 hover:bg-deepPurple transition-colors font-medium disabled:bg-gray-300 disabled:cursor-not-allowed"
       >
         <Save className="w-4 h-4" />
         {isSubmitting ? "Saving..." : "Save Template"}

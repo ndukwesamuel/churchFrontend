@@ -32,7 +32,6 @@ const MessageComposer = () => {
   const { mutateAsync, isLoading } = useMutateData(`createMessage`, "POST");
 
   const recipientGroups = contactData?.data?.groupCounts || [];
-  // Form setup
   const form = useForm({
     resolver: zodResolver(messageSchema),
     defaultValues: {
@@ -140,10 +139,10 @@ const MessageComposer = () => {
     <div className="min-h-screen bg-gray-50 p-4">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-2xl font-semibold text-darkBlueGray mb-2">
             Compose Messages
           </h1>
-          <p className="text-gray-600">
+          <p className="text-slateBlue font-normal text-sm">
             Create and send SMS, Email, or WhatsApp messages to your
             congregation
           </p>

@@ -83,23 +83,32 @@ const PreviewMessage = ({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="sms" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="sms" className="flex items-center gap-1">
+          <Tabs defaultValue="sms" className="w-full ">
+            <TabsList className="grid w-full grid-cols-3 bg-paleBlueGray rounded-full">
+              <TabsTrigger
+                value="sms"
+                className="flex items-center gap-1 rounded-full"
+              >
                 <Smartphone className="h-4 w-4" />
                 SMS
               </TabsTrigger>
-              <TabsTrigger value="email" className="flex items-center gap-1">
+              <TabsTrigger
+                value="email"
+                className="flex items-center gap-1 rounded-full"
+              >
                 <Mail className="h-4 w-4" />
                 Email
               </TabsTrigger>
-              <TabsTrigger value="whatsapp" className="flex items-center gap-1">
+              <TabsTrigger
+                value="whatsapp"
+                className="flex items-center gap-1 rounded-full"
+              >
                 <MessageCircle className="h-4 w-4" />
                 WhatsApp
               </TabsTrigger>
             </TabsList>
             <TabsContent value="sms" className="mt-4">
-              <div className="p-4 bg-blue-50 rounded-lg border">
+              <div className="p-4 bg-paleBlueGray rounded-lg border">
                 <div className="text-sm text-gray-600 mb-2">SMS Preview:</div>
                 <div className="text-sm">
                   {formatMessage(formData.message, "sms") ||
@@ -114,7 +123,7 @@ const PreviewMessage = ({
               </div>
             </TabsContent>
             <TabsContent value="email" className="mt-4">
-              <div className="p-4 bg-gray-50 rounded-lg border">
+              <div className="p-4 bg-paleBlueGray rounded-lg border">
                 <div className="text-sm text-gray-600 mb-2">Email Preview:</div>
                 <div className="text-sm">
                   {formatMessage(formData.message, "email") ||
@@ -123,7 +132,7 @@ const PreviewMessage = ({
               </div>
             </TabsContent>
             <TabsContent value="whatsapp" className="mt-4">
-              <div className="p-4 bg-green-50 rounded-lg border">
+              <div className="p-4 bg-paleBlueGray rounded-lg border">
                 <div className="text-sm text-gray-600 mb-2">
                   WhatsApp Preview:
                 </div>

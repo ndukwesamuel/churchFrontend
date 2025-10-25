@@ -25,3 +25,27 @@ export const getChannelBadgeColor = (channel) => {
       return "bg-gray-500 text-white";
   }
 };
+
+export const formatFileSize = (bytes) => {
+  if (!bytes) return "0 B";
+  const k = 1024;
+  const sizes = ["B", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+};
+export const truncateMessage = (text, maxLength = 30) => {
+  return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
+};
+
+export const getStatusColor = (status) => {
+  switch (status) {
+    case "draft":
+      return "bg-gray-500";
+    case "sent":
+      return "bg-green-500";
+    case "pending":
+      return "bg-yellow-500";
+    default:
+      return "bg-gray-500";
+  }
+};
