@@ -76,7 +76,7 @@ const TemplateManager = () => {
   );
   const templates = data?.data?.templates || [];
   const pagination = data?.data?.pagination;
-
+  console.log(pagination);
   const { data: categoryData } = useFetchData(
     "/api/v1/categories/stats/counts",
     "categoriesStats"

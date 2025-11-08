@@ -119,7 +119,7 @@ const SignUpStep2 = ({ onBack, onSubmit, isLoading, defaultValues }) => {
       </div>
 
       <p className="text-center text-darkBlueGray text-xs md:text-sm px-2">
-        By signing up, you agree to ChurchComm's{" "}
+        By signing up, you agree to JxtComm's{" "}
         <a href="#" className="text-moodIndigo font-medium hover:underline">
           Terms of Service
         </a>{" "}

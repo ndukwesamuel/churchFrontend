@@ -33,7 +33,7 @@ const Dashboard = () => {
     {
       title: "Active contact",
       value: statsDetails?.activeUsers || 0,
-      change: "6% this month",
+      change: "0% this month",
       icon: Users,
     },
     {
@@ -41,7 +41,7 @@ const Dashboard = () => {
       value:
         statsDetails?.messageTypeCounts.find((m) => m.messageType === "sms")
           ?.count || 0,
-      change: "+10% this month",
+      change: "0% this month",
       icon: MessageSquareText,
     },
     {
@@ -49,7 +49,7 @@ const Dashboard = () => {
       value:
         statsDetails?.messageTypeCounts.find((m) => m.messageType === "email")
           ?.count || 0,
-      change: "+22% this month",
+      change: "0% this month",
       icon: Mail,
     },
   ];
