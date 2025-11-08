@@ -4,6 +4,7 @@ import { Toaster } from "sonner";
 import RouteGuard from "./utils/RouteGuard";
 import RootLayout from "./layouts/RootLayout";
 import ErrorPage from "./pages/ErrorPage";
+import BirthdayDashboard from "./pages/birthday/Birthdaydashboard";
 
 // 🔹 Lazy-loaded pages
 const Login = lazy(() => import("./pages/auth/Login"));
@@ -62,6 +63,7 @@ const router = createBrowserRouter([
           },
           { path: "/files", element: <FileManager /> },
           { path: "/settings", element: <SettingsPage /> },
+          { path: "/birthday", element: <BirthdayDashboard /> },
           { path: "/field-officers", element: <FieldOfficers /> },
           { path: "*", element: <ErrorPage /> },
         ],

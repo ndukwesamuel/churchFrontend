@@ -6,6 +6,7 @@ import {
   FolderOpen,
   Settings,
   Home,
+  UtensilsCrossed,
 } from "lucide-react";
 
 export const tabs = [
@@ -39,6 +40,13 @@ export const tabs = [
     label: "Files",
     icon: FolderOpen,
   },
+
+  {
+    path: "/birthday",
+    label: "Birthday",
+    icon: UtensilsCrossed,
+  },
+
   {
     path: "/settings",
     label: "Settings",
