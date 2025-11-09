@@ -1,68 +1,33 @@
-import React, { useState, useRef } from "react";
-import {
-  Upload,
-  Search,
-  FolderPlus,
-  MoreVertical,
-  X,
-  File,
-  Folder,
-  AlertCircle,
-  Loader,
-  Save,
-  CircleCheck,
-  Eye,
-  ZoomIn,
-  ZoomOut,
-  Plus,
-} from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import React from "react";
+import { MoreVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Slider } from "@/components/ui/slider";
-import { formatFileSize } from "../../../utils/helpers";
-import { formatDate } from "../../../utils/helpers";
+import { formatFileSize, formatDate } from "../../../utils/helpers";
+
 const FileItem = ({ photo }) => (
-  <div className="py-4 flex items-center justify-between hover:bg-gray-50 rounded-lg px-2">
-    <div className="flex items-center space-x-4">
-      <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden">
+  <div className="py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between hover:bg-gray-50 rounded-lg px-2 gap-3 sm:gap-0">
+    {/* Left: Image + Details */}
+    <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 w-full">
+      <div className="w-full sm:w-12 h-40 sm:h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
         <img
           src={photo.url}
           alt={photo.caption}
           className="w-full h-full object-cover"
         />
       </div>
-      <div>
-        <h3 className="text-sm font-medium text-gray-900">{photo.caption}</h3>
-        <div className="flex items-center space-x-4 mt-1 text-xs text-gray-600">
-          <span>{formatFileSize(photo.otherdata?.bytes)}</span>
-          <span>Folder: {photo.folderName}</span>
-          <span>{formatDate(photo.createdAt)}</span>
-          {photo.otherdata && (
+
+      <div className="mt-2 sm:mt-0 flex-1">
+        <h3 className="text-sm font-medium text-gray-900 truncate">
+          {photo.caption}
+        </h3>
+
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs text-gray-600">
+          {photo.otherdata?.bytes && (
+            <span>{formatFileSize(photo.otherdata.bytes)}</span>
+          )}
+          {photo.folderName && <span>Folder: {photo.folderName}</span>}
+          {photo.createdAt && <span>{formatDate(photo.createdAt)}</span>}
+          {photo.otherdata?.width && (
             <span>
               {photo.otherdata.width} × {photo.otherdata.height}
             </span>
@@ -70,10 +35,12 @@ const FileItem = ({ photo }) => (
         </div>
       </div>
     </div>
-    <div className="flex items-center space-x-3">
+
+    {/* Right: Status + Actions */}
+    <div className="flex items-center justify-between sm:justify-end space-x-3 sm:space-x-3 mt-2 sm:mt-0 w-full sm:w-auto">
       <Badge
         variant="secondary"
-        className="bg-green-100 text-green-600 hover:bg-green-100"
+        className="bg-green-100 text-green-600 hover:bg-green-100 text-xs"
       >
         Uploaded
       </Badge>

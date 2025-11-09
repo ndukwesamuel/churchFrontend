@@ -62,7 +62,7 @@ export const TemplateEditor = ({
       </div>
 
       {/* Variables Preview */}
-      {content && (
+      {/* {content && (
         <div className="bg-gray-50 p-3 rounded-lg">
           <h4 className="text-sm font-medium text-gray-700 mb-2">
             Variables in use:
@@ -82,7 +82,7 @@ export const TemplateEditor = ({
             )}
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Save Button */}
       <button

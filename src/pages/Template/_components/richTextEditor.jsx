@@ -160,7 +160,7 @@ export const RichTextEditor = ({ content, onChange, variables, error }) => {
 
         {/* Variable Dropdown */}
         <div className="relative">
-          <button
+          {/* <button
             type="button"
             onClick={() => setShowVariables(!showVariables)}
             className="flex items-center gap-2 px-3 py-1 bg-purple-100 text-purple-700 rounded-md text-sm hover:bg-purple-200 transition-colors"
@@ -172,7 +172,7 @@ export const RichTextEditor = ({ content, onChange, variables, error }) => {
                 showVariables ? "rotate-180" : ""
               }`}
             />
-          </button>
+          </button> */}
 
           {showVariables && (
             <>
