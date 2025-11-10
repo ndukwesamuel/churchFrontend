@@ -70,7 +70,7 @@ export default function Login() {
         <div className="w-full max-w-md space-y-6">
           <div className="text-center space-y-2">
             <h1 className="text-2xl font-semibold text-darkBlueGray">
-              Welcome Back to JXTCOMM!
+              Welcome to JXTCOMM!
             </h1>
             <p className="text-blueBayoux text-sm md:text-base">
               Manage your church's operations, track communications, and stay

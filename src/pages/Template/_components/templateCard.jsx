@@ -123,7 +123,7 @@ export const TemplateCard = ({
       </div>
 
       {/* Variables */}
-      <div className="flex flex-wrap gap-1.5 sm:gap-2">
+      {/* <div className="flex flex-wrap gap-1.5 sm:gap-2">
         {template.variables && template.variables.length > 0 ? (
           template.variables.map((variable, index) => (
             <span
@@ -138,7 +138,7 @@ export const TemplateCard = ({
             No variables used
           </span>
         )}
-      </div>
+      </div> */}
     </div>
   );
 };

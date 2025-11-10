@@ -15,6 +15,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import ImageScaleControl from "./imageScalePreview";
+import ImagePreview from "./imagePreview";
 
 const UploadModal = ({
   isOpen,

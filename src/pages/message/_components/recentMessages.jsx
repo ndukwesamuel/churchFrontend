@@ -39,12 +39,12 @@ const RecentMessages = () => {
     <div className="space-y-5">
       <div>
         <h2 className="text-lg font-semibold text-darkBlueGray">
-          Recent Messages
+          Recent Campaigns
         </h2>
         <p className="text-inkyBlue mt-1 text-sm">
           {recentMessages.length > 0
-            ? `Your Last ${recentMessages.length} messages`
-            : "You don’t have any messages yet"}
+            ? `Your Last ${recentMessages.length} Campaigns`
+            : "You don't have any Campaigns yet"}
         </p>
       </div>
 
@@ -56,7 +56,7 @@ const RecentMessages = () => {
             No messages yet
           </p>
           <p className="text-sm text-inkyBlue mt-1">
-            When you send your first message, it’ll appear here.
+            When you send your first message, it'll appear here.
           </p>
         </div>
       )}

@@ -70,7 +70,7 @@ const SignUpStep1 = ({ onNext, defaultValues }) => {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <h1 className="text-xl md:text-2xl font-semibold text-center text-darkBlueGray">
-        Welcome Back to JXTCOMM!
+        Welcome to JXTCOMM!
       </h1>
       <p className="text-blueBayoux font-normal text-sm md:text-base mb-3 text-center px-2">
         Manage your church's operations, track communications, and stay
