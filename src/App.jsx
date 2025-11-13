@@ -6,7 +6,6 @@ import RootLayout from "./layouts/RootLayout";
 import ErrorPage from "./pages/ErrorPage";
 import BirthdayDashboard from "./pages/birthday/Birthdaydashboard";
 
-// 🔹 Lazy-loaded pages
 const Login = lazy(() => import("./pages/auth/Login"));
 const MainSignUp = lazy(() => import("./pages/auth/MainSignUp"));
 const Dashboard = lazy(() => import("./pages/UserDashboard/Dashboard"));
@@ -25,7 +24,7 @@ const EditTemplate = lazy(() =>
 const FileManager = lazy(() => import("./pages/FileManager/FileManager"));
 const SettingsPage = lazy(() => import("./pages/settings/settings"));
 const FieldOfficers = lazy(() => import("./pages/FieldOfficers/FieldOfficers"));
-
+const Campaigns = lazy(() => import("./pages/message/campaign"));
 const router = createBrowserRouter([
   {
     path: "/",
@@ -53,6 +52,8 @@ const router = createBrowserRouter([
           { path: "/contacts", element: <Contacts /> },
           { path: "/contacts/bulk", element: <BulkUploadContacts /> },
           { path: "/compose", element: <MessageComposer /> },
+          { path: "/campaigns", element: <Campaigns /> },
+
           {
             path: "templates",
             children: [
@@ -77,7 +78,6 @@ function App() {
   return (
     <>
       <Toaster position="top-right" richColors />
-      {/* 🔹 Wrap the router with Suspense fallback */}
       <Suspense fallback={<div className="p-10 text-center">Loading...</div>}>
         <RouterProvider router={router} />
       </Suspense>

@@ -52,11 +52,11 @@ const PreviewMessage = ({
     const totalRecipients = getTotalRecipients();
     switch (formData.messageType) {
       case "sms":
-        return (totalRecipients * 0.0036).toFixed(2);
+        return (totalRecipients * 5.76).toFixed(2);
       case "email":
-        return (totalRecipients * 0.015).toFixed(2);
+        return (totalRecipients * 24.0).toFixed(2);
       case "whatsapp":
-        return (totalRecipients * 0.009).toFixed(2);
+        return (totalRecipients * 14.4).toFixed(2);
       default:
         return "0.00";
     }

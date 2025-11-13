@@ -89,7 +89,7 @@ const Dashboard = () => {
               </Link>
 
               <Link
-                to="#"
+                to="/campaigns"
                 className="flex flex-1 items-center justify-center gap-2 px-4 py-4 text-darkBlueGray bg-paleBlueGray rounded-full font-medium hover:bg-gray-50 text-sm whitespace-nowrap"
               >
                 <Eye size={16} />
