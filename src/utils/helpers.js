@@ -49,3 +49,10 @@ export const getStatusColor = (status) => {
       return "bg-gray-500";
   }
 };
+
+export const fmt = (n) =>
+  n.toLocaleString(undefined, {
+    style: "currency",
+    currency: "NGN",
+    maximumFractionDigits: 0,
+  });
