@@ -12,6 +12,9 @@
 //   Settings,
 //   Save,
 //   CheckCircle2,
+//   Trash2,
+//   Edit,
+//   AlertCircle,
 // } from "lucide-react";
 // import {
 //   Select,
@@ -23,7 +26,7 @@
 // import { Input } from "@/components/ui/input";
 // import { Button } from "@/components/ui/button";
 // import { Checkbox } from "@/components/ui/checkbox";
-// import { useFetchData } from "../../hook/Request";
+// import { useFetchData, useMutateData } from "../../hook/Request";
 // import { toast } from "sonner";
 
 // const MONTHS = [
@@ -55,8 +58,8 @@
 //   const [selectedChannels, setSelectedChannels] = useState([]);
 //   const [sendTime, setSendTime] = useState("08:00");
 //   const [isEnabled, setIsEnabled] = useState(true);
-//   const [isSavingConfig, setIsSavingConfig] = useState(false);
 //   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+//   const [showConfigForm, setShowConfigForm] = useState(false);
 
 //   // Build API URL based on selected month
 //   const apiUrl =
@@ -76,50 +79,70 @@
 //     "birthday-templates"
 //   );
 
+//   const templates__new_Data =
+//     templateData?.data?.templates?.filter(
+//       (template) => template.category?.name === "Birthday"
+//     ) || [];
+
 //   // Fetch existing config
 //   const {
 //     data: configData,
 //     isLoading: configLoading,
 //     refetch: refetchConfig,
-//   } = useFetchData("/api/v1/birthday-config", "birthday-config");
+//   } = useFetchData("/api/v1/birthday/templateConfig", "birthday-config");
 
-//   console.log({
-//     fgtt: data,
-//     templates: templateData?.data?.templates,
-//     config: configData,
-//   });
+//   // Mutation for saving config
+//   const { mutate: saveConfig, isLoading: isSavingConfig } = useMutateData(
+//     "birthday-config",
+//     "POST"
+//   );
+
+//   // Mutation for deleting config
+//   const { mutate: deleteConfig, isLoading: isDeletingConfig } = useMutateData(
+//     "birthday-config",
+//     "DELETE"
+//   );
+
+//   // Mutation for sending birthday messages
+//   const { mutate: sendBirthdayMessage, isLoading: isSendingMessage } =
+//     useMutateData("birthday-messages", "POST");
 
 //   const birthdays = data || [];
-//   const templates = templateData?.data?.templates || [];
+//   const templates = templates__new_Data || [];
+
+//   // Get the first config (since there's only one per user)
+//   const currentConfig = configData?.data?.[0] || null;
 
 //   // Get selected template object
 //   const selectedTemplateObj = templates.find((t) => t._id === selectedTemplate);
 
 //   // Load existing config when data is fetched
 //   useEffect(() => {
-//     if (configData?.data) {
-//       const config = configData.data;
-//       setSelectedTemplate(config.template || "");
-//       setSelectedChannels(config.selectedChannels || []);
-//       setSendTime(config.sendTime || "08:00");
-//       setIsEnabled(config.enabled !== false);
+//     if (currentConfig) {
+//       setSelectedTemplate(currentConfig.template?._id || "");
+//       setSelectedChannels(currentConfig.selectedChannels || []);
+//       setSendTime(currentConfig.sendTime || "08:00");
+//       setIsEnabled(currentConfig.enabled !== false);
 //       setHasUnsavedChanges(false);
+//       setShowConfigForm(false);
+//     } else {
+//       setShowConfigForm(true);
 //     }
-//   }, [configData]);
+//   }, [currentConfig]);
 
 //   // Track changes
 //   useEffect(() => {
-//     if (configData?.data) {
+//     if (currentConfig) {
 //       const hasChanges =
-//         selectedTemplate !== (configData.data.template || "") ||
+//         selectedTemplate !== (currentConfig.template?._id || "") ||
 //         JSON.stringify(selectedChannels) !==
-//           JSON.stringify(configData.data.selectedChannels || []) ||
-//         sendTime !== (configData.data.sendTime || "08:00") ||
-//         isEnabled !== (configData.data.enabled !== false);
+//           JSON.stringify(currentConfig.selectedChannels || []) ||
+//         sendTime !== (currentConfig.sendTime || "08:00") ||
+//         isEnabled !== (currentConfig.enabled !== false);
 
 //       setHasUnsavedChanges(hasChanges);
 //     }
-//   }, [selectedTemplate, selectedChannels, sendTime, isEnabled, configData]);
+//   }, [selectedTemplate, selectedChannels, sendTime, isEnabled, currentConfig]);
 
 //   // Handle channel selection
 //   const handleChannelToggle = (channel) => {
@@ -142,40 +165,67 @@
 //       return;
 //     }
 
-//     setIsSavingConfig(true);
+//     const configPayload = {
+//       template: selectedTemplate,
+//       selectedChannels: selectedChannels,
+//       enabled: isEnabled,
+//       sendTime: sendTime,
+//     };
 
-//     try {
-//       const token = localStorage.getItem("token"); // Adjust based on your auth implementation
-
-//       const response = await fetch("/api/v1/birthday-config", {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json",
-//           Authorization: `Bearer ${token}`,
+//     saveConfig(
+//       {
+//         url: "/api/v1/birthday/template",
+//         data: configPayload,
+//       },
+//       {
+//         onSuccess: (response) => {
+//           toast.success("Birthday configuration saved successfully! 🎉");
+//           setHasUnsavedChanges(false);
+//           refetchConfig();
+//           setShowConfigForm(false);
 //         },
-//         body: JSON.stringify({
-//           template: selectedTemplate,
-//           selectedChannels: selectedChannels,
-//           enabled: isEnabled,
-//           sendTime: sendTime,
-//         }),
-//       });
-
-//       const result = await response.json();
-
-//       if (response.ok) {
-//         toast.success("Birthday configuration saved successfully! 🎉");
-//         setHasUnsavedChanges(false);
-//         refetchConfig();
-//       } else {
-//         throw new Error(result.message || "Failed to save configuration");
+//         onError: (error) => {
+//           console.error("Error saving config:", error);
+//           toast.error(
+//             error?.message || "Failed to save birthday configuration"
+//           );
+//         },
 //       }
-//     } catch (error) {
-//       console.error("Error saving config:", error);
-//       toast.error(error.message || "Failed to save birthday configuration");
-//     } finally {
-//       setIsSavingConfig(false);
+//     );
+//   };
+
+//   // Delete birthday configuration
+//   const handleDeleteConfig = async () => {
+//     if (!currentConfig) return;
+
+//     if (
+//       !confirm("Are you sure you want to delete this birthday configuration?")
+//     ) {
+//       return;
 //     }
+
+//     deleteConfig(
+//       {
+//         url: `/api/v1/birthday/templateConfig/${currentConfig._id}`,
+//       },
+//       {
+//         onSuccess: () => {
+//           toast.success("Birthday configuration deleted successfully! 🗑️");
+//           refetchConfig();
+//           setSelectedTemplate("");
+//           setSelectedChannels([]);
+//           setSendTime("08:00");
+//           setIsEnabled(true);
+//           setShowConfigForm(true);
+//         },
+//         onError: (error) => {
+//           console.error("Error deleting config:", error);
+//           toast.error(
+//             error?.message || "Failed to delete birthday configuration"
+//           );
+//         },
+//       }
+//     );
 //   };
 
 //   // Filter by search query
@@ -237,7 +287,7 @@
 //   // Handle sending birthday messages
 //   const handleSendMessage = async (contact, messageType) => {
 //     // Check if config is saved
-//     if (!selectedTemplate || selectedChannels.length === 0) {
+//     if (!currentConfig) {
 //       toast.error("Please configure and save your birthday settings first");
 //       return;
 //     }
@@ -245,45 +295,44 @@
 //     const key = `${contact._id}-${messageType}`;
 //     setSendingMessages((prev) => ({ ...prev, [key]: true }));
 
-//     try {
-//       const token = localStorage.getItem("token");
+//     const messagePayload = {
+//       contactId: contact._id,
+//       messageType: messageType,
+//       templateId: currentConfig.template._id,
+//     };
 
-//       const response = await fetch(`/api/v1/birthday/send-message`, {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json",
-//           Authorization: `Bearer ${token}`,
+//     sendBirthdayMessage(
+//       {
+//         url: "/api/v1/birthday/sendmessage",
+//         data: messagePayload,
+//       },
+//       {
+//         onSuccess: (response) => {
+//           setSendingMessages((prev) => ({ ...prev, [key]: false }));
+
+//           if (messageType === "sms") {
+//             toast.success(
+//               `SMS birthday message sent to ${contact.fullName}! 🎉`
+//             );
+//           } else if (messageType === "email") {
+//             toast.success(
+//               `Email birthday message sent to ${contact.fullName}! 📧`
+//             );
+//           } else if (messageType === "both") {
+//             toast.success(
+//               `SMS & Email birthday messages sent to ${contact.fullName}! 🎊`
+//             );
+//           }
 //         },
-//         body: JSON.stringify({
-//           contactId: contact._id,
-//           messageType: messageType, // 'sms', 'email', or 'both'
-//           templateId: selectedTemplate,
-//         }),
-//       });
-
-//       const result = await response.json();
-
-//       if (response.ok) {
-//         if (messageType === "sms") {
-//           toast.success(`SMS birthday message sent to ${contact.fullName}! 🎉`);
-//         } else if (messageType === "email") {
-//           toast.success(
-//             `Email birthday message sent to ${contact.fullName}! 📧`
+//         onError: (error) => {
+//           setSendingMessages((prev) => ({ ...prev, [key]: false }));
+//           console.error("Error sending message:", error);
+//           toast.error(
+//             error?.message || `Failed to send message to ${contact.fullName}`
 //           );
-//         } else if (messageType === "both") {
-//           toast.success(
-//             `SMS & Email birthday messages sent to ${contact.fullName}! 🎊`
-//           );
-//         }
-//       } else {
-//         throw new Error(result.message || "Failed to send message");
+//         },
 //       }
-//     } catch (error) {
-//       console.error("Error sending message:", error);
-//       toast.error(`Failed to send message to ${contact.fullName}`);
-//     } finally {
-//       setSendingMessages((prev) => ({ ...prev, [key]: false }));
-//     }
+//     );
 //   };
 
 //   return (
@@ -352,172 +401,334 @@
 //           </div>
 //         </div>
 
-//         {/* Birthday Configuration Section */}
-//         <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-//           <div className="flex items-center gap-3 mb-4">
-//             <Settings className="w-5 h-5 text-[#5B38DB]" />
-//             <div>
-//               <h3 className="font-semibold text-gray-900">
-//                 Birthday Message Configuration
-//               </h3>
-//               <p className="text-sm text-gray-600">
-//                 Set up your default template and channels for birthday messages
-//               </p>
+//         {/* Current Configuration Display */}
+//         {currentConfig && !showConfigForm && (
+//           <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+//             <div className="flex items-start justify-between mb-4">
+//               <div className="flex items-center gap-3">
+//                 <CheckCircle2 className="w-5 h-5 text-green-600" />
+//                 <div>
+//                   <h3 className="font-semibold text-gray-900">
+//                     Active Birthday Configuration
+//                   </h3>
+//                   <p className="text-sm text-gray-600">
+//                     Your birthday messages are configured and ready
+//                   </p>
+//                 </div>
+//               </div>
+//               <div className="flex gap-2">
+//                 {/* <Button
+//                   size="sm"
+//                   variant="outline"
+//                   onClick={() => setShowConfigForm(true)}
+//                   className="text-blue-600 hover:text-blue-800"
+//                 >
+//                   <Edit className="w-4 h-4 mr-1" />
+//                   Edit
+//                 </Button> */}
+//                 <Button
+//                   size="sm"
+//                   variant="outline"
+//                   onClick={handleDeleteConfig}
+//                   disabled={isDeletingConfig}
+//                   className="text-red-600 hover:text-red-800 hover:bg-red-50 border-red-300"
+//                 >
+//                   {isDeletingConfig ? (
+//                     <>
+//                       <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin mr-1"></div>
+//                       Deleting...
+//                     </>
+//                   ) : (
+//                     <>
+//                       <Trash2 className="w-4 h-4 mr-1" />
+//                       Delete
+//                     </>
+//                   )}
+//                 </Button>
+//               </div>
+//             </div>
+
+//             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+//               {/* Template */}
+//               <div className="bg-gray-50 rounded-lg p-4">
+//                 <p className="text-xs text-gray-500 mb-1">Template</p>
+//                 <p className="font-medium text-gray-900">
+//                   {currentConfig.template?.name || "Not set"}
+//                 </p>
+//                 {currentConfig.template?.note && (
+//                   <p className="text-xs text-gray-500 mt-1">
+//                     {currentConfig.template.note}
+//                   </p>
+//                 )}
+//               </div>
+
+//               {/* Channels */}
+//               <div className="bg-gray-50 rounded-lg p-4">
+//                 <p className="text-xs text-gray-500 mb-2">Channels</p>
+//                 <div className="flex flex-wrap gap-2">
+//                   {currentConfig.selectedChannels.map((channel) => (
+//                     <span
+//                       key={channel}
+//                       className="inline-flex items-center gap-1 px-2 py-1 bg-white rounded text-xs font-medium text-gray-700 border border-gray-200"
+//                     >
+//                       {channel === "sms" && <Phone className="w-3 h-3" />}
+//                       {channel === "email" && <Mail className="w-3 h-3" />}
+//                       {channel.toUpperCase()}
+//                     </span>
+//                   ))}
+//                 </div>
+//               </div>
+
+//               {/* Send Time */}
+//               <div className="bg-gray-50 rounded-lg p-4">
+//                 <p className="text-xs text-gray-500 mb-1">Send Time</p>
+//                 <p className="font-medium text-gray-900">
+//                   {currentConfig.sendTime}
+//                 </p>
+//               </div>
+
+//               {/* Status */}
+//               <div className="bg-gray-50 rounded-lg p-4">
+//                 <p className="text-xs text-gray-500 mb-1">Status</p>
+//                 <span
+//                   className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium ${
+//                     currentConfig.enabled
+//                       ? "bg-green-100 text-green-700"
+//                       : "bg-gray-100 text-gray-700"
+//                   }`}
+//                 >
+//                   <div
+//                     className={`w-2 h-2 rounded-full ${
+//                       currentConfig.enabled ? "bg-green-600" : "bg-gray-600"
+//                     }`}
+//                   ></div>
+//                   {currentConfig.enabled ? "Enabled" : "Disabled"}
+//                 </span>
+//               </div>
 //             </div>
 //           </div>
+//         )}
 
-//           <div className="space-y-4">
-//             {/* Template Selection */}
-//             <div>
-//               <label className="text-sm font-medium text-gray-700 mb-2 block">
-//                 Select Message Template <span className="text-red-500">*</span>
-//               </label>
-//               <Select
-//                 value={selectedTemplate}
-//                 onValueChange={setSelectedTemplate}
-//               >
-//                 <SelectTrigger className="w-full">
-//                   <SelectValue placeholder="Choose a birthday template..." />
-//                 </SelectTrigger>
-//                 <SelectContent>
-//                   {templatesLoading ? (
-//                     <div className="p-4 text-center text-gray-500">
-//                       Loading templates...
-//                     </div>
-//                   ) : templates.length === 0 ? (
-//                     <div className="p-4 text-center text-gray-500">
-//                       No templates available
-//                     </div>
-//                   ) : (
-//                     templates.map((template) => (
-//                       <SelectItem key={template._id} value={template._id}>
-//                         <div className="flex flex-col">
-//                           <span className="font-medium">{template.name}</span>
-//                           {template.note && (
-//                             <span className="text-xs text-gray-500">
-//                               {template.note}
-//                             </span>
-//                           )}
-//                         </div>
-//                       </SelectItem>
-//                     ))
-//                   )}
-//                 </SelectContent>
-//               </Select>
-//               {selectedTemplateObj && (
-//                 <p className="text-xs text-gray-500 mt-1">
-//                   Selected:{" "}
-//                   <span className="font-medium">
-//                     {selectedTemplateObj.name}
-//                   </span>
-//                 </p>
+//         {/* Birthday Configuration Form */}
+//         {(!currentConfig || showConfigForm) && (
+//           <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+//             <div className="flex items-center justify-between mb-4">
+//               <div className="flex items-center gap-3">
+//                 <Settings className="w-5 h-5 text-[#5B38DB]" />
+//                 <div>
+//                   <h3 className="font-semibold text-gray-900">
+//                     {currentConfig
+//                       ? "Edit Birthday Configuration"
+//                       : "Birthday Message Configuration"}
+//                   </h3>
+//                   <p className="text-sm text-gray-600">
+//                     {currentConfig
+//                       ? "Update your template and channels for birthday messages"
+//                       : "Set up your default template and channels for birthday messages"}
+//                   </p>
+//                 </div>
+//               </div>
+//               {currentConfig && showConfigForm && (
+//                 <Button
+//                   variant="outline"
+//                   size="sm"
+//                   onClick={() => {
+//                     setShowConfigForm(false);
+//                     // Reset to current config values
+//                     setSelectedTemplate(currentConfig.template?._id || "");
+//                     setSelectedChannels(currentConfig.selectedChannels || []);
+//                     setSendTime(currentConfig.sendTime || "08:00");
+//                     setIsEnabled(currentConfig.enabled !== false);
+//                   }}
+//                 >
+//                   Cancel
+//                 </Button>
 //               )}
 //             </div>
 
-//             {/* Channel Selection */}
-//             <div>
-//               <label className="text-sm font-medium text-gray-700 mb-2 block">
-//                 Select Channels <span className="text-red-500">*</span>
-//               </label>
-//               <div className="flex gap-4">
-//                 {CHANNEL_OPTIONS.map((channel) => {
-//                   const Icon = channel.icon;
-//                   return (
-//                     <div
-//                       key={channel.value}
-//                       className="flex items-center space-x-2"
-//                     >
-//                       <Checkbox
-//                         id={channel.value}
-//                         checked={selectedChannels.includes(channel.value)}
-//                         onCheckedChange={() =>
-//                           handleChannelToggle(channel.value)
-//                         }
-//                       />
-//                       <label
-//                         htmlFor={channel.value}
-//                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-2 cursor-pointer"
-//                       >
-//                         <Icon className="w-4 h-4" />
-//                         {channel.label}
-//                       </label>
-//                     </div>
-//                   );
-//                 })}
-//               </div>
-//             </div>
-
-//             {/* Send Time */}
-//             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//             <div className="space-y-4">
+//               {/* Template Selection */}
 //               <div>
 //                 <label className="text-sm font-medium text-gray-700 mb-2 block">
-//                   Send Time
+//                   Select Message Template{" "}
+//                   <span className="text-red-500">*</span>
 //                 </label>
-//                 <Input
-//                   type="time"
-//                   value={sendTime}
-//                   onChange={(e) => setSendTime(e.target.value)}
-//                   className="w-full"
-//                 />
+//                 <Select
+//                   value={selectedTemplate}
+//                   onValueChange={setSelectedTemplate}
+//                 >
+//                   <SelectTrigger className="w-full">
+//                     <SelectValue placeholder="Choose a birthday template..." />
+//                   </SelectTrigger>
+//                   <SelectContent>
+//                     {templatesLoading ? (
+//                       <div className="p-4 text-center text-gray-500">
+//                         Loading templates...
+//                       </div>
+//                     ) : templates.length === 0 ? (
+//                       <div className="p-4 text-center text-gray-500">
+//                         No birthday templates available
+//                       </div>
+//                     ) : (
+//                       templates.map((template) => (
+//                         <SelectItem key={template._id} value={template._id}>
+//                           <div className="flex flex-col">
+//                             <span className="font-medium">{template.name}</span>
+//                             {template.note && (
+//                               <span className="text-xs text-gray-500">
+//                                 {template.note}
+//                               </span>
+//                             )}
+//                           </div>
+//                         </SelectItem>
+//                       ))
+//                     )}
+//                   </SelectContent>
+//                 </Select>
+//                 {selectedTemplateObj && (
+//                   <p className="text-xs text-gray-500 mt-1">
+//                     Selected:{" "}
+//                     <span className="font-medium">
+//                       {selectedTemplateObj.name}
+//                     </span>
+//                   </p>
+//                 )}
 //               </div>
 
-//               <div className="flex items-end">
-//                 <div className="flex items-center space-x-2">
-//                   <Checkbox
-//                     id="enabled"
-//                     checked={isEnabled}
-//                     onCheckedChange={setIsEnabled}
-//                   />
-//                   <label
-//                     htmlFor="enabled"
-//                     className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-//                   >
-//                     Enable automatic birthday messages
-//                   </label>
+//               {/* Channel Selection */}
+//               <div>
+//                 <label className="text-sm font-medium text-gray-700 mb-2 block">
+//                   Select Channels <span className="text-red-500">*</span>
+//                 </label>
+//                 <div className="flex gap-4">
+//                   {CHANNEL_OPTIONS.map((channel) => {
+//                     const Icon = channel.icon;
+//                     return (
+//                       <div
+//                         key={channel.value}
+//                         className="flex items-center space-x-2"
+//                       >
+//                         <Checkbox
+//                           id={channel.value}
+//                           checked={selectedChannels.includes(channel.value)}
+//                           onCheckedChange={() =>
+//                             handleChannelToggle(channel.value)
+//                           }
+//                         />
+//                         <label
+//                           htmlFor={channel.value}
+//                           className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-2 cursor-pointer"
+//                         >
+//                           <Icon className="w-4 h-4" />
+//                           {channel.label}
+//                         </label>
+//                       </div>
+//                     );
+//                   })}
 //                 </div>
 //               </div>
-//             </div>
 
-//             {/* Save Button */}
-//             <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-//               <div>
-//                 {hasUnsavedChanges && (
-//                   <p className="text-sm text-amber-600 flex items-center gap-1">
-//                     <span className="w-2 h-2 bg-amber-600 rounded-full"></span>
-//                     You have unsaved changes
-//                   </p>
-//                 )}
-//                 {!hasUnsavedChanges && selectedTemplate && (
-//                   <p className="text-sm text-green-600 flex items-center gap-1">
-//                     <CheckCircle2 className="w-4 h-4" />
-//                     Configuration saved
-//                   </p>
-//                 )}
+//               {/* Send Time */}
+//               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//                 <div>
+//                   <label className="text-sm font-medium text-gray-700 mb-2 block">
+//                     Send Time
+//                   </label>
+//                   <Input
+//                     type="time"
+//                     value={sendTime}
+//                     onChange={(e) => setSendTime(e.target.value)}
+//                     className="w-full"
+//                   />
+//                 </div>
+
+//                 <div className="flex items-end">
+//                   <div className="flex items-center space-x-2">
+//                     <Checkbox
+//                       id="enabled"
+//                       checked={isEnabled}
+//                       onCheckedChange={setIsEnabled}
+//                     />
+//                     <label
+//                       htmlFor="enabled"
+//                       className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+//                     >
+//                       Enable automatic birthday messages
+//                     </label>
+//                   </div>
+//                 </div>
 //               </div>
-//               <Button
-//                 onClick={handleSaveConfig}
-//                 disabled={
-//                   isSavingConfig ||
-//                   !selectedTemplate ||
-//                   selectedChannels.length === 0
-//                 }
-//                 className="bg-[#5B38DB] hover:bg-[#4a2db0]"
-//               >
-//                 {isSavingConfig ? (
-//                   <>
-//                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-//                     Saving...
-//                   </>
-//                 ) : (
-//                   <>
-//                     <Save className="w-4 h-4 mr-2" />
-//                     Save Configuration
-//                   </>
-//                 )}
-//               </Button>
+
+//               {/* Save Button */}
+//               <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+//                 <div>
+//                   {hasUnsavedChanges && (
+//                     <p className="text-sm text-amber-600 flex items-center gap-1">
+//                       <span className="w-2 h-2 bg-amber-600 rounded-full"></span>
+//                       You have unsaved changes
+//                     </p>
+//                   )}
+//                   {!hasUnsavedChanges && selectedTemplate && currentConfig && (
+//                     <p className="text-sm text-green-600 flex items-center gap-1">
+//                       <CheckCircle2 className="w-4 h-4" />
+//                       Configuration saved
+//                     </p>
+//                   )}
+//                 </div>
+//                 <Button
+//                   onClick={handleSaveConfig}
+//                   disabled={
+//                     isSavingConfig ||
+//                     !selectedTemplate ||
+//                     selectedChannels.length === 0
+//                   }
+//                   className="bg-[#5B38DB] hover:bg-[#4a2db0]"
+//                 >
+//                   {isSavingConfig ? (
+//                     <>
+//                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+//                       Saving...
+//                     </>
+//                   ) : (
+//                     <>
+//                       <Save className="w-4 h-4 mr-2" />
+//                       {currentConfig
+//                         ? "Update Configuration"
+//                         : "Save Configuration"}
+//                     </>
+//                   )}
+//                 </Button>
+//               </div>
 //             </div>
 //           </div>
-//         </div>
+//         )}
+
+//         {/* No Config Warning */}
+//         {!currentConfig && !showConfigForm && (
+//           <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+//             <div className="flex items-start gap-3">
+//               <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5" />
+//               <div className="flex-1">
+//                 <h3 className="font-semibold text-amber-900 mb-1">
+//                   No Birthday Configuration Set
+//                 </h3>
+//                 <p className="text-sm text-amber-800 mb-3">
+//                   You haven't configured your birthday messages yet. Set up your
+//                   template and channels to start sending birthday wishes
+//                   automatically.
+//                 </p>
+//                 <Button
+//                   size="sm"
+//                   onClick={() => setShowConfigForm(true)}
+//                   className="bg-amber-600 hover:bg-amber-700"
+//                 >
+//                   <Settings className="w-4 h-4 mr-2" />
+//                   Configure Now
+//                 </Button>
+//               </div>
+//             </div>
+//           </div>
+//         )}
 
 //         {/* Filters */}
 //         <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6">
@@ -624,10 +835,10 @@
 //                             formatBirthday={formatBirthday}
 //                             onSendMessage={handleSendMessage}
 //                             sendingMessages={sendingMessages}
-//                             selectedChannels={selectedChannels}
-//                             hasConfig={
-//                               !!selectedTemplate && selectedChannels.length > 0
+//                             selectedChannels={
+//                               currentConfig?.selectedChannels || []
 //                             }
+//                             hasConfig={!!currentConfig}
 //                           />
 //                         ))}
 //                     </div>
@@ -648,10 +859,8 @@
 //                         formatBirthday={formatBirthday}
 //                         onSendMessage={handleSendMessage}
 //                         sendingMessages={sendingMessages}
-//                         selectedChannels={selectedChannels}
-//                         hasConfig={
-//                           !!selectedTemplate && selectedChannels.length > 0
-//                         }
+//                         selectedChannels={currentConfig?.selectedChannels || []}
+//                         hasConfig={!!currentConfig}
 //                       />
 //                     ))}
 //                 </div>
@@ -664,7 +873,7 @@
 //   );
 // }
 
-// // Birthday Card Component
+// // Birthday Card Component (unchanged)
 // function BirthdayCard({
 //   contact,
 //   isBirthdayToday,
@@ -829,6 +1038,9 @@ import {
   Settings,
   Save,
   CheckCircle2,
+  Trash2,
+  Edit,
+  AlertCircle,
 } from "lucide-react";
 import {
   Select,
@@ -873,6 +1085,7 @@ export default function BirthdayDashboard() {
   const [sendTime, setSendTime] = useState("08:00");
   const [isEnabled, setIsEnabled] = useState(true);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [showConfigForm, setShowConfigForm] = useState(false);
 
   // Build API URL based on selected month
   const apiUrl =
@@ -892,12 +1105,17 @@ export default function BirthdayDashboard() {
     "birthday-templates"
   );
 
+  const templates__new_Data =
+    templateData?.data?.templates?.filter(
+      (template) => template.category?.name === "Birthday"
+    ) || [];
+
   // Fetch existing config
   const {
     data: configData,
     isLoading: configLoading,
     refetch: refetchConfig,
-  } = useFetchData("/api/v1/birthday-config", "birthday-config");
+  } = useFetchData("/api/v1/birthday/templateConfig", "birthday-config");
 
   // Mutation for saving config
   const { mutate: saveConfig, isLoading: isSavingConfig } = useMutateData(
@@ -905,41 +1123,52 @@ export default function BirthdayDashboard() {
     "POST"
   );
 
+  // Mutation for deleting config
+  const { mutate: deleteConfig, isLoading: isDeletingConfig } = useMutateData(
+    "birthday-config",
+    "DELETE"
+  );
+
   // Mutation for sending birthday messages
   const { mutate: sendBirthdayMessage, isLoading: isSendingMessage } =
     useMutateData("birthday-messages", "POST");
 
   const birthdays = data || [];
-  const templates = templateData?.data?.templates || [];
+  const templates = templates__new_Data || [];
+
+  // Get the first config (since there's only one per user)
+  const currentConfig = configData?.data?.[0] || null;
 
   // Get selected template object
   const selectedTemplateObj = templates.find((t) => t._id === selectedTemplate);
 
   // Load existing config when data is fetched
   useEffect(() => {
-    if (configData?.data) {
-      const config = configData.data;
-      setSelectedTemplate(config.template || "");
-      setSelectedChannels(config.selectedChannels || []);
-      setSendTime(config.sendTime || "08:00");
-      setIsEnabled(config.enabled !== false);
+    if (currentConfig) {
+      setSelectedTemplate(currentConfig.template?._id || "");
+      setSelectedChannels(currentConfig.selectedChannels || []);
+      setSendTime(currentConfig.sendTime || "08:00");
+      setIsEnabled(currentConfig.enabled !== false);
       setHasUnsavedChanges(false);
+      setShowConfigForm(false);
+    } else {
+      setShowConfigForm(true);
     }
-  }, [configData]);
+  }, [currentConfig]);
 
   // Track changes
   useEffect(() => {
-    if (configData?.data) {
+    if (currentConfig) {
       const hasChanges =
-        selectedTemplate !== (configData.data.template || "") ||
+        selectedTemplate !== (currentConfig.template?._id || "") ||
         JSON.stringify(selectedChannels) !==
-          JSON.stringify(configData.data.selectedChannels || []) ||
-        sendTime !== (configData.data.sendTime || "08:00") ||
-        isEnabled !== (configData.data.enabled !== false);
+          JSON.stringify(currentConfig.selectedChannels || []) ||
+        sendTime !== (currentConfig.sendTime || "08:00") ||
+        isEnabled !== (currentConfig.enabled !== false);
 
       setHasUnsavedChanges(hasChanges);
     }
-  }, [selectedTemplate, selectedChannels, sendTime, isEnabled, configData]);
+  }, [selectedTemplate, selectedChannels, sendTime, isEnabled, currentConfig]);
 
   // Handle channel selection
   const handleChannelToggle = (channel) => {
@@ -969,10 +1198,6 @@ export default function BirthdayDashboard() {
       sendTime: sendTime,
     };
 
-    console.log({
-      tyu: configPayload,
-    });
-
     saveConfig(
       {
         url: "/api/v1/birthday/template",
@@ -983,11 +1208,46 @@ export default function BirthdayDashboard() {
           toast.success("Birthday configuration saved successfully! 🎉");
           setHasUnsavedChanges(false);
           refetchConfig();
+          setShowConfigForm(false);
         },
         onError: (error) => {
           console.error("Error saving config:", error);
           toast.error(
             error?.message || "Failed to save birthday configuration"
+          );
+        },
+      }
+    );
+  };
+
+  // Delete birthday configuration
+  const handleDeleteConfig = async () => {
+    if (!currentConfig) return;
+
+    if (
+      !confirm("Are you sure you want to delete this birthday configuration?")
+    ) {
+      return;
+    }
+
+    deleteConfig(
+      {
+        url: `/api/v1/birthday/templateConfig/${currentConfig._id}`,
+      },
+      {
+        onSuccess: () => {
+          toast.success("Birthday configuration deleted successfully! 🗑️");
+          refetchConfig();
+          setSelectedTemplate("");
+          setSelectedChannels([]);
+          setSendTime("08:00");
+          setIsEnabled(true);
+          setShowConfigForm(true);
+        },
+        onError: (error) => {
+          console.error("Error deleting config:", error);
+          toast.error(
+            error?.message || "Failed to delete birthday configuration"
           );
         },
       }
@@ -1050,43 +1310,32 @@ export default function BirthdayDashboard() {
     isBirthdayUpcoming(b.birthDay, b.birthMonth)
   );
 
-  // Handle sending birthday messages
-  const handleSendMessage = async (contact, messageType) => {
-    // Check if config is saved
-    if (!selectedTemplate || selectedChannels.length === 0) {
-      toast.error("Please configure and save your birthday settings first");
-      return;
-    }
-
-    const key = `${contact._id}-${messageType}`;
+  // Handle sending birthday messages - FIXED VERSION
+  const handleSendMessage = async (contact, channel) => {
+    const key = `${contact._id}-${channel}`;
     setSendingMessages((prev) => ({ ...prev, [key]: true }));
 
     const messagePayload = {
       contactId: contact._id,
-      messageType: messageType, // 'sms', 'email', or 'both'
-      templateId: selectedTemplate,
+      channel: channel, // Changed from messageType to channel to match your API
     };
 
     sendBirthdayMessage(
       {
-        url: "/api/v1/birthday/send-message",
+        url: "/api/v1/birthday/sendmessage",
         data: messagePayload,
       },
       {
         onSuccess: (response) => {
           setSendingMessages((prev) => ({ ...prev, [key]: false }));
 
-          if (messageType === "sms") {
+          if (channel === "sms") {
             toast.success(
               `SMS birthday message sent to ${contact.fullName}! 🎉`
             );
-          } else if (messageType === "email") {
+          } else if (channel === "email") {
             toast.success(
               `Email birthday message sent to ${contact.fullName}! 📧`
-            );
-          } else if (messageType === "both") {
-            toast.success(
-              `SMS & Email birthday messages sent to ${contact.fullName}! 🎊`
             );
           }
         },
@@ -1167,172 +1416,325 @@ export default function BirthdayDashboard() {
           </div>
         </div>
 
-        {/* Birthday Configuration Section */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-          <div className="flex items-center gap-3 mb-4">
-            <Settings className="w-5 h-5 text-[#5B38DB]" />
-            <div>
-              <h3 className="font-semibold text-gray-900">
-                Birthday Message Configuration
-              </h3>
-              <p className="text-sm text-gray-600">
-                Set up your default template and channels for birthday messages
-              </p>
+        {/* Current Configuration Display */}
+        {currentConfig && !showConfigForm && (
+          <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <CheckCircle2 className="w-5 h-5 text-green-600" />
+                <div>
+                  <h3 className="font-semibold text-gray-900">
+                    Active Birthday Configuration
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    Your birthday messages are configured and ready
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleDeleteConfig}
+                  disabled={isDeletingConfig}
+                  className="text-red-600 hover:text-red-800 hover:bg-red-50 border-red-300"
+                >
+                  {isDeletingConfig ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin mr-1"></div>
+                      Deleting...
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="w-4 h-4 mr-1" />
+                      Delete
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Template */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <p className="text-xs text-gray-500 mb-1">Template</p>
+                <p className="font-medium text-gray-900">
+                  {currentConfig.template?.name || "Not set"}
+                </p>
+                {currentConfig.template?.note && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    {currentConfig.template.note}
+                  </p>
+                )}
+              </div>
+
+              {/* Channels */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <p className="text-xs text-gray-500 mb-2">Channels</p>
+                <div className="flex flex-wrap gap-2">
+                  {currentConfig.selectedChannels.map((channel) => (
+                    <span
+                      key={channel}
+                      className="inline-flex items-center gap-1 px-2 py-1 bg-white rounded text-xs font-medium text-gray-700 border border-gray-200"
+                    >
+                      {channel === "sms" && <Phone className="w-3 h-3" />}
+                      {channel === "email" && <Mail className="w-3 h-3" />}
+                      {channel.toUpperCase()}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Send Time */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <p className="text-xs text-gray-500 mb-1">Send Time</p>
+                <p className="font-medium text-gray-900">
+                  {currentConfig.sendTime}
+                </p>
+              </div>
+
+              {/* Status */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <p className="text-xs text-gray-500 mb-1">Status</p>
+                <span
+                  className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium ${
+                    currentConfig.enabled
+                      ? "bg-green-100 text-green-700"
+                      : "bg-gray-100 text-gray-700"
+                  }`}
+                >
+                  <div
+                    className={`w-2 h-2 rounded-full ${
+                      currentConfig.enabled ? "bg-green-600" : "bg-gray-600"
+                    }`}
+                  ></div>
+                  {currentConfig.enabled ? "Enabled" : "Disabled"}
+                </span>
+              </div>
             </div>
           </div>
+        )}
 
-          <div className="space-y-4">
-            {/* Template Selection */}
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">
-                Select Message Template <span className="text-red-500">*</span>
-              </label>
-              <Select
-                value={selectedTemplate}
-                onValueChange={setSelectedTemplate}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Choose a birthday template..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {templatesLoading ? (
-                    <div className="p-4 text-center text-gray-500">
-                      Loading templates...
-                    </div>
-                  ) : templates.length === 0 ? (
-                    <div className="p-4 text-center text-gray-500">
-                      No templates available
-                    </div>
-                  ) : (
-                    templates.map((template) => (
-                      <SelectItem key={template._id} value={template._id}>
-                        <div className="flex flex-col">
-                          <span className="font-medium">{template.name}</span>
-                          {template.note && (
-                            <span className="text-xs text-gray-500">
-                              {template.note}
-                            </span>
-                          )}
-                        </div>
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
-              {selectedTemplateObj && (
-                <p className="text-xs text-gray-500 mt-1">
-                  Selected:{" "}
-                  <span className="font-medium">
-                    {selectedTemplateObj.name}
-                  </span>
-                </p>
+        {/* Birthday Configuration Form */}
+        {(!currentConfig || showConfigForm) && (
+          <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <Settings className="w-5 h-5 text-[#5B38DB]" />
+                <div>
+                  <h3 className="font-semibold text-gray-900">
+                    {currentConfig
+                      ? "Edit Birthday Configuration"
+                      : "Birthday Message Configuration"}
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    {currentConfig
+                      ? "Update your template and channels for birthday messages"
+                      : "Set up your default template and channels for birthday messages"}
+                  </p>
+                </div>
+              </div>
+              {currentConfig && showConfigForm && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setShowConfigForm(false);
+                    // Reset to current config values
+                    setSelectedTemplate(currentConfig.template?._id || "");
+                    setSelectedChannels(currentConfig.selectedChannels || []);
+                    setSendTime(currentConfig.sendTime || "08:00");
+                    setIsEnabled(currentConfig.enabled !== false);
+                  }}
+                >
+                  Cancel
+                </Button>
               )}
             </div>
 
-            {/* Channel Selection */}
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">
-                Select Channels <span className="text-red-500">*</span>
-              </label>
-              <div className="flex gap-4">
-                {CHANNEL_OPTIONS.map((channel) => {
-                  const Icon = channel.icon;
-                  return (
-                    <div
-                      key={channel.value}
-                      className="flex items-center space-x-2"
-                    >
-                      <Checkbox
-                        id={channel.value}
-                        checked={selectedChannels.includes(channel.value)}
-                        onCheckedChange={() =>
-                          handleChannelToggle(channel.value)
-                        }
-                      />
-                      <label
-                        htmlFor={channel.value}
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-2 cursor-pointer"
-                      >
-                        <Icon className="w-4 h-4" />
-                        {channel.label}
-                      </label>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Send Time */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-4">
+              {/* Template Selection */}
               <div>
                 <label className="text-sm font-medium text-gray-700 mb-2 block">
-                  Send Time
+                  Select Message Template{" "}
+                  <span className="text-red-500">*</span>
                 </label>
-                <Input
-                  type="time"
-                  value={sendTime}
-                  onChange={(e) => setSendTime(e.target.value)}
-                  className="w-full"
-                />
+                <Select
+                  value={selectedTemplate}
+                  onValueChange={setSelectedTemplate}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Choose a birthday template..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {templatesLoading ? (
+                      <div className="p-4 text-center text-gray-500">
+                        Loading templates...
+                      </div>
+                    ) : templates.length === 0 ? (
+                      <div className="p-4 text-center text-gray-500">
+                        No birthday templates available
+                      </div>
+                    ) : (
+                      templates.map((template) => (
+                        <SelectItem key={template._id} value={template._id}>
+                          <div className="flex flex-col">
+                            <span className="font-medium">{template.name}</span>
+                            {template.note && (
+                              <span className="text-xs text-gray-500">
+                                {template.note}
+                              </span>
+                            )}
+                          </div>
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+                {selectedTemplateObj && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    Selected:{" "}
+                    <span className="font-medium">
+                      {selectedTemplateObj.name}
+                    </span>
+                  </p>
+                )}
               </div>
 
-              <div className="flex items-end">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="enabled"
-                    checked={isEnabled}
-                    onCheckedChange={setIsEnabled}
-                  />
-                  <label
-                    htmlFor="enabled"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                  >
-                    Enable automatic birthday messages
-                  </label>
+              {/* Channel Selection */}
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-2 block">
+                  Select Channels <span className="text-red-500">*</span>
+                </label>
+                <div className="flex gap-4">
+                  {CHANNEL_OPTIONS.map((channel) => {
+                    const Icon = channel.icon;
+                    return (
+                      <div
+                        key={channel.value}
+                        className="flex items-center space-x-2"
+                      >
+                        <Checkbox
+                          id={channel.value}
+                          checked={selectedChannels.includes(channel.value)}
+                          onCheckedChange={() =>
+                            handleChannelToggle(channel.value)
+                          }
+                        />
+                        <label
+                          htmlFor={channel.value}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-2 cursor-pointer"
+                        >
+                          <Icon className="w-4 h-4" />
+                          {channel.label}
+                        </label>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
-            </div>
 
-            {/* Save Button */}
-            <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-              <div>
-                {hasUnsavedChanges && (
-                  <p className="text-sm text-amber-600 flex items-center gap-1">
-                    <span className="w-2 h-2 bg-amber-600 rounded-full"></span>
-                    You have unsaved changes
-                  </p>
-                )}
-                {!hasUnsavedChanges && selectedTemplate && (
-                  <p className="text-sm text-green-600 flex items-center gap-1">
-                    <CheckCircle2 className="w-4 h-4" />
-                    Configuration saved
-                  </p>
-                )}
+              {/* Send Time */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-2 block">
+                    Send Time
+                  </label>
+                  <Input
+                    type="time"
+                    value={sendTime}
+                    onChange={(e) => setSendTime(e.target.value)}
+                    className="w-full"
+                  />
+                </div>
+
+                <div className="flex items-end">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="enabled"
+                      checked={isEnabled}
+                      onCheckedChange={setIsEnabled}
+                    />
+                    <label
+                      htmlFor="enabled"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                    >
+                      Enable automatic birthday messages
+                    </label>
+                  </div>
+                </div>
               </div>
-              <Button
-                onClick={handleSaveConfig}
-                disabled={
-                  isSavingConfig ||
-                  !selectedTemplate ||
-                  selectedChannels.length === 0
-                }
-                className="bg-[#5B38DB] hover:bg-[#4a2db0]"
-              >
-                {isSavingConfig ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save className="w-4 h-4 mr-2" />
-                    Save Configuration
-                  </>
-                )}
-              </Button>
+
+              {/* Save Button */}
+              <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                <div>
+                  {hasUnsavedChanges && (
+                    <p className="text-sm text-amber-600 flex items-center gap-1">
+                      <span className="w-2 h-2 bg-amber-600 rounded-full"></span>
+                      You have unsaved changes
+                    </p>
+                  )}
+                  {!hasUnsavedChanges && selectedTemplate && currentConfig && (
+                    <p className="text-sm text-green-600 flex items-center gap-1">
+                      <CheckCircle2 className="w-4 h-4" />
+                      Configuration saved
+                    </p>
+                  )}
+                </div>
+                <Button
+                  onClick={handleSaveConfig}
+                  disabled={
+                    isSavingConfig ||
+                    !selectedTemplate ||
+                    selectedChannels.length === 0
+                  }
+                  className="bg-[#5B38DB] hover:bg-[#4a2db0]"
+                >
+                  {isSavingConfig ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4 mr-2" />
+                      {currentConfig
+                        ? "Update Configuration"
+                        : "Save Configuration"}
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
+        )}
+
+        {/* No Config Warning */}
+        {!currentConfig && !showConfigForm && (
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5" />
+              <div className="flex-1">
+                <h3 className="font-semibold text-amber-900 mb-1">
+                  No Birthday Configuration Set
+                </h3>
+                <p className="text-sm text-amber-800 mb-3">
+                  You haven't configured your birthday messages yet. Set up your
+                  template and channels to start sending birthday wishes
+                  automatically.
+                </p>
+                <Button
+                  size="sm"
+                  onClick={() => setShowConfigForm(true)}
+                  className="bg-amber-600 hover:bg-amber-700"
+                >
+                  <Settings className="w-4 h-4 mr-2" />
+                  Configure Now
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Filters */}
         <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6">
@@ -1439,10 +1841,6 @@ export default function BirthdayDashboard() {
                             formatBirthday={formatBirthday}
                             onSendMessage={handleSendMessage}
                             sendingMessages={sendingMessages}
-                            selectedChannels={selectedChannels}
-                            hasConfig={
-                              !!selectedTemplate && selectedChannels.length > 0
-                            }
                           />
                         ))}
                     </div>
@@ -1463,10 +1861,6 @@ export default function BirthdayDashboard() {
                         formatBirthday={formatBirthday}
                         onSendMessage={handleSendMessage}
                         sendingMessages={sendingMessages}
-                        selectedChannels={selectedChannels}
-                        hasConfig={
-                          !!selectedTemplate && selectedChannels.length > 0
-                        }
                       />
                     ))}
                 </div>
@@ -1479,7 +1873,7 @@ export default function BirthdayDashboard() {
   );
 }
 
-// Birthday Card Component
+// Birthday Card Component - FIXED to always show both buttons
 function BirthdayCard({
   contact,
   isBirthdayToday,
@@ -1487,18 +1881,12 @@ function BirthdayCard({
   formatBirthday,
   onSendMessage,
   sendingMessages,
-  selectedChannels,
-  hasConfig,
 }) {
   const isToday = isBirthdayToday(contact.birthDay, contact.birthMonth);
   const isUpcoming = isBirthdayUpcoming(contact.birthDay, contact.birthMonth);
 
   const isSendingSMS = sendingMessages[`${contact._id}-sms`];
   const isSendingEmail = sendingMessages[`${contact._id}-email`];
-  const isSendingBoth = sendingMessages[`${contact._id}-both`];
-
-  const canSendSMS = selectedChannels.includes("sms");
-  const canSendEmail = selectedChannels.includes("email") && contact.email;
 
   return (
     <div
@@ -1541,89 +1929,53 @@ function BirthdayCard({
           </div>
         </div>
 
-        {/* Message Actions */}
+        {/* Message Actions - ALWAYS SHOW BOTH BUTTONS */}
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-sm text-gray-500 mr-2">{contact.role}</span>
 
-          {/* SMS Button */}
-          {canSendSMS && (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => onSendMessage(contact, "sms")}
-              disabled={isSendingSMS || !hasConfig}
-              className="text-blue-600 hover:text-blue-800 hover:bg-blue-50 border-blue-300 disabled:opacity-50"
-              title={
-                !hasConfig ? "Please configure settings first" : "Send SMS"
-              }
-            >
-              {isSendingSMS ? (
-                <>
-                  <div className="w-3 h-3 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mr-1"></div>
-                  Sending...
-                </>
-              ) : (
-                <>
-                  <Phone className="w-4 h-4 mr-1" />
-                  SMS
-                </>
-              )}
-            </Button>
-          )}
+          {/* SMS Button - Always visible */}
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => onSendMessage(contact, "sms")}
+            disabled={isSendingSMS}
+            className="text-blue-600 hover:text-blue-800 hover:bg-blue-50 border-blue-300 disabled:opacity-50"
+            title="Send SMS"
+          >
+            {isSendingSMS ? (
+              <>
+                <div className="w-3 h-3 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mr-1"></div>
+                Sending...
+              </>
+            ) : (
+              <>
+                <Phone className="w-4 h-4 mr-1" />
+                SMS
+              </>
+            )}
+          </Button>
 
-          {/* Email Button */}
-          {canSendEmail && (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => onSendMessage(contact, "email")}
-              disabled={isSendingEmail || !hasConfig}
-              className="text-green-600 hover:text-green-800 hover:bg-green-50 border-green-300 disabled:opacity-50"
-              title={
-                !hasConfig ? "Please configure settings first" : "Send email"
-              }
-            >
-              {isSendingEmail ? (
-                <>
-                  <div className="w-3 h-3 border-2 border-green-600 border-t-transparent rounded-full animate-spin mr-1"></div>
-                  Sending...
-                </>
-              ) : (
-                <>
-                  <Mail className="w-4 h-4 mr-1" />
-                  Email
-                </>
-              )}
-            </Button>
-          )}
-
-          {/* Both Button */}
-          {canSendSMS && canSendEmail && (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => onSendMessage(contact, "both")}
-              disabled={isSendingBoth || !hasConfig}
-              className="text-purple-600 hover:text-purple-800 hover:bg-purple-50 border-purple-300 disabled:opacity-50"
-              title={
-                !hasConfig
-                  ? "Please configure settings first"
-                  : "Send both SMS and Email"
-              }
-            >
-              {isSendingBoth ? (
-                <>
-                  <div className="w-3 h-3 border-2 border-purple-600 border-t-transparent rounded-full animate-spin mr-1"></div>
-                  Sending...
-                </>
-              ) : (
-                <>
-                  <Send className="w-4 h-4 mr-1" />
-                  Both
-                </>
-              )}
-            </Button>
-          )}
+          {/* Email Button - Always visible, disabled if no email */}
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => onSendMessage(contact, "email")}
+            disabled={isSendingEmail || !contact.email}
+            className="text-green-600 hover:text-green-800 hover:bg-green-50 border-green-300 disabled:opacity-50"
+            title={!contact.email ? "No email address available" : "Send email"}
+          >
+            {isSendingEmail ? (
+              <>
+                <div className="w-3 h-3 border-2 border-green-600 border-t-transparent rounded-full animate-spin mr-1"></div>
+                Sending...
+              </>
+            ) : (
+              <>
+                <Mail className="w-4 h-4 mr-1" />
+                Email
+              </>
+            )}
+          </Button>
         </div>
       </div>
     </div>
