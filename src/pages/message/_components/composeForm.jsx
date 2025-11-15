@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   Card,
   CardContent,
@@ -25,9 +26,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { ArrowRight, Bold, Italic, Underline } from "lucide-react";
-
+import TemplateListModal from "./templateListModal";
 const ComposeForm = ({ form, recipientGroups, onNext, isMobile }) => {
-  console.log(isMobile);
+  const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
+
   const {
     handleSubmit,
     formState: { isValid },
@@ -78,7 +80,17 @@ const ComposeForm = ({ form, recipientGroups, onNext, isMobile }) => {
               name="message"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Message</FormLabel>
+                  <div className="flex items-center justify-between">
+                    <FormLabel>Message</FormLabel>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsTemplateModalOpen(true)}
+                    >
+                      Insert Template
+                    </Button>
+                  </div>
                   <div className="border rounded-md">
                     <FormControl>
                       <Textarea
@@ -174,6 +186,11 @@ const ComposeForm = ({ form, recipientGroups, onNext, isMobile }) => {
             Next <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         )}
+        <TemplateListModal
+          isOpen={isTemplateModalOpen}
+          onOpenChange={setIsTemplateModalOpen}
+          onUseTemplate={(content) => form.setValue("message", content)}
+        />
       </form>
     </Form>
   );

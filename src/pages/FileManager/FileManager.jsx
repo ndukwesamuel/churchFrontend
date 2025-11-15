@@ -488,24 +488,30 @@ const FileManager = () => {
 
           {/* Library Header */}
           <CardHeader className="border-b">
-            <div className="flex items-center justify-between mb-4">
+            {/* Top row: Title + action buttons */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-4">
               <div>
-                <CardTitle>File Library</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-lg sm:text-xl">
+                  File Library
+                </CardTitle>
+                <CardDescription className="text-sm sm:text-base">
                   Manage your uploaded files and media
                 </CardDescription>
               </div>
-              <div className="flex space-x-3">
+
+              {/* Buttons stack on mobile */}
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
                 <Button
                   variant="outline"
                   onClick={() => setShowNewFolderInput(true)}
+                  className="w-full sm:w-auto"
                 >
                   <FolderPlus className="w-4 h-4 mr-2" />
                   New Folder
                 </Button>
                 <Button
                   onClick={() => setShowUploadModal(true)}
-                  className="flex items-center space-x-2  bg-deepPurple hover:bg-deepPurple"
+                  className="flex items-center justify-center bg-deepPurple hover:bg-deepPurple w-full sm:w-auto"
                 >
                   <Upload className="w-4 h-4 mr-2" />
                   Upload Files
@@ -513,9 +519,10 @@ const FileManager = () => {
               </div>
             </div>
 
-            {/* Search and Filter */}
-            <div className="flex items-center justify-between">
-              <div className="relative flex-1 max-w-md">
+            {/* Search + Filter row */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              {/* Search input */}
+              <div className="relative flex-1 w-full sm:max-w-md">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <Input
                   type="text"
@@ -525,9 +532,11 @@ const FileManager = () => {
                   className="pl-10"
                 />
               </div>
-              <div className="ml-4">
+
+              {/* Filter select */}
+              <div className="w-full sm:w-40">
                 <Select defaultValue="all">
-                  <SelectTrigger className="w-40">
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="All Types" />
                   </SelectTrigger>
                   <SelectContent>

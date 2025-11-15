@@ -1,16 +1,12 @@
 import { MessageSquareText } from "lucide-react";
-import { formatDate, truncateMessage } from "../../../utils/helpers";
-import { useFetchData } from "../../../hook/Request";
-
-const RecentMessages = () => {
+import { useFetchData } from "../../hook/Request";
+import { formatDate, truncateMessage } from "../../utils/helpers";
+const Campaigns = () => {
   const { data: messageData, loading } = useFetchData(
     `/api/v1/messages`,
     "messages"
   );
-
-  // Extract and limit to 8
   const messages = messageData?.data?.messages || [];
-  const recentMessages = messages.slice(0, 8);
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -33,38 +29,45 @@ const RecentMessages = () => {
     }
   };
 
-  const getMessageTypeBadge = (type) => type.toUpperCase();
+  const getMessageTypeBadge = (type) => type?.toUpperCase() || "UNKNOWN";
 
   return (
-    <div className="space-y-5">
+    <div className="p-4 space-y-5">
       <div>
-        <h2 className="text-lg font-semibold text-darkBlueGray">
-          Recent Campaigns
+        <h2 className="text-2xl font-semibold text-darkBlueGray">
+          All Campaigns
         </h2>
         <p className="text-inkyBlue mt-1 text-sm">
-          {recentMessages.length > 0
-            ? `Your Last ${recentMessages.length} Campaigns`
-            : "You don't have any Campaigns yet"}
+          {messages.length > 0
+            ? `Showing all ${messages.length} campaigns`
+            : "You don't have any campaigns yet."}
         </p>
       </div>
 
       {/* Empty State */}
-      {recentMessages.length === 0 && !loading && (
+      {messages.length === 0 && !loading && (
         <div className="flex flex-col items-center justify-center py-16 text-center text-blueBayoux">
           <MessageSquareText className="w-12 h-12 mb-4 text-blueBayoux opacity-70" />
           <p className="text-base sm:text-lg font-medium text-darkBlueGray">
-            No messages yet
+            No campaigns yet
           </p>
           <p className="text-sm text-inkyBlue mt-1">
-            When you send your first message, it'll appear here.
+            When you send your first campaign, it'll appear here.
           </p>
         </div>
       )}
 
-      {/*Message Grid */}
-      {recentMessages.length > 0 && (
+      {/* Loading State */}
+      {loading && (
+        <div className="flex justify-center items-center py-10 text-blueBayoux">
+          <p>Loading campaigns...</p>
+        </div>
+      )}
+
+      {/* Campaign Grid */}
+      {!loading && messages.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {recentMessages.map((message) => {
+          {messages.map((message) => {
             const statusBadge = getStatusBadge(message.status);
 
             return (
@@ -114,7 +117,7 @@ const RecentMessages = () => {
                   <p className="text-xs text-darkBlueGray">
                     To:{" "}
                     <span className="text-blueBayoux font-medium">
-                      {message.recipients[0]?.name}
+                      {message.recipients?.[0]?.name || "N/A"}
                     </span>
                   </p>
                   <p className="text-sm font-medium text-blueBayoux">
@@ -130,4 +133,4 @@ const RecentMessages = () => {
   );
 };
 
-export default RecentMessages;
+export default Campaigns;

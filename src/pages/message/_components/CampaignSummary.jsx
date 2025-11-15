@@ -43,7 +43,7 @@ const CampaignSummary = ({
 
           <div className="flex items-center justify-between">
             <span className="text-sm">Amount to Pay</span>
-            <span className="font-medium">₦{price}</span>
+            <span className="font-medium">#{price}</span>
           </div>
         </CardContent>
       </Card>

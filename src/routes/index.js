@@ -25,11 +25,11 @@ export const tabs = [
     label: "Compose",
     icon: PenTool,
   },
-  // {
-  //   path: "/campaigns",
-  //   label: "Campaigns",
-  //   icon: Megaphone,
-  // },
+  {
+    path: "/campaigns",
+    label: "Campaigns",
+    icon: Megaphone,
+  },
   {
     path: "/templates",
     label: "Templates",

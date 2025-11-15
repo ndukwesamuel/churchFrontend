@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import ImageScaleControl from "./imageScalePreview";
 import ImagePreviewModal from "./imagePreview";
+// import ImagePreview from "./imagePreview";
 
 const UploadModal = ({
   isOpen,
