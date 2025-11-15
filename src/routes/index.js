@@ -7,6 +7,7 @@ import {
   Settings,
   Home,
   UtensilsCrossed,
+  Wallet2,
 } from "lucide-react";
 
 export const tabs = [
@@ -14,6 +15,11 @@ export const tabs = [
     path: "/dashboard",
     label: "Dashboard",
     icon: Home,
+  },
+  {
+    path: "/wallet",
+    label: "Wallet",
+    icon: Wallet2,
   },
   {
     path: "/contacts",
