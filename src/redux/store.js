@@ -2,24 +2,6 @@ import { configureStore } from "@reduxjs/toolkit";
 import storage from "redux-persist/lib/storage";
 import { combineReducers } from "redux";
 import { persistReducer, persistStore } from "redux-persist";
-// import { counterSlice } from "./slice/counterSlice";
-// import { Auth } from "./AuthSlice";
-
-// import Auth from "./Auth";
-// import AuthenticationSlice from "./AuthenticationSlice";
-// import groupSlice from "./groupSlice";
-// import ProfileSlice from "./ProfileSlice";
-// import { walletApi } from "./WalletApi";
-// import { orderApi, groupOrderApi } from "./orderApi";
-// import { passwordResetApi } from "./PasswordResetApi";
-// import { categoryApi } from "./categoryApi";
-// import { groupApi } from "./groupApi";
-// import { userApi } from "./userApi";
-// import ProductSlice from "./ProductSlice";
-// import OrderSlice from "./OrderSlice";
-// import AdminRecipteSLice from "./AdminRecipteSLice";
-
-// AuthSlice
 
 import AuthSlice from "./AuthSlice";
 import estateSlice from "./estateSlice";
@@ -27,13 +9,6 @@ import estateSlice from "./estateSlice";
 const reducers = combineReducers({
   AuthSlice: AuthSlice,
   estateSlice: estateSlice,
-  //   counterSlice: counterSlice,
-  //   AuthenticationSlice: AuthenticationSlice,
-  //   groupSlice: groupSlice,
-  //   ProfileSlice: ProfileSlice,
-  //   ProductSlice: ProductSlice,
-  //   OrderSlice: OrderSlice,
-  //   AdminRecipteSLice: AdminRecipteSLice,
 });
 
 const persistConfig = {

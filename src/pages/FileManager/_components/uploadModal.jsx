@@ -15,6 +15,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import ImageScaleControl from "./imageScalePreview";
+import ImagePreviewModal from "./imagePreview";
 
 const UploadModal = ({
   isOpen,
@@ -103,7 +105,7 @@ const UploadModal = ({
           </h4>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-64 overflow-y-auto">
             {previewImages.map((imageData, index) => (
-              <ImagePreview
+              <ImagePreviewModal
                 key={index}
                 imageData={imageData}
                 index={index}

@@ -192,6 +192,9 @@ export default function AddContactModal({ onClose, contact }) {
       ...values,
       phoneNumber: standardizePhoneNumber(values.phoneNumber),
     };
+    console.log({
+      aaa: dataToSend,
+    });
 
     const mutation = isEditing ? updateContact : addContact;
     const url = isEditing

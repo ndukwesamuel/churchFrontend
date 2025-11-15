@@ -252,6 +252,11 @@ const FileManager = () => {
           ? await scaleImage(file)
           : file;
 
+      console.log({
+        rtyuu: selectedFolder,
+        emem: processedFile,
+      });
+
       uploadSingleImage(
         { folder_id: selectedFolder, imageFile: processedFile },
         {
@@ -264,6 +269,10 @@ const FileManager = () => {
             setIsUploading(false);
           },
           onError: (error) => {
+            console.log({
+              tyu: error,
+            });
+
             alert(error.message || "Failed to upload image. Please try again.");
             setIsUploading(false);
           },

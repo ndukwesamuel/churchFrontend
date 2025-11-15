@@ -41,6 +41,25 @@ export default function Login() {
     if (user) navigate("/dashboard");
   }, [user, navigate]);
 
+  // const onSubmit = async (formData) => {
+  //   try {
+  //     const response = await loginMutation.mutateAsync({
+  //       url: "/api/v1/auth/signin",
+  //       data: formData,
+  //     });
+
+  //     if (response?.error) {
+  //       toast.error(response.error);
+  //     } else {
+  //       dispatch(logindispatch(response));
+  //       toast.success("Login successful!");
+  //       navigate("/dashboard");
+  //     }
+  //   } catch (err) {
+  //     toast.error(err?.message || "Login failed");
+  //   }
+  // };
+
   const onSubmit = async (formData) => {
     try {
       const response = await loginMutation.mutateAsync({
@@ -51,11 +70,18 @@ export default function Login() {
       if (response?.error) {
         toast.error(response.error);
       } else {
+        // Log the response structure for debugging
+        console.log("Login Response:", {
+          hasToken: !!response?.data?.token,
+          hasUserId: !!(response?.data?.user?.id || response?.data?.id),
+        });
+
         dispatch(logindispatch(response));
         toast.success("Login successful!");
         navigate("/dashboard");
       }
     } catch (err) {
+      console.error("Login error:", err);
       toast.error(err?.message || "Login failed");
     }
   };
