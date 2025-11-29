@@ -5,7 +5,7 @@ import RouteGuard from "./utils/RouteGuard";
 import RootLayout from "./layouts/RootLayout";
 import ErrorPage from "./pages/ErrorPage";
 import BirthdayDashboard from "./pages/birthday/Birthdaydashboard";
-import CampaignDetails from "./pages/message/Campaigndetails";
+import CampaignDetails from "./pages/message/campaigndet";
 
 const Login = lazy(() => import("./pages/auth/Login"));
 const MainSignUp = lazy(() => import("./pages/auth/MainSignUp"));
