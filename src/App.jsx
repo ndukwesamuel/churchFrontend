@@ -59,7 +59,6 @@ const router = createBrowserRouter([
             path: "campaigns",
             children: [
               { index: true, element: <Campaigns /> },
-              // { path: "create", element: <CreateTemplate /> },
               { path: ":id", element: <CampaignDetails /> },
             ],
           },
