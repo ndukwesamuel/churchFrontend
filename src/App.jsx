@@ -5,6 +5,7 @@ import RouteGuard from "./utils/RouteGuard";
 import RootLayout from "./layouts/RootLayout";
 import ErrorPage from "./pages/ErrorPage";
 import BirthdayDashboard from "./pages/birthday/Birthdaydashboard";
+import CampaignDetails from "./pages/message/Campaigndetails";
 
 const Login = lazy(() => import("./pages/auth/Login"));
 const MainSignUp = lazy(() => import("./pages/auth/MainSignUp"));
@@ -52,7 +53,16 @@ const router = createBrowserRouter([
           { path: "/contacts", element: <Contacts /> },
           { path: "/contacts/bulk", element: <BulkUploadContacts /> },
           { path: "/compose", element: <MessageComposer /> },
-          { path: "/campaigns", element: <Campaigns /> },
+          // { path: "/campaigns", element: <Campaigns /> },
+
+          {
+            path: "campaigns",
+            children: [
+              { index: true, element: <Campaigns /> },
+              // { path: "create", element: <CreateTemplate /> },
+              { path: ":id", element: <CampaignDetails /> },
+            ],
+          },
 
           {
             path: "templates",
