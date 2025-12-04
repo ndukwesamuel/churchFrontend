@@ -11,6 +11,11 @@ const Campaigns = () => {
     "messages"
   );
   const messages = messageData?.data?.messages || [];
+
+  console.log({
+    yyuuu: messages,
+  });
+
   const [activeTab, setActiveTab] = useState("sent");
 
   // Separate messages into sent and scheduled
