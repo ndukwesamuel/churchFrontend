@@ -716,7 +716,7 @@ import ImagePreviewModal from "./_components/imagePreview";
 import { formatFileSize } from "../../utils/helpers";
 import FileItem from "./_components/fileItem";
 import EmptyState from "./_components/emptyState.jsx";
-import FolderDetailModal from "./_components/Folderdetailmodal.jsx";
+import FolderDetailModal from "./_components/Folderdetailmodal";
 
 const FileManager = () => {
   const [showUploadModal, setShowUploadModal] = useState(false);
