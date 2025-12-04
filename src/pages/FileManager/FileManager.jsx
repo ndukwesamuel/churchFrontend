@@ -711,10 +711,12 @@ import UploadModal from "./_components/uploadModal";
 import CreateFolderModal from "./_components/createFolderModal";
 import FolderCard from "./_components/folderCard";
 import ImagePreviewModal from "./_components/imagePreview";
-import FolderDetailModal from "./_components/folderDetailModal";
+// import FolderDetailModal from "./_components/folderDetailModal";
+// FolderDetailModal
 import { formatFileSize } from "../../utils/helpers";
 import FileItem from "./_components/fileItem";
 import EmptyState from "./_components/emptyState.jsx";
+import FolderDetailModal from "./_components/Folderdetailmodal.jsx";
 
 const FileManager = () => {
   const [showUploadModal, setShowUploadModal] = useState(false);
