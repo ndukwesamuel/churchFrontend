@@ -158,7 +158,7 @@ export const useSingleImageUpload = (queryKey) => {
       try {
         const response = await axios({
           url: `${apiUrl}/api/v1/collection/add-fileToFolder`, // New endpoint
-          method: "POST",
+          method: "PATCH",
           data: formData,
           headers: {
             Authorization: `Bearer ${token}`,
