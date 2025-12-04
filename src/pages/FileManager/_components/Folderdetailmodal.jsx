@@ -87,10 +87,10 @@ const FolderDetailModal = ({
                       variant="ghost"
                       size="sm"
                       className="text-white hover:bg-white/20"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onImageClick(photo);
-                      }}
+                      //   onClick={(e) => {
+                      //     e.stopPropagation();
+                      //     onImageClick(photo);
+                      //   }}
                     >
                       View
                     </Button>
