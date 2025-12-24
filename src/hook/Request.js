@@ -2,9 +2,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useSelector } from "react-redux";
 
-const apiUrl = "http://localhost:8000";
+// const apiUrl = "http://localhost:8000";
 
-// const apiUrl = "https://crude-melamie-samheart-84c01e76.koyeb.app";
+const apiUrl = "https://crude-melamie-samheart-84c01e76.koyeb.app";
 
 const fetchData = async (url, token) => {
   try {
