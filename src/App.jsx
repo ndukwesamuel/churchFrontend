@@ -6,21 +6,26 @@ import RootLayout from "./layouts/RootLayout";
 import ErrorPage from "./pages/ErrorPage";
 import BirthdayDashboard from "./pages/birthday/Birthdaydashboard";
 import CampaignDetails from "./pages/message/campaigndet";
+import EventsList from "./pages/Event/EventsList";
+import CreateEvent from "./pages/Event/CreateEvent";
+import PublicRegistration from "./pages/Event/PublicRegistration";
+import EventDashboard from "./pages/Event/EventDashboard";
+import EditEvent from "./pages/Event/EditEvent";
 
 const Login = lazy(() => import("./pages/auth/Login"));
 const MainSignUp = lazy(() => import("./pages/auth/MainSignUp"));
 const Dashboard = lazy(() => import("./pages/UserDashboard/Dashboard"));
 const Contacts = lazy(() => import("./pages/Contact/Contacts"));
-const BulkUploadContacts = lazy(() =>
-  import("./pages/Contact/BulkUploadContacts")
+const BulkUploadContacts = lazy(
+  () => import("./pages/Contact/BulkUploadContacts"),
 );
 const MessageComposer = lazy(() => import("./pages/message/messageComposer"));
 const TemplateManager = lazy(() => import("./pages/Template/template"));
-const CreateTemplate = lazy(() =>
-  import("./pages/Template/_components/createTemplate")
+const CreateTemplate = lazy(
+  () => import("./pages/Template/_components/createTemplate"),
 );
-const EditTemplate = lazy(() =>
-  import("./pages/Template/_components/editTemplate")
+const EditTemplate = lazy(
+  () => import("./pages/Template/_components/editTemplate"),
 );
 const FileManager = lazy(() => import("./pages/FileManager/FileManager"));
 const SettingsPage = lazy(() => import("./pages/settings/settings"));
@@ -42,6 +47,23 @@ const router = createBrowserRouter([
     element: <MainSignUp />,
     errorElement: <ErrorPage />,
   },
+
+  // Public Event Registration Routes (NO AUTH REQUIRED)
+  {
+    path: "/register/:eventId",
+    element: <PublicRegistration />,
+    errorElement: <ErrorPage />,
+  },
+  // {
+  //   path: "/register/:eventId/success",
+  //   element: <RegistrationSuccess />,
+  //   errorElement: <ErrorPage />,
+  // },
+  // {
+  //   path: "/register/:eventId/check",
+  //   element: <CheckRegistration />,
+  //   errorElement: <ErrorPage />,
+  // },
   {
     element: <RouteGuard />,
     errorElement: <ErrorPage />,
@@ -69,6 +91,18 @@ const router = createBrowserRouter([
               { index: true, element: <TemplateManager /> },
               { path: "create", element: <CreateTemplate /> },
               { path: ":templateId", element: <EditTemplate /> },
+            ],
+          },
+
+          // Events Routes (Protected - Admin Only)
+          {
+            path: "events",
+            children: [
+              { index: true, element: <EventsList /> },
+              { path: "create", element: <CreateEvent /> },
+              { path: ":eventId", element: <EventDashboard /> },
+              { path: ":eventId/edit", element: <EditEvent /> },
+              // { path: ":eventId/registrations", element: <RegistrationsList /> },
             ],
           },
           { path: "/files", element: <FileManager /> },

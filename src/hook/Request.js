@@ -1,9 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useSelector } from "react-redux";
-
 // const apiUrl = "http://localhost:8000";
 
+//"https://crude-melamie-samheart-84c01e76.koyeb.app";
 const apiUrl = "https://crude-melamie-samheart-84c01e76.koyeb.app";
 
 const fetchData = async (url, token) => {
@@ -40,11 +40,11 @@ const mutateData = async ({ url, token, data, method = "POST" }) => {
   } catch (error) {
     console.error(
       "Error in mutateData:",
-      error.response?.data || error.message
+      error.response?.data || error.message,
     );
     throw new Error(
       error.response?.data?.message ||
-        "Something went wrong while mutating data"
+        "Something went wrong while mutating data",
     );
   }
 };
@@ -169,10 +169,10 @@ export const useSingleImageUpload = (queryKey) => {
       } catch (error) {
         console.error(
           "Single image upload error:",
-          error.response?.data || error.message
+          error.response?.data || error.message,
         );
         throw new Error(
-          error.response?.data?.message || "Failed to upload image"
+          error.response?.data?.message || "Failed to upload image",
         );
       }
     },

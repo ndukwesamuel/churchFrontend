@@ -52,4 +52,10 @@ export const tabs = [
     label: "Settings",
     icon: Settings,
   },
+
+  {
+    path: "/events",
+    label: "Events",
+    icon: Settings,
+  },
 ];
