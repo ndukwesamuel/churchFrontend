@@ -1,4 +1,3 @@
-// pages/Events/EventDashboard.jsx
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -64,7 +63,7 @@ const EventDashboard = () => {
       )
     ) {
       deleteEvent(
-        { url: `/api/events/${eventId}` },
+        { url: `/api/v1/event/${eventId}` },
         {
           onSuccess: () => {
             toast.success("Event deleted successfully");
@@ -82,13 +81,14 @@ const EventDashboard = () => {
     setChangingStatus(true);
     updateEventStatus(
       {
-        url: `/api/events/${eventId}/status`,
+        url: `/api/v1/event/${eventId}/status`,
         data: { status: newStatus },
       },
       {
         onSuccess: () => {
           toast.success(`Event ${newStatus} successfully`);
           refetchEvent();
+          refetchStats();
           setChangingStatus(false);
         },
         onError: (error) => {
@@ -108,7 +108,7 @@ const EventDashboard = () => {
   const handleExport = async () => {
     try {
       const response = await fetch(
-        `http://localhost:8000/api/event-registrations/${eventId}/export`,
+        `http://localhost:8000/api/v1/event/registrations/${eventId}/export`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -231,24 +231,39 @@ const EventDashboard = () => {
 
           {/* Action Buttons */}
           <div className="flex flex-wrap gap-2">
+            {/* Draft Status - Show Open Registration Button */}
             {event.status === "draft" && (
               <button
                 onClick={() => handleStatusChange("open")}
                 disabled={changingStatus}
                 className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
               >
-                Open Registration
+                {changingStatus ? "Opening..." : "Open Registration"}
               </button>
             )}
+
+            {/* Open Status - Show Close Registration Button */}
             {event.status === "open" && (
               <button
                 onClick={() => handleStatusChange("closed")}
                 disabled={changingStatus}
                 className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50"
               >
-                Close Registration
+                {changingStatus ? "Closing..." : "Close Registration"}
               </button>
             )}
+
+            {/* Closed Status - Show Reopen Registration Button */}
+            {event.status === "closed" && (
+              <button
+                onClick={() => handleStatusChange("open")}
+                disabled={changingStatus}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              >
+                {changingStatus ? "Reopening..." : "Reopen Registration"}
+              </button>
+            )}
+
             <button
               onClick={copyRegistrationLink}
               className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"

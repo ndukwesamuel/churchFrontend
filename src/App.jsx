@@ -11,6 +11,7 @@ import CreateEvent from "./pages/Event/CreateEvent";
 import PublicRegistration from "./pages/Event/PublicRegistration";
 import EventDashboard from "./pages/Event/EventDashboard";
 import EditEvent from "./pages/Event/EditEvent";
+import RegistrationsList from "./pages/Event/RegistrationsList";
 
 const Login = lazy(() => import("./pages/auth/Login"));
 const MainSignUp = lazy(() => import("./pages/auth/MainSignUp"));
@@ -54,16 +55,7 @@ const router = createBrowserRouter([
     element: <PublicRegistration />,
     errorElement: <ErrorPage />,
   },
-  // {
-  //   path: "/register/:eventId/success",
-  //   element: <RegistrationSuccess />,
-  //   errorElement: <ErrorPage />,
-  // },
-  // {
-  //   path: "/register/:eventId/check",
-  //   element: <CheckRegistration />,
-  //   errorElement: <ErrorPage />,
-  // },
+
   {
     element: <RouteGuard />,
     errorElement: <ErrorPage />,
@@ -102,7 +94,10 @@ const router = createBrowserRouter([
               { path: "create", element: <CreateEvent /> },
               { path: ":eventId", element: <EventDashboard /> },
               { path: ":eventId/edit", element: <EditEvent /> },
-              // { path: ":eventId/registrations", element: <RegistrationsList /> },
+              {
+                path: ":eventId/registrations",
+                element: <RegistrationsList />,
+              },
             ],
           },
           { path: "/files", element: <FileManager /> },

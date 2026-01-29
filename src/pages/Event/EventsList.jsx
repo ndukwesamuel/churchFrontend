@@ -67,7 +67,7 @@ const EventsList = () => {
       )
     ) {
       deleteEvent(
-        { url: `/api/events/${eventId}` },
+        { url: `/api/v1/event/${eventId}` },
         {
           onSuccess: () => {
             toast.success("Event deleted successfully");
