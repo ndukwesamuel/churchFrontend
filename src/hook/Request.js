@@ -3,7 +3,6 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 // const apiUrl = "http://localhost:8000";
 
-//"https://crude-melamie-samheart-84c01e76.koyeb.app";
 const apiUrl = "https://crude-melamie-samheart-84c01e76.koyeb.app";
 
 const fetchData = async (url, token) => {

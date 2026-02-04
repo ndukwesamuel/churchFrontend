@@ -208,7 +208,7 @@ export default function AddContactModal({ onClose, contact }) {
       {
         onSuccess: () => onClose(),
         onError: (err) => console.error("Failed to save contact:", err),
-      }
+      },
     );
   };
 
@@ -242,7 +242,7 @@ export default function AddContactModal({ onClose, contact }) {
           >
             {/* Full Name */}
             <FormField
-              control={form.control}
+              control={form?.control}
               name="fullName"
               render={({ field }) => (
                 <FormItem>
@@ -257,7 +257,7 @@ export default function AddContactModal({ onClose, contact }) {
 
             {/* Email */}
             <FormField
-              control={form.control}
+              control={form?.control}
               name="email"
               render={({ field }) => (
                 <FormItem>
@@ -272,7 +272,7 @@ export default function AddContactModal({ onClose, contact }) {
 
             {/* Phone Number */}
             <FormField
-              control={form.control}
+              control={form?.control}
               name="phoneNumber"
               render={({ field }) => (
                 <FormItem>
@@ -292,7 +292,7 @@ export default function AddContactModal({ onClose, contact }) {
                         <div className="absolute right-3 top-1/2 -translate-y-1/2">
                           <span
                             className={`text-xs px-2 py-1 rounded-full border font-medium ${getNetworkColor(
-                              detectedNetwork
+                              detectedNetwork,
                             )}`}
                           >
                             {detectedNetwork}
@@ -329,7 +329,7 @@ export default function AddContactModal({ onClose, contact }) {
                             <SelectItem key={day} value={String(day)}>
                               {day}
                             </SelectItem>
-                          )
+                          ),
                         )}
                       </SelectContent>
                     </Select>
@@ -454,8 +454,8 @@ export default function AddContactModal({ onClose, contact }) {
                   ? "Updating..."
                   : "Update Contact"
                 : isAdding
-                ? "Saving..."
-                : "Save Contact"}
+                  ? "Saving..."
+                  : "Save Contact"}
             </Button>
           </form>
         </Form>

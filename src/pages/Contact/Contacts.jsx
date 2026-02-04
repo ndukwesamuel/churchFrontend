@@ -706,7 +706,7 @@ export default function Contacts() {
 
   const { data: contactData, refetch } = useFetchData(
     `/api/v1/contacts`,
-    "contacts"
+    "contacts",
   );
   const contacts = contactData?.data?.members || [];
   const groups = contactData?.data?.groups || [];
@@ -778,7 +778,7 @@ export default function Contacts() {
           let birthdayThisYear = new Date(
             thisYear,
             contactMonth - 1,
-            contactDay
+            contactDay,
           );
 
           // If birthday already passed this year, check next year
@@ -786,7 +786,7 @@ export default function Contacts() {
             birthdayThisYear = new Date(
               thisYear + 1,
               contactMonth - 1,
-              contactDay
+              contactDay,
             );
           }
 
@@ -859,7 +859,7 @@ export default function Contacts() {
         {
           onSuccess: () => refetch(),
           onError: (err) => console.error("Failed to delete contact:", err),
-        }
+        },
       );
     }
   };
@@ -892,7 +892,7 @@ export default function Contacts() {
             }}
             className="bg-deepPurple text-white px-4 py-2 rounded-md hover:bg-deepPurple"
           >
-            + Add Contact
+            + Add Contact. kaka
           </button>
         </div>
       </div>
@@ -1112,7 +1112,7 @@ export default function Contacts() {
           {filteredContacts.map((contact) => {
             const birthday = formatBirthday(
               contact.birthDay,
-              contact.birthMonth
+              contact.birthMonth,
             );
 
             return (
@@ -1223,7 +1223,7 @@ export default function Contacts() {
                 {filteredContacts.map((contact) => {
                   const birthday = formatBirthday(
                     contact.birthDay,
-                    contact.birthMonth
+                    contact.birthMonth,
                   );
 
                   return (
