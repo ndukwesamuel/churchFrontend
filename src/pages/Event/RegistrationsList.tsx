@@ -19,6 +19,9 @@ import {
 import { useFetchData, useDeleteData, usePatchData } from "../../hook/Request";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { BASE_API_URL } from "../../hook/api.config";
+
+const apiUrl = BASE_API_URL;
 
 const RegistrationsList = () => {
   const { eventId } = useParams();
@@ -161,7 +164,7 @@ const RegistrationsList = () => {
   const handleExport = async () => {
     try {
       const response = await fetch(
-        `http://localhost:8000/api/v1/event/registrations/${eventId}/export`,
+        `${apiUrl}/api/v1/event/registrations/${eventId}/export`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,

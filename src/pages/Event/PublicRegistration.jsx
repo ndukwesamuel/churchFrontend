@@ -13,8 +13,9 @@ import {
 import axios from "axios";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { BASE_API_URL } from "../../hook/api.config";
 
-const apiUrl = "http://localhost:8000/";
+const apiUrl = BASE_API_URL;
 
 const PublicRegistration = () => {
   const { eventId } = useParams();
@@ -33,7 +34,7 @@ const PublicRegistration = () => {
     const fetchEvent = async () => {
       try {
         const response = await axios.get(
-          `${apiUrl}api/v1/event/public/${eventId}`,
+          `${apiUrl}/api/v1/event/public/${eventId}`,
         );
 
         setEventData(response.data.data);
@@ -168,7 +169,7 @@ const PublicRegistration = () => {
 
     try {
       const response = await axios.post(
-        `${apiUrl}api/v1/event/public/${eventId}`,
+        `${apiUrl}/api/v1/event/public/${eventId}`,
         {
           registrantName,
           registrantEmail,
