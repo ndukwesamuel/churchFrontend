@@ -15,11 +15,21 @@ import {
   Trash2,
   MoreVertical,
   X,
+  Eye,
+  LogIn,
+  LogOut,
+  ScanLine,
 } from "lucide-react";
-import { useFetchData, useDeleteData, usePatchData } from "../../hook/Request";
+import {
+  useFetchData,
+  useDeleteData,
+  usePatchData,
+  useMutateData,
+} from "../../hook/Request";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { BASE_API_URL } from "../../hook/api.config";
+import RegistrationProfileModal from "./RegistrationProfileModal";
 
 const apiUrl = BASE_API_URL;
 
@@ -31,6 +41,7 @@ const RegistrationsList = () => {
   const [selectedRegistrations, setSelectedRegistrations] = useState([]);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [showBulkActions, setShowBulkActions] = useState(false);
+  const [profileRegistrationId, setProfileRegistrationId] = useState(null);
 
   const { data: eventData, isLoading: loadingEvent } = useFetchData(
     `/api/v1/event/${eventId}`,
@@ -51,6 +62,8 @@ const RegistrationsList = () => {
   const { mutate: updateRegistrationStatus } = usePatchData(
     "event-registrations",
   );
+  // Check-in endpoint is POST — toggles in/out server-side, so no body needed.
+  const { mutate: toggleCheckIn } = useMutateData("event-registrations");
 
   const event = eventData?.data;
   const allRegistrations = registrationsData?.data || [];
@@ -158,6 +171,26 @@ const RegistrationsList = () => {
         },
       );
     }
+  };
+
+  // Handle check-in / check-out toggle
+  const handleToggleCheckIn = (regId, currentlyCheckedIn) => {
+    toggleCheckIn(
+      { url: `/api/v1/event/registration/${regId}/checkin` },
+      {
+        onSuccess: (response) => {
+          toast.success(
+            response?.message ||
+              (currentlyCheckedIn ? "Checked out" : "Checked in"),
+          );
+          refetchRegistrations();
+          setOpenDropdown(null);
+        },
+        onError: (error) => {
+          toast.error(error?.message || "Failed to update check-in status");
+        },
+      },
+    );
   };
 
   // Handle export
@@ -280,13 +313,22 @@ const RegistrationsList = () => {
             <p className="text-gray-600 text-sm">{event.eventName}</p>
           </div>
 
-          <button
-            onClick={handleExport}
-            className="flex items-center justify-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
-          >
-            <Download className="w-4 h-4" />
-            Export to CSV
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => navigate(`/events/${eventId}/checkin`)}
+              className="flex items-center justify-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700"
+            >
+              <ScanLine className="w-4 h-4" />
+              Scan to Check In
+            </button>
+            <button
+              onClick={handleExport}
+              className="flex items-center justify-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+            >
+              <Download className="w-4 h-4" />
+              Export to CSV
+            </button>
+          </div>
         </div>
       </div>
 
@@ -468,6 +510,9 @@ const RegistrationsList = () => {
                     Status
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Checked In
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Registered
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -514,6 +559,25 @@ const RegistrationsList = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4">
+                      <span
+                        className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${
+                          registration.checkedIn
+                            ? "bg-green-100 text-green-800"
+                            : "bg-gray-100 text-gray-600"
+                        }`}
+                      >
+                        {registration.checkedIn ? (
+                          <>
+                            <LogIn className="w-3 h-3" /> In
+                          </>
+                        ) : (
+                          <>
+                            <LogOut className="w-3 h-3" /> Out
+                          </>
+                        )}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
                       <p className="text-sm text-gray-600">
                         {format(
                           new Date(registration.registeredAt),
@@ -541,6 +605,38 @@ const RegistrationsList = () => {
 
                         {openDropdown === registration._id && (
                           <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border z-10">
+                            <button
+                              onClick={() => {
+                                setProfileRegistrationId(registration._id);
+                                setOpenDropdown(null);
+                              }}
+                              className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
+                            >
+                              <Eye className="w-4 h-4 text-gray-600" />
+                              View Profile
+                            </button>
+                            <button
+                              onClick={() =>
+                                handleToggleCheckIn(
+                                  registration._id,
+                                  registration.checkedIn,
+                                )
+                              }
+                              className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
+                            >
+                              {registration.checkedIn ? (
+                                <>
+                                  <LogOut className="w-4 h-4 text-gray-600" />
+                                  Check Out
+                                </>
+                              ) : (
+                                <>
+                                  <LogIn className="w-4 h-4 text-green-600" />
+                                  Check In
+                                </>
+                              )}
+                            </button>
+                            <div className="border-t"></div>
                             <button
                               onClick={() =>
                                 handleStatusUpdate(
@@ -614,6 +710,14 @@ const RegistrationsList = () => {
           Showing {filteredRegistrations.length} of {allRegistrations.length}{" "}
           registration(s)
         </div>
+      )}
+
+      {profileRegistrationId && (
+        <RegistrationProfileModal
+          registrationId={profileRegistrationId}
+          onClose={() => setProfileRegistrationId(null)}
+          onCheckInToggled={() => refetchRegistrations()}
+        />
       )}
     </div>
   );

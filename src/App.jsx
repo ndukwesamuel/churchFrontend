@@ -12,6 +12,7 @@ import PublicRegistration from "./pages/Event/PublicRegistration";
 import EventDashboard from "./pages/Event/EventDashboard";
 import EditEvent from "./pages/Event/EditEvent";
 import RegistrationsList from "./pages/Event/RegistrationsList";
+import CheckInScanner from "./pages/Event/CheckInScanner";
 
 const Login = lazy(() => import("./pages/auth/Login"));
 const MainSignUp = lazy(() => import("./pages/auth/MainSignUp"));
@@ -97,6 +98,10 @@ const router = createBrowserRouter([
               {
                 path: ":eventId/registrations",
                 element: <RegistrationsList />,
+              },
+              {
+                path: ":eventId/checkin",
+                element: <CheckInScanner />,
               },
             ],
           },

@@ -17,7 +17,9 @@ import {
   Copy,
   BarChart3,
   QrCode,
+  LogIn,
   X,
+  ScanLine,
 } from "lucide-react";
 import { useFetchData, useDeleteData, usePatchData } from "../../hook/Request";
 import { format } from "date-fns";
@@ -240,7 +242,7 @@ const EventDashboard = () => {
           <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-semibold">
-                Event Registration QR Code
+                Sign-Up Link QR Code
               </h3>
               <button
                 onClick={() => setShowQRModal(false)}
@@ -355,7 +357,14 @@ const EventDashboard = () => {
               className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
             >
               <QrCode className="w-4 h-4" />
-              QR Code
+              Sign-Up QR
+            </button>
+            <button
+              onClick={() => navigate(`/events/${eventId}/checkin`)}
+              className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700"
+            >
+              <ScanLine className="w-4 h-4" />
+              Scan to Check In
             </button>
             <button
               onClick={copyRegistrationLink}
@@ -457,7 +466,7 @@ const EventDashboard = () => {
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-6">
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between mb-2">
             <Users className="w-8 h-8 text-blue-600" />
@@ -496,6 +505,16 @@ const EventDashboard = () => {
             </span>
           </div>
           <p className="text-sm text-gray-600">Attended</p>
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center justify-between mb-2">
+            <LogIn className="w-8 h-8 text-teal-600" />
+            <span className="text-3xl font-bold text-teal-600">
+              {stats?.currentlyCheckedIn || 0}
+            </span>
+          </div>
+          <p className="text-sm text-gray-600">Currently Checked In</p>
         </div>
       </div>
 
