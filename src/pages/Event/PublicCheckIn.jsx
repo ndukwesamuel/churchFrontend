@@ -44,7 +44,7 @@ const PublicCheckIn = () => {
           reg.registrantName.toLowerCase().includes(search) ||
           (reg.groupCode && reg.groupCode.toLowerCase().includes(search)),
       )
-    : [];
+    : registrations;
 
   const handleToggleCheckIn = async () => {
     if (!selected) return;
@@ -96,8 +96,10 @@ const PublicCheckIn = () => {
             <div className="text-center py-8">
               <Loader className="w-6 h-6 animate-spin text-purple-600 mx-auto" />
             </div>
-          ) : search && results.length === 0 ? (
-            <p className="text-center text-gray-500 py-6">No matches found</p>
+          ) : results.length === 0 ? (
+            <p className="text-center text-gray-500 py-6">
+              {search ? "No matches found" : "No registrants yet"}
+            </p>
           ) : (
             <div className="mt-4 divide-y divide-gray-100 max-h-96 overflow-y-auto">
               {results.map((reg) => (
