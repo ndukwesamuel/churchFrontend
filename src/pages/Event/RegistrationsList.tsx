@@ -758,6 +758,7 @@ import { format } from "date-fns";
 import { toast } from "sonner";
 import { BASE_API_URL } from "../../hook/api.config";
 import RegistrationProfileModal from "./RegistrationProfileModal";
+import GroupsPanel from "./GroupsPanel";
 
 const apiUrl = BASE_API_URL;
 
@@ -766,9 +767,11 @@ const RegistrationsList = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [groupFilter, setGroupFilter] = useState("all");
   const [selectedRegistrations, setSelectedRegistrations] = useState([]);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [showBulkActions, setShowBulkActions] = useState(false);
+  const [showGroupsPanel, setShowGroupsPanel] = useState(false);
   const [profileRegistrationId, setProfileRegistrationId] = useState(null);
 
   const { data: eventData, isLoading: loadingEvent } = useFetchData(
@@ -786,15 +789,23 @@ const RegistrationsList = () => {
     `event-registrations-${eventId}`,
   );
 
+  const {
+    data: groupsData,
+    isLoading: loadingGroups,
+    refetch: refetchGroups,
+  } = useFetchData(`/api/v1/event/${eventId}/groups`, `event-groups-${eventId}`);
+
   const { mutate: deleteRegistration } = useDeleteData("event-registrations");
   const { mutate: updateRegistrationStatus } = usePatchData(
     "event-registrations",
   );
+  const { mutate: assignGroup } = usePatchData("event-registrations");
   // Check-in endpoint is POST — toggles in/out server-side, so no body needed.
   const { mutate: toggleCheckIn } = useMutateData("event-registrations");
 
   const event = eventData?.data;
   const allRegistrations = registrationsData?.data || [];
+  const groups = groupsData?.data || [];
 
   // Filter registrations
   const filteredRegistrations = allRegistrations.filter((reg) => {
@@ -804,8 +815,31 @@ const RegistrationsList = () => {
 
     const matchesStatus = statusFilter === "all" || reg.status === statusFilter;
 
-    return matchesSearch && matchesStatus;
+    const matchesGroup =
+      groupFilter === "all" ||
+      (groupFilter === "none" ? !reg.groupId : reg.groupId === groupFilter);
+
+    return matchesSearch && matchesStatus && matchesGroup;
   });
+
+  // Handle assigning/unassigning a registrant to a group
+  const handleAssignGroup = (regId, groupId) => {
+    assignGroup(
+      {
+        url: `/api/v1/event/registration/${regId}/group`,
+        data: { groupId: groupId || null },
+      },
+      {
+        onSuccess: () => {
+          toast.success(groupId ? "Assigned to group" : "Unassigned from group");
+          refetchRegistrations();
+          refetchGroups();
+        },
+        onError: (error) =>
+          toast.error(error?.message || "Failed to assign group"),
+      },
+    );
+  };
 
   // Handle select all
   const handleSelectAll = (e) => {
@@ -1043,6 +1077,13 @@ const RegistrationsList = () => {
 
           <div className="flex gap-2">
             <button
+              onClick={() => setShowGroupsPanel(!showGroupsPanel)}
+              className="flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+            >
+              <Users className="w-4 h-4" />
+              {showGroupsPanel ? "Hide Groups" : "Manage Groups"}
+            </button>
+            <button
               onClick={() => navigate(`/events/${eventId}/checkin`)}
               className="flex items-center justify-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700"
             >
@@ -1059,6 +1100,15 @@ const RegistrationsList = () => {
           </div>
         </div>
       </div>
+
+      {showGroupsPanel && (
+        <GroupsPanel
+          eventId={eventId}
+          groups={groups}
+          loadingGroups={loadingGroups}
+          refetchGroups={refetchGroups}
+        />
+      )}
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
@@ -1141,6 +1191,20 @@ const RegistrationsList = () => {
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
           </div>
+
+          <select
+            value={groupFilter}
+            onChange={(e) => setGroupFilter(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+          >
+            <option value="all">All Groups</option>
+            <option value="none">Unassigned</option>
+            {groups.map((group) => (
+              <option key={group._id} value={group._id}>
+                {group.name}
+              </option>
+            ))}
+          </select>
 
           {selectedRegistrations.length > 0 && (
             <div className="flex items-center gap-2">
@@ -1241,6 +1305,9 @@ const RegistrationsList = () => {
                     Checked In
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Group
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Registered
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -1304,6 +1371,29 @@ const RegistrationsList = () => {
                           </>
                         )}
                       </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        {registration.groupCode && (
+                          <span className="px-2 py-0.5 rounded bg-purple-100 text-purple-800 text-xs font-semibold">
+                            {registration.groupCode}
+                          </span>
+                        )}
+                        <select
+                          value={registration.groupId || ""}
+                          onChange={(e) =>
+                            handleAssignGroup(registration._id, e.target.value)
+                          }
+                          className="text-sm border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        >
+                          <option value="">Unassigned</option>
+                          {groups.map((group) => (
+                            <option key={group._id} value={group._id}>
+                              {group.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <p className="text-sm text-gray-600">

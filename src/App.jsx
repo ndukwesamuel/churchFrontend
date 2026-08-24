@@ -9,6 +9,7 @@ import CampaignDetails from "./pages/message/campaigndet";
 import EventsList from "./pages/Event/EventsList";
 import CreateEvent from "./pages/Event/CreateEvent";
 import PublicRegistration from "./pages/Event/PublicRegistration";
+import PublicCheckIn from "./pages/Event/PublicCheckIn";
 import EventDashboard from "./pages/Event/EventDashboard";
 import EditEvent from "./pages/Event/EditEvent";
 import RegistrationsList from "./pages/Event/RegistrationsList";
@@ -54,6 +55,14 @@ const router = createBrowserRouter([
   {
     path: "/register/:eventId",
     element: <PublicRegistration />,
+    errorElement: <ErrorPage />,
+  },
+
+  // TEMPORARY — no login required, hardcoded to one event on the backend.
+  // Remove alongside the /public-test/* API routes by end of Sept 2026.
+  {
+    path: "/public-checkin",
+    element: <PublicCheckIn />,
     errorElement: <ErrorPage />,
   },
 
