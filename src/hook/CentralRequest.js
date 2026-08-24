@@ -76,52 +76,6 @@ const mutateData = async ({
     return handleApiError(error);
   }
 };
-// // const mutateData = async ({ url, token, data, method = "POST" }) => {
-// //   try {
-// //     const response = await axios({
-// //       method,
-// //       url: `${apiUrl}${url}`,
-// //       data,
-// //       headers: {
-// //         Authorization: `Bearer ${token}`,
-// //       },
-// //     });
-// //     return response.data;
-// //   } catch (error) {
-// //     throw new Error(
-// //       error.response?.data?.message ||
-// //         "Something went wrong while mutating data"
-// //     );
-// //   }
-// // };
-
-// // Reusable hook for GET requests
-// export const useFetchData = (url, queryKey, options = {}) => {
-//   const { user } = useSelector((state) => state?.reducer?.AuthSlice);
-//   const token = user?.token;
-//   return useQuery({
-//     queryKey: [queryKey, token],
-//     queryFn: () => fetchData(url, token),
-//     ...options,
-//   });
-// };
-
-// // Reusable hook for mutations (POST, PUT, DELETE)
-// export const useMutateData = (queryKey, method = "POST") => {
-//   const { user } = useSelector((state) => state?.reducer?.AuthSlice);
-//   const token = user?.token;
-//   const queryClient = useQueryClient();
-
-//   return useMutation({
-//     mutationFn: ({ url, data }) => mutateData({ url, token, data, method }),
-//     onSuccess: () => {
-//       queryClient.invalidateQueries([queryKey]);
-//     },
-//     onError: (error) => {
-//       throw error?.response;
-//     },
-//   });
-// };
 
 // Custom hooks
 export const useFetchData = (queryKey, url, options = {}) => {
