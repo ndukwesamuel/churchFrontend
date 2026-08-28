@@ -34,6 +34,8 @@ const FileManager = lazy(() => import("./pages/FileManager/FileManager"));
 const SettingsPage = lazy(() => import("./pages/settings/settings"));
 const FieldOfficers = lazy(() => import("./pages/FieldOfficers/FieldOfficers"));
 const Campaigns = lazy(() => import("./pages/message/campaign"));
+const WalletPage = lazy(() => import("./pages/wallet/wallet"));
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -115,6 +117,8 @@ const router = createBrowserRouter([
             ],
           },
           { path: "/files", element: <FileManager /> },
+          { path: "/wallet", element: <WalletPage /> },
+
           { path: "/settings", element: <SettingsPage /> },
           { path: "/birthday", element: <BirthdayDashboard /> },
           { path: "/field-officers", element: <FieldOfficers /> },
